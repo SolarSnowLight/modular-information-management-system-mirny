@@ -7,6 +7,8 @@ import (
 
 	_ "main-server/docs"
 
+	route "main-server/pkg/constants/route"
+
 	_ "github.com/swaggo/files"
 	swaggerFiles "github.com/swaggo/files"
 	_ "github.com/swaggo/gin-swagger"
@@ -27,12 +29,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	auth := router.Group("/auth")
+	auth := router.Group(route.AUTH_MAIN_ROUTE)
 	{
-		auth.POST("/sign-up", h.signUp)
-		auth.POST("/sign-in", h.signIn)
-		auth.POST("/refresh", h.refresh)
-		auth.POST("/logout", h.logout)
+		auth.POST(route.AUTH_SIGN_UP_ROUTE, h.signUp)
+		auth.POST(route.AUTH_SIGN_IN_ROUTE, h.signIn)
+		// auth.POST(route.AUTH_SIGN_IN_VK_ROUTE, )
+		// auth.POST(route.AUTH_SIGN_IN_GOOGLE_ROUTE, )
+		auth.POST(route.AUTH_REFRESH_TOKEN_ROUTE, h.refresh)
+		auth.POST(route.AUTH_LOGOUT_ROUTE, h.logout)
 	}
 
 	/*api := router.Group("/api", h.userIdentity)
