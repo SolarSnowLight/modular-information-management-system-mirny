@@ -27,6 +27,8 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
+	router.LoadHTMLGlob("pkg/templates/*")
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	auth := router.Group(route.AUTH_MAIN_ROUTE)
@@ -37,6 +39,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// auth.POST(route.AUTH_SIGN_IN_GOOGLE_ROUTE, )
 		auth.POST(route.AUTH_REFRESH_TOKEN_ROUTE, h.refresh)
 		auth.POST(route.AUTH_LOGOUT_ROUTE, h.logout)
+		auth.GET(route.AUTH_ACTIVATE_ROUTE, h.activate)
 	}
 
 	/*api := router.Group("/api", h.userIdentity)

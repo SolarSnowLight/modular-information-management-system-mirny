@@ -1,19 +1,21 @@
 package repository
 
 import (
-	"main-server/pkg/model"
+	rbacModel "main-server/pkg/model/rbac"
+	userModel "main-server/pkg/model/user"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type Authorization interface {
-	CreateUser(user model.UserRegisterModel) (model.UserAuthDataModel, error)
-	LoginUser(user model.UserLoginModel) (model.UserAuthDataModel, error)
-	Refresh(refreshToken model.TokenRefreshModel) (model.UserAuthDataModel, error)
-	Logout(tokens model.TokenDataModel) (bool, error)
+	CreateUser(user userModel.UserRegisterModel) (userModel.UserAuthDataModel, error)
+	LoginUser(user userModel.UserLoginModel) (userModel.UserAuthDataModel, error)
+	Refresh(refreshToken userModel.TokenRefreshModel) (userModel.UserAuthDataModel, error)
+	Logout(tokens userModel.TokenDataModel) (bool, error)
+	Activate(link string) (bool, error)
 
-	GetUser(column, value string) (model.UserModel, error)
-	GetRole(column, value string) (model.RoleModel, error)
+	GetUser(column, value string) (userModel.UserModel, error)
+	GetRole(column, value string) (rbacModel.RoleModel, error)
 }
 
 type Repository struct {

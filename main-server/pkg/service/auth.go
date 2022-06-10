@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"main-server/pkg/model"
+	userModel "main-server/pkg/model/user"
 	"main-server/pkg/repository"
 
 	"github.com/dgrijalva/jwt-go"
@@ -28,35 +28,42 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 /*
 *	Create user
  */
-func (s *AuthService) CreateUser(user model.UserRegisterModel) (model.UserAuthDataModel, error) {
+func (s *AuthService) CreateUser(user userModel.UserRegisterModel) (userModel.UserAuthDataModel, error) {
 	return s.repo.CreateUser(user)
 }
 
 /*
 *	Login user
  */
-func (s *AuthService) LoginUser(user model.UserLoginModel) (model.UserAuthDataModel, error) {
+func (s *AuthService) LoginUser(user userModel.UserLoginModel) (userModel.UserAuthDataModel, error) {
 	return s.repo.LoginUser(user)
 }
 
 /*
 *	Refresh user
  */
-func (s *AuthService) Refresh(refreshToken model.TokenRefreshModel) (model.UserAuthDataModel, error) {
+func (s *AuthService) Refresh(refreshToken userModel.TokenRefreshModel) (userModel.UserAuthDataModel, error) {
 	return s.repo.Refresh(refreshToken)
 }
 
 /*
 *	Logout user
  */
-func (s *AuthService) Logout(tokens model.TokenDataModel) (bool, error) {
+func (s *AuthService) Logout(tokens userModel.TokenDataModel) (bool, error) {
 	return s.repo.Logout(tokens)
+}
+
+/*
+*	Активация аккаунта
+ */
+func (s *AuthService) Activate(link string) (bool, error) {
+	return s.repo.Activate(link)
 }
 
 /*
 *	Token parsing function
  */
-func (s *AuthService) ParseToken(pToken, signingKey string) (model.TokenOutputParse, error) {
+func (s *AuthService) ParseToken(pToken, signingKey string) (userModel.TokenOutputParse, error) {
 	token, err := jwt.ParseWithClaims(pToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
@@ -66,32 +73,32 @@ func (s *AuthService) ParseToken(pToken, signingKey string) (model.TokenOutputPa
 	})
 
 	if !token.Valid {
-		return model.TokenOutputParse{}, errors.New("token is not valid")
+		return userModel.TokenOutputParse{}, errors.New("token is not valid")
 	}
 
 	if err != nil {
-		return model.TokenOutputParse{}, err
+		return userModel.TokenOutputParse{}, err
 	}
 
 	// Получение данных из токена (с преобразованием к указателю на tokenClaims)
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
-		return model.TokenOutputParse{}, errors.New("token claims are not of type")
+		return userModel.TokenOutputParse{}, errors.New("token claims are not of type")
 	}
 
 	user, err := s.repo.GetUser("uuid", claims.UsersId)
 
 	if err != nil {
-		return model.TokenOutputParse{}, err
+		return userModel.TokenOutputParse{}, err
 	}
 
 	role, err := s.repo.GetRole("uuid", claims.RolesId)
 
 	if err != nil {
-		return model.TokenOutputParse{}, err
+		return userModel.TokenOutputParse{}, err
 	}
 
-	return model.TokenOutputParse{
+	return userModel.TokenOutputParse{
 		UsersId: user.Id,
 		RolesId: role.Id,
 	}, nil
