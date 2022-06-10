@@ -37,8 +37,7 @@ export const userSlice = createSlice({
 
 
 
-const login =
-    (login: string, password: string): AppThunk =>
+const login = (login: string, password: string): AppThunk =>
     async dispatch => {
         const jwt = 'somejwt'
         const user = {
@@ -50,8 +49,7 @@ const login =
     }
 
 
-const logout =
-    (): AppThunk =>
+const logout = (): AppThunk =>
     async dispatch => {
         dispatch(setJwt(null))
         dispatch(setUser(null))
