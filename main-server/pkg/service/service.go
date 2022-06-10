@@ -1,19 +1,20 @@
 package service
 
 import (
-	"main-server/pkg/model"
+	userModel "main-server/pkg/model/user"
 	"main-server/pkg/repository"
 )
 
 type Authorization interface {
-	CreateUser(user model.UserRegisterModel) (model.UserAuthDataModel, error)
-	LoginUser(user model.UserLoginModel) (model.UserAuthDataModel, error)
-	Refresh(token model.TokenRefreshModel) (model.UserAuthDataModel, error)
-	Logout(tokens model.TokenDataModel) (bool, error)
+	CreateUser(user userModel.UserRegisterModel) (userModel.UserAuthDataModel, error)
+	LoginUser(user userModel.UserLoginModel) (userModel.UserAuthDataModel, error)
+	Refresh(token userModel.TokenRefreshModel) (userModel.UserAuthDataModel, error)
+	Logout(tokens userModel.TokenDataModel) (bool, error)
+	Activate(link string) (bool, error)
 
 	/*GenerateToken(email string, timeTTL time.Duration) (string, error)
 	GenerateTokenWithUuid(uuid string, timeTTL time.Duration) (string, error)*/
-	ParseToken(token, signingKey string) (model.TokenOutputParse, error)
+	ParseToken(token, signingKey string) (userModel.TokenOutputParse, error)
 }
 
 type Service struct {

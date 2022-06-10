@@ -18,4 +18,5 @@ const (
 	// MAIN
 	AUTH_REFRESH_TOKEN_ROUTE = "/refresh"
 	AUTH_LOGOUT_ROUTE        = "/logout"
+	AUTH_ACTIVATE_ROUTE      = "/activate/:link"
 )
