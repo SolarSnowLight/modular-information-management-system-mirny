@@ -1,5 +1,6 @@
 import {AnyAction, configureStore, ThunkAction} from '@reduxjs/toolkit'
-import userReducer from "./userSlice";
+import { userReducer } from "./userSlice";
+import { errorsReducer } from './errorsSlice'
 import {
     persistReducer,
     FLUSH,
@@ -34,6 +35,7 @@ const userPersistedReducer = persistReducer(
 export const store = configureStore({
     reducer: {
         user: userPersistedReducer,
+        errors: errorsReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

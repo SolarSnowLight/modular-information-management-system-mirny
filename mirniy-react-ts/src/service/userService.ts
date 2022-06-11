@@ -19,6 +19,9 @@ const login = async (login: string, password: string): Promise<ServiceData<Login
                 }}
             }
             data = data as BadRequest
+            if (status===401) {
+                return { error: { code: 'incorrect data', message: data.message } }
+            }
             return { error: { code: 'error', message: data.message } }
         },
         (error: AxiosError) => {
