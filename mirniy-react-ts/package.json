@@ -4,6 +4,7 @@
     "private": true,
     "dependencies": {
         "@reduxjs/toolkit": "^1.8.2",
+        "@rrainpath/ts-utils": "^0.1.1",
         "@testing-library/jest-dom": "^5.14.1",
         "@testing-library/react": "^13.0.0",
         "@testing-library/user-event": "^13.2.1",
@@ -11,6 +12,7 @@
         "@types/node": "^16.7.13",
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",
+        "axios": "^0.27.2",
         "react": "^18.1.0",
         "react-dom": "^18.1.0",
         "react-redux": "^8.0.2",

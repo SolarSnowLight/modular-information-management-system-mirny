@@ -1,7 +1,19 @@
 import {Link} from "react-router-dom";
+import {testApi} from "../api/testApi";
+import {AxiosError} from "axios";
 
 
 function Main(){
+
+    const makeError = () => {
+        testApi.makeError().then(
+            response => console.log('response', response),
+            (error: AxiosError) => {
+                console.log('error', error)
+                console.log('error code: ', error.code)
+            }
+        )
+    }
 
     return <>
         <Link to={'/signup'}>
@@ -10,7 +22,7 @@ function Main(){
         <Link to={'/login'}>
             <button>Вход</button>
         </Link>
-
+        <button onClick={makeError}>Error</button>
     </>
 }
 
