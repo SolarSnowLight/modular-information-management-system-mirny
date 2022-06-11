@@ -104,14 +104,30 @@ func (r *AuthPostgres) CreateUser(user userModel.UserRegisterModel) (userModel.U
 		return userModel.UserAuthDataModel{}, err
 	}
 
-	// Генерация токенов доступа и обновления
-	accessToken, err := GenerateToken(userUuid, role.Uuid, authConstants.TOKEN_TLL_ACCESS, viper.GetString("token.signing_key_access"))
+	/* Установка типа аутентификации пользователя (в данном случае - LOCAL) */
+	var authTypes userModel.AuthTypeModel
+	query = fmt.Sprintf("SELECT * FROM %s WHERE value=$1", tableConstants.AUTH_TYPES_TABLE)
+	err = r.db.Get(&authTypes, query, "LOCAL")
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, errors.New(err.Error())
+	}
+
+	query = fmt.Sprintf("INSERT INTO %s (users_id, auth_types_id) values ($1, $2)", tableConstants.USERS_AUTH_TYPES_TABLE)
+	_, err = tx.Exec(query, id, authTypes.Id)
 	if err != nil {
 		tx.Rollback()
 		return userModel.UserAuthDataModel{}, err
 	}
 
-	refreshToken, err := GenerateToken(userUuid, role.Uuid, authConstants.TOKEN_TLL_REFRESH, viper.GetString("token.signing_key_refresh"))
+	// Генерация токенов доступа и обновления
+	accessToken, err := GenerateToken(userUuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_ACCESS, viper.GetString("token.signing_key_access"))
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	refreshToken, err := GenerateToken(userUuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_REFRESH, viper.GetString("token.signing_key_refresh"))
 	if err != nil {
 		tx.Rollback()
 		return userModel.UserAuthDataModel{}, err
@@ -404,17 +420,18 @@ func generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(viper.GetString("crypt.salt"))))
 }
 
-// Структура определяющая данные токена
+/* Структура */
 type tokenClaims struct {
 	jwt.StandardClaims
-	UsersId string `json:"users_id"`
-	RolesId string `json:"roles_id"`
+	UsersId     string `json:"users_id"`
+	RolesId     string `json:"roles_id"`
+	AuthTypesId string `json:"auth_types_id"`
 }
 
 /*
 * Функция генерации токена
  */
-func GenerateToken(uuid, rolesUuid string, tokenTTL time.Duration, signingKey string) (string, error) {
+func GenerateToken(uuid, rolesUuid, authTypesUuid string, tokenTTL time.Duration, signingKey string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
@@ -422,6 +439,7 @@ func GenerateToken(uuid, rolesUuid string, tokenTTL time.Duration, signingKey st
 		},
 		uuid,
 		rolesUuid,
+		authTypesUuid,
 	})
 
 	return token.SignedString([]byte(signingKey))
