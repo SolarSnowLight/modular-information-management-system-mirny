@@ -22,10 +22,23 @@ type UserRegisterModel struct {
 	Password   string `json:"password" binding:"required"`
 }
 
+// Модель для регистрации через Google OAuth2
+type UserRegisterOAuth2Model struct {
+	Email      string `json:"email" binding:"required"`
+	FamilyName string `json:"family_name" binding:"required"`
+	GivenName  string `json:"given_name" binding:"required"`
+	Name       string `json:"name" binding:"required"`
+}
+
 // Модель для работы с данными при авторизации пользователя (парсинг JSON, etc.)
 type UserLoginModel struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
+}
+
+/* Модель для работы с данными при авторизации пользователя через Google OAuth2 */
+type UserLoginOAuth2Model struct {
+	Code string `json:"code" binding:"required"`
 }
 
 // Модель представляющая пользовательские авторизационные данные
@@ -38,4 +51,18 @@ type UserAuthDataModel struct {
 type UserActivateModel struct {
 	ActivationLink string `json:"activation_link" db:"activation_link"`
 	IsActivated    bool   `json:"is_activated" db:"is_activated"`
+}
+
+/* Модель для представления типов авторизации */
+type AuthTypeModel struct {
+	Id    int    `json:"id" db:"id"`
+	Uuid  string `json:"uuid" db:"uuid"`
+	Value string `json:"value" db:"value"`
+}
+
+/* Модель для связки пользователей с конкретными типами авторизаций */
+type UserAuthTypeModel struct {
+	Id          int `json:"id" db:"id"`
+	UsersId     int `json:"users_id" db:"users_id"`
+	AuthTypesId int `json:"auth_types_id" db:"auth_types_id"`
 }

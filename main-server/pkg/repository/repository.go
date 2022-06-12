@@ -5,11 +5,14 @@ import (
 	userModel "main-server/pkg/model/user"
 
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/oauth2"
 )
 
 type Authorization interface {
 	CreateUser(user userModel.UserRegisterModel) (userModel.UserAuthDataModel, error)
 	LoginUser(user userModel.UserLoginModel) (userModel.UserAuthDataModel, error)
+	LoginUserOAuth2(token *oauth2.Token) (userModel.UserAuthDataModel, error)
+	CreateUserOAuth2(userModel.UserRegisterOAuth2Model) (userModel.UserAuthDataModel, error)
 	Refresh(refreshToken userModel.TokenRefreshModel) (userModel.UserAuthDataModel, error)
 	Logout(tokens userModel.TokenDataModel) (bool, error)
 	Activate(link string) (bool, error)

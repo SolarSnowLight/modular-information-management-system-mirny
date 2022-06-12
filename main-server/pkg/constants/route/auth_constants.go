@@ -13,7 +13,7 @@ const (
 	AUTH_SIGN_IN_VK_ROUTE = "/sign-in/vk"
 
 	// Google
-	AUTH_SIGN_IN_GOOGLE_ROUTE = "/sign-in/google"
+	AUTH_SIGN_IN_GOOGLE_ROUTE = "/sign-in/oauth2"
 
 	// MAIN
 	AUTH_REFRESH_TOKEN_ROUTE = "/refresh"

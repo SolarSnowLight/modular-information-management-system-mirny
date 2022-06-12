@@ -6,6 +6,7 @@ import (
 	"main-server/pkg/repository"
 
 	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/oauth2"
 )
 
 // Структура определяющая данные токена
@@ -37,6 +38,13 @@ func (s *AuthService) CreateUser(user userModel.UserRegisterModel) (userModel.Us
  */
 func (s *AuthService) LoginUser(user userModel.UserLoginModel) (userModel.UserAuthDataModel, error) {
 	return s.repo.LoginUser(user)
+}
+
+/*
+*	Login user with Google OAuth2
+ */
+func (s *AuthService) LoginUserOAuth2(token *oauth2.Token) (userModel.UserAuthDataModel, error) {
+	return s.repo.LoginUserOAuth2(token)
 }
 
 /*
