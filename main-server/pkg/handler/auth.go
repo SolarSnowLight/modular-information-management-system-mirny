@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"main-server/configs"
 	userModel "main-server/pkg/model/user"
+	"main-server/pkg/service/google_oauth2"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -76,6 +78,83 @@ func (h *Handler) signIn(c *gin.Context) {
 	c.JSON(http.StatusOK, userModel.TokenAccessModel{
 		AccessToken: data.AccessToken,
 	})
+}
+
+// @Summary SignInVK
+// @Tags auth
+// @Description Авторизация пользователя через VK
+// @ID login
+// @Accept  json
+// @Produce  json
+// @Param input body model.UserLoginModel true "credentials"
+// @Success 200 {object} model.UserAuthDataModel "data"
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /auth/sign-in/vk [post]
+func (h *Handler) signInVK(c *gin.Context) {
+	var input userModel.UserLoginModel
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	data, err := h.services.Authorization.LoginUser(input)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// Добавление токена обновления в http only cookie
+	c.SetCookie(viper.GetString("environment.refresh_token_key"), data.RefreshToken,
+		30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
+
+	c.JSON(http.StatusOK, userModel.TokenAccessModel{
+		AccessToken: data.AccessToken,
+	})
+}
+
+// @Summary SignInOAuth2
+// @Tags auth
+// @Description Авторизация пользователя через Google OAuth2
+// @ID login
+// @Accept  json
+// @Produce  json
+// @Param input body model.UserLoginModel true "credentials"
+// @Success 200 {object} model.UserAuthDataModel "data"
+// @Failure 400,404 {object} errorResponse
+// @Failure 500 {object} errorResponse
+// @Failure default {object} errorResponse
+// @Router /auth/sign-in/oauth2 [post]
+func (h *Handler) signInOAuth2(c *gin.Context) {
+	var input userModel.GoogleOAuth2Code
+
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+		return
+	}
+
+	token, err := configs.AppOAuth2Config.GoogleLogin.Exchange(c, input.Code)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	is_verify, err := google_oauth2.VerifyAccessToken(token)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if !is_verify {
+		newErrorResponse(c, http.StatusBadRequest, "Данный токен не принадлежит данному пользователю!")
+		return
+	}
+
+	c.JSON(http.StatusOK, input)
 }
 
 // @Summary Refresh

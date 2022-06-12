@@ -3,6 +3,7 @@ package handler
 import (
 	"main-server/pkg/service"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
 	_ "main-server/docs"
@@ -23,11 +24,20 @@ func NewHandler(services *service.Service) *Handler {
 	return &Handler{services: services}
 }
 
-// Инициализация маршрутов
+/* Инициализация маршрутов */
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.LoadHTMLGlob("pkg/templates/*")
+
+	// Настройка CORS-политики
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins: true, // для тестов
+		// AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"POST", "GET"},
+		AllowHeaders:     []string{"Origin", "Content-type"},
+		AllowCredentials: true,
+	}))
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -35,6 +45,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		auth.POST(route.AUTH_SIGN_UP_ROUTE, h.signUp)
 		auth.POST(route.AUTH_SIGN_IN_ROUTE, h.signIn)
+		auth.POST(route.AUTH_SIGN_IN_GOOGLE_ROUTE, h.signInOAuth2)
 		// auth.POST(route.AUTH_SIGN_IN_VK_ROUTE, )
 		// auth.POST(route.AUTH_SIGN_IN_GOOGLE_ROUTE, )
 		auth.POST(route.AUTH_REFRESH_TOKEN_ROUTE, h.refresh)

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	mainserver "main-server"
+	"main-server/configs"
 	"main-server/pkg/handler"
 	"main-server/pkg/repository"
 	"main-server/pkg/service"
@@ -51,6 +52,9 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("failed to initialize db: %s", err.Error())
 	}
+
+	// Инициализация OAuth2 сервиса авторизации
+	configs.InitOAuth2Config()
 
 	// dependency injection
 	repos := repository.NewRepository(db)

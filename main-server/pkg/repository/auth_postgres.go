@@ -11,15 +11,16 @@ import (
 	tableConstants "main-server/pkg/constants/table"
 	"main-server/pkg/model/email"
 	rbacModel "main-server/pkg/model/rbac"
+	"main-server/pkg/model/user"
 	userModel "main-server/pkg/model/user"
 	smtpService "main-server/pkg/service/smtp"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/jmoiron/sqlx"
 	uuid "github.com/satori/go.uuid"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/oauth2"
 )
 
 type AuthPostgres struct {
@@ -88,12 +89,12 @@ func (r *AuthPostgres) CreateUser(user userModel.UserRegisterModel) (userModel.U
 		return userModel.UserAuthDataModel{}, err
 	}
 
-	query = fmt.Sprintf("SELECT * FROM %s WHERE value = $1 limit 1", tableConstants.ROLES_TABLE)
+	query = fmt.Sprintf("SELECT * FROM %s WHERE value = $1 LIMIT 1", tableConstants.ROLES_TABLE)
 	var role rbacModel.RoleModel
 	err = r.db.Get(&role, query, "USER")
 	if err != nil {
 		tx.Rollback()
-		return userModel.UserAuthDataModel{}, errors.New(err.Error())
+		return userModel.UserAuthDataModel{}, errors.New("Роли пользователя не существует!")
 	}
 
 	// Добавление роли пользователю (по-умолчанию данная роль - USER)
@@ -237,14 +238,23 @@ func (r *AuthPostgres) LoginUser(user userModel.UserLoginModel) (userModel.UserA
 		return userModel.UserAuthDataModel{}, errors.New("Пользователь не имеет роли!")
 	}
 
+	/* Получение типа аутентификации (в данном случае - LOCAL) */
+	var authTypes userModel.AuthTypeModel
+	query = fmt.Sprintf("SELECT * FROM %s WHERE value=$1", tableConstants.AUTH_TYPES_TABLE)
+	err = r.db.Get(&authTypes, query, "LOCAL")
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, errors.New(err.Error())
+	}
+
 	// Генерация токенов доступа и обновления
-	accessToken, err := GenerateToken(findUser.Uuid, role.Uuid, authConstants.TOKEN_TLL_ACCESS, viper.GetString("token.signing_key_access"))
+	accessToken, err := GenerateToken(findUser.Uuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_ACCESS, viper.GetString("token.signing_key_access"))
 	if err != nil {
 		tx.Rollback()
 		return userModel.UserAuthDataModel{}, err
 	}
 
-	refreshToken, err := GenerateToken(findUser.Uuid, role.Uuid, authConstants.TOKEN_TLL_REFRESH, viper.GetString("token.signing_key_refresh"))
+	refreshToken, err := GenerateToken(findUser.Uuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_REFRESH, viper.GetString("token.signing_key_refresh"))
 	if err != nil {
 		tx.Rollback()
 		return userModel.UserAuthDataModel{}, err
@@ -262,6 +272,253 @@ func (r *AuthPostgres) LoginUser(user userModel.UserLoginModel) (userModel.UserA
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, tx.Commit()
+}
+
+/*
+* Создание пользователя через OAuth2
+ */
+func (r *AuthPostgres) CreateUserOAuth2(user user.UserRegisterOAuth2Model) (userModel.UserAuthDataModel, error) {
+	return userModel.UserAuthDataModel{}, nil
+	/*check := CheckRowExists(r.db, tableConstants.USERS_TABLE, "email", user.Email)
+
+	if check {
+		return userModel.UserAuthDataModel{}, errors.New("Пользователь с данным email-адресом уже существует!")
+	}
+
+	// Начало транзакции
+	tx, err := r.db.Begin()
+	if err != nil {
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	// Хэширование пароля
+	// user.Password = generatePasswordHash(user.Password)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), viper.GetInt("crypt.cost"))
+	if err != nil {
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	user.Password = string(hashedPassword)
+
+	var id int
+	var userUuid string
+
+	// Запрос на добавление нового пользователя в систему
+	query := fmt.Sprintf("INSERT INTO %s (email, password, uuid) values ($1, $2, $3) RETURNING id, uuid", tableConstants.USERS_TABLE)
+
+	// Генерация UUID
+	u1 := uuid.NewV4()
+
+	row := tx.QueryRow(query, user.Email, user.Password, u1)
+	if err := row.Scan(&id, &userUuid); err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, errors.New("Пользователь с данными регистрационными данными уже существует!")
+	}
+
+	// Запрос на добавление пользовательских данных
+	query = fmt.Sprintf(
+		`INSERT INTO %s (name, surname, patronymic, gender, phone, nickname, date_birth, date_registration, users_id)
+		values ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+		tableConstants.USERS_DATA_TABLE)
+
+	_, err = tx.Exec(query, user.Name, user.Surname,
+		user.Patronymic, user.Gender, user.Phone,
+		user.Nickname, user.DateBirth, time.Now(), id)
+
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	query = fmt.Sprintf("SELECT * FROM %s WHERE value = $1 LIMIT 1", tableConstants.ROLES_TABLE)
+	var role rbacModel.RoleModel
+	err = r.db.Get(&role, query, "USER")
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, errors.New("Роли пользователя не существует!")
+	}
+
+	// Добавление роли пользователю (по-умолчанию данная роль - USER)
+	query = fmt.Sprintf("INSERT INTO %s (users_id, roles_id) VALUES ($1, $2)", tableConstants.USERS_ROLES_TABLE)
+	_, err = tx.Exec(query, id, role.Id)
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	// Установка типа аутентификации пользователя (в данном случае - LOCAL)
+	var authTypes userModel.AuthTypeModel
+	query = fmt.Sprintf("SELECT * FROM %s WHERE value=$1", tableConstants.AUTH_TYPES_TABLE)
+	err = r.db.Get(&authTypes, query, "LOCAL")
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, errors.New(err.Error())
+	}
+
+	query = fmt.Sprintf("INSERT INTO %s (users_id, auth_types_id) values ($1, $2)", tableConstants.USERS_AUTH_TYPES_TABLE)
+	_, err = tx.Exec(query, id, authTypes.Id)
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	// Генерация токенов доступа и обновления
+	accessToken, err := GenerateToken(userUuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_ACCESS, viper.GetString("token.signing_key_access"))
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	refreshToken, err := GenerateToken(userUuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_REFRESH, viper.GetString("token.signing_key_refresh"))
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	// Установка токенов пользователю
+	query = fmt.Sprintf("INSERT INTO %s (users_id, access_token, refresh_token) values ($1, $2, $3)", tableConstants.TOKENS_TABLE)
+	_, err = tx.Exec(query, id, accessToken, refreshToken)
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	// Добавление ссылки на активацию аккаунта
+	// Генерация UUID
+	u2 := uuid.NewV4()
+	query = fmt.Sprintf("INSERT INTO %s (users_id, is_activated, activation_link) values ($1, $2, $3)", tableConstants.ACTIVATIONS_TABLE)
+	_, err = tx.Exec(query, id, false, u2)
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	//auth := smtp.PlainAuth("", viper.GetString("smtp.email"), os.Getenv("SMTP_PASSWORD"), viper.GetString("smtp.host"))
+
+	//err = smtp.SendMail(viper.GetString("smtp.host")+":"+viper.GetString("smtp.port"), auth,
+		//viper.GetString("smtp.email"), []string{user.Email}, []byte(`<p>Hello, world!</p>`))
+
+	err = smtpService.SendMessage(user.Email, smtpService.BuildMessage(email.Mail{
+		Sender:  viper.GetString("smtp.email"),
+		To:      []string{user.Email},
+		Subject: "Подтверждение аккаунта \"МИСУ Мирный\"",
+		Body: fmt.Sprintf(`<html>
+		<head>
+			<meta charset="utf-8" />
+			<title></title>
+		</head>
+		<style>
+			body {background-color: #FEFEF9;}
+			h2   {color: #181511;}
+			button {
+				color: rgb(0, 0, 0);
+				outline: none;
+				border: none;
+				border-radius: 30px;
+				background-color: #B19472;
+				padding: 8px 16px;
+				margin-top: 16px;
+				cursor: pointer;
+			}
+		</style>
+		<body>
+			<h2>Подтверждение E-mail</h2>
+			<br><text>Вы получили это письмо, так как Ваш почтовый адрес был указан в приложении "МИСУ Мирный".</text>
+			</br><text>Чтобы подтвердить Вашу почту перейдите по ссылке: </text></br>
+			<a href="%s">
+			<button>Подтвердить E-mail</button>
+			</a>
+			<br><br><br>
+			<text>Если Вы не проходили процедуру регистрации в приложении "МИСУ Мирный", то не отвечайте на данное сообщение.</text>
+		</body>
+	</html>`, viper.GetString("api_url")+"/auth/activate/"+u2.String()),
+	}))
+
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	return userModel.UserAuthDataModel{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, tx.Commit()*/
+}
+
+/*
+* Функция авторизации пользователя через Google OAuth2
+ */
+func (r *AuthPostgres) LoginUserOAuth2(token *oauth2.Token) (userModel.UserAuthDataModel, error) {
+	return userModel.UserAuthDataModel{}, nil
+	/*var findUser userModel.UserModel
+	var userData userModel.UserRegisterOAuth2Model
+
+	userData, err := google_oauth2.GetUserInfo(token)
+
+	if err != nil {
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	query := fmt.Sprintf("SELECT * FROM %s tl WHERE tl.email = $1", tableConstants.USERS_TABLE)
+	if err := r.db.Get(&findUser, query, userData.Email); err != nil {
+		// Если пользователя не существует - создаём его
+		return r.CreateUserOAuth2(userData)
+	}
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	query = fmt.Sprintf("DELETE FROM %s tl WHERE tl.users_id = $1", tableConstants.TOKENS_TABLE)
+	if _, err := r.db.Exec(query, findUser.Id); err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	query = fmt.Sprintf(`SELECT roles.id, roles.uuid, roles.value, roles.description, roles.users_id FROM %s
+			INNER JOIN %s on users_roles.roles_id = roles.id WHERE users_roles.users_id = $1`, tableConstants.USERS_ROLES_TABLE, tableConstants.ROLES_TABLE)
+
+	var role rbacModel.RoleModel
+	if err := r.db.Get(&role, query, findUser.Id); err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, errors.New("Пользователь не имеет роли!")
+	}
+
+	// Получение типа аутентификации (в данном случае - GOOGLE)
+	var authTypes userModel.AuthTypeModel
+	query = fmt.Sprintf("SELECT * FROM %s WHERE value=$1", tableConstants.AUTH_TYPES_TABLE)
+	err = r.db.Get(&authTypes, query, "GOOGLE")
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, errors.New(err.Error())
+	}
+
+	// Генерация токенов доступа и обновления
+	accessToken, err := GenerateToken(findUser.Uuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_ACCESS, viper.GetString("token.signing_key_access"))
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	refreshToken, err := GenerateToken(findUser.Uuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_REFRESH, viper.GetString("token.signing_key_refresh"))
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	// Установка токенов пользователю
+	query = fmt.Sprintf("INSERT INTO %s (users_id, access_token, refresh_token) values ($1, $2, $3)", tableConstants.TOKENS_TABLE)
+	_, err = tx.Exec(query, findUser.Id, accessToken, refreshToken)
+	if err != nil {
+		tx.Rollback()
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	return userModel.UserAuthDataModel{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, tx.Commit()*/
 }
 
 /*
@@ -301,9 +558,16 @@ func (r *AuthPostgres) Refresh(token userModel.TokenRefreshModel) (userModel.Use
 
 	var refreshToken string
 
-	logrus.Info(isValid)
+	/* Получение типа аутентификации (в данном случае - LOCAL) */
+	var authTypes userModel.AuthTypeModel
+	query = fmt.Sprintf("SELECT * FROM %s WHERE value=$1", tableConstants.AUTH_TYPES_TABLE)
+	err = r.db.Get(&authTypes, query, "LOCAL")
+	if err != nil {
+		return userModel.UserAuthDataModel{}, errors.New(err.Error())
+	}
+
 	if !isValid {
-		refreshToken, err = GenerateToken(user.Uuid, role.Uuid, authConstants.TOKEN_TLL_REFRESH, viper.GetString("token.signing_key_refresh"))
+		refreshToken, err = GenerateToken(user.Uuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_REFRESH, viper.GetString("token.signing_key_refresh"))
 		if err != nil {
 			return userModel.UserAuthDataModel{}, err
 		}
@@ -315,7 +579,7 @@ func (r *AuthPostgres) Refresh(token userModel.TokenRefreshModel) (userModel.Use
 		refreshToken = token.RefreshToken
 	}
 
-	accessToken, err := GenerateToken(user.Uuid, role.Uuid, authConstants.TOKEN_TLL_ACCESS, viper.GetString("token.signing_key_access"))
+	accessToken, err := GenerateToken(user.Uuid, role.Uuid, authTypes.Uuid, authConstants.TOKEN_TLL_ACCESS, viper.GetString("token.signing_key_access"))
 	if err != nil {
 		return userModel.UserAuthDataModel{}, err
 	}
@@ -420,7 +684,7 @@ func generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(viper.GetString("crypt.salt"))))
 }
 
-/* Структура */
+/* Структура тела токена */
 type tokenClaims struct {
 	jwt.StandardClaims
 	UsersId     string `json:"users_id"`
