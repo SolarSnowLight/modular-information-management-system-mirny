@@ -20,7 +20,7 @@ function Main(){
             <button>Регистрация</button>
         </Link>
         <Link to={'/login'}>
-            <button>Вход</button>
+            <button>Вход & Выход</button>
         </Link>
         <button onClick={makeError}>Error</button>
     </>
