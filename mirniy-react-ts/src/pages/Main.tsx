@@ -5,7 +5,7 @@ import {AxiosError} from "axios";
 
 function Main(){
 
-    const makeError = () => {
+    /*const makeError = () => {
         testApi.makeError().then(
             response => console.log('response', response),
             (error: AxiosError) => {
@@ -13,7 +13,7 @@ function Main(){
                 console.log('error code: ', error.code)
             }
         )
-    }
+    }*/
 
     return <>
         <Link to={'/signup'}>
@@ -22,7 +22,10 @@ function Main(){
         <Link to={'/login'}>
             <button>Вход & Выход</button>
         </Link>
-        <button onClick={makeError}>Error</button>
+        {/*<button onClick={makeError}>Error</button>*/}
+        <Link to={'/article'}>
+            <button>Статья</button>
+        </Link>
     </>
 }
 
