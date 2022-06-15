@@ -9,6 +9,8 @@ import {useDebounce} from "../hooks/useDebounce";
 import {useObjectToKey} from "../hooks/useOjectToKey";
 
 
+const imageExtensions = /\.((jpg)|(jpeg)|(png)|(webp)|(bmp)|(jfif))$/i
+
 
 function Article(){
 
@@ -29,17 +31,48 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
     const onDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         if (isDraggingFiles){
             console.log('DROP:',ev)
-            const imgs = [] as File[]
-            for (const f of ev.dataTransfer.files) {
-                /*
+
+            /*
+                dataTransfer.items[*].type:
                     type: "image/jpeg"
                     type: "image/png"
                     type: "image/webp"
-                 */
+             */
+
+
+            /*
+            const imgs = [] as File[]
+
+            for (const f of ev.dataTransfer.files) {
+
+
                 if (!f.type.startsWith('image/')) continue
                 imgs.push(f)
             }
             setImages([...images,...imgs])
+            */
+
+            const addImg = (file: File) => {
+                if (imageExtensions.test(file.name))
+                    setImages(images=>[...images, file])
+            }
+
+            for (const item of ev.dataTransfer.items){
+                const fsItem = item.webkitGetAsEntry()
+                walkFileTree(fsItem, addImg)
+                /*if (fsItem?.isFile){
+                    const fsFile = fsItem as FileSystemFileEntry
+                    fsFile.file(
+                        addImg,
+                        err=>console.log('error creating file object: ',err)
+                    )
+                } else if (fsItem?.isDirectory){
+                    console.log("IS DIRECTORY!!!")
+                }*/
+
+            }
+
+
         }
 
         /*
@@ -122,7 +155,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
                 isDraggingFiles &&
                 <div onDrop={onDrop} className={css.dragOverlay}>
                     <div className={css.dragOverlayText}>
-                        drop files here
+                        drop files & folders here
                     </div>
                 </div>
             }
@@ -166,4 +199,21 @@ const ImagePreview = ({ file, onRemove }: { file: File, onRemove: (file:File)=>v
 }
 
 
+
+
+function walkFileTree(fsItem: FileSystemEntry|null, onFile: (file:File)=>void){
+    if (fsItem?.isFile){
+        const fsFile = fsItem as FileSystemFileEntry
+        fsFile.file(
+            onFile,
+            err=>console.log('error creating file object: ',err)
+        )
+    } else if (fsItem?.isDirectory){
+        const fsDir = fsItem as FileSystemDirectoryEntry
+        fsDir.createReader().readEntries(
+            (fsItems: FileSystemEntry[]) => fsItems.forEach(it=>walkFileTree(it,onFile)),
+            err=>console.log('error reading directory: ',err)
+        )
+    }
+}
 
