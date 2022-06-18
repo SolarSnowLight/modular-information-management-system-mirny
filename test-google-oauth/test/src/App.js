@@ -12,7 +12,8 @@ function App() {
   const loginOAuthHandler = async (response) => {
     try {
 
-      const data = await request("http://localhost:5000/auth/sign-in/oauth2", 'POST', { code: response.code });
+      console.log(response.code);
+      //const data = await request("http://localhost:5000/auth/sign-in/oauth2", 'POST', { code: response.code });
     } catch (e) { 
       console.log(e);
     }

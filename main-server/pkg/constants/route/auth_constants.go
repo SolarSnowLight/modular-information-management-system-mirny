@@ -10,7 +10,8 @@ const (
 	AUTH_SIGN_UP_ROUTE = "/sign-up"
 
 	// VK
-	AUTH_SIGN_IN_VK_ROUTE = "/sign-in/vk"
+	AUTH_SIGN_IN_VK_ROUTE          = "/sign-in/vk"
+	AUTH_SIGN_IN_VK_CALLBACK_ROUTE = "/sign-in/vk/callback"
 
 	// Google
 	AUTH_SIGN_IN_GOOGLE_ROUTE = "/sign-in/oauth2"

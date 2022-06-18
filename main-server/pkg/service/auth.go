@@ -1,29 +1,24 @@
 package service
 
 import (
-	"errors"
 	userModel "main-server/pkg/model/user"
 	"main-server/pkg/repository"
 
-	"github.com/dgrijalva/jwt-go"
-	"golang.org/x/oauth2"
+	"github.com/spf13/viper"
 )
-
-// Структура определяющая данные токена
-type tokenClaims struct {
-	jwt.StandardClaims
-	UsersId string `json:"users_id"`
-	RolesId string `json:"roles_id"`
-}
 
 // Структура репозитория
 type AuthService struct {
-	repo repository.Authorization
+	repo         repository.Authorization
+	tokenService TokenService
 }
 
 // Функция создания нового репозитория
-func NewAuthService(repo repository.Authorization) *AuthService {
-	return &AuthService{repo: repo}
+func NewAuthService(repo repository.Authorization, tokenService TokenService) *AuthService {
+	return &AuthService{
+		repo:         repo,
+		tokenService: tokenService,
+	}
 }
 
 /*
@@ -43,21 +38,27 @@ func (s *AuthService) LoginUser(user userModel.UserLoginModel) (userModel.UserAu
 /*
 *	Login user with Google OAuth2
  */
-func (s *AuthService) LoginUserOAuth2(token *oauth2.Token) (userModel.UserAuthDataModel, error) {
-	return s.repo.LoginUserOAuth2(token)
+func (s *AuthService) LoginUserOAuth2(code string) (userModel.UserAuthDataModel, error) {
+	return s.repo.LoginUserOAuth2(code)
 }
 
 /*
 *	Refresh user
  */
-func (s *AuthService) Refresh(refreshToken userModel.TokenRefreshModel) (userModel.UserAuthDataModel, error) {
-	return s.repo.Refresh(refreshToken)
+func (s *AuthService) Refresh(data userModel.TokenLogoutDataModel, refreshToken string) (userModel.UserAuthDataModel, error) {
+	token, err := s.tokenService.ParseTokenWithoutValid(refreshToken, viper.GetString("token.signing_key_refresh"))
+
+	if err != nil {
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	return s.repo.Refresh(data, refreshToken, token)
 }
 
 /*
 *	Logout user
  */
-func (s *AuthService) Logout(tokens userModel.TokenDataModel) (bool, error) {
+func (s *AuthService) Logout(tokens userModel.TokenLogoutDataModel) (bool, error) {
 	return s.repo.Logout(tokens)
 }
 
@@ -72,7 +73,8 @@ func (s *AuthService) Activate(link string) (bool, error) {
 *	Token parsing function
  */
 func (s *AuthService) ParseToken(pToken, signingKey string) (userModel.TokenOutputParse, error) {
-	token, err := jwt.ParseWithClaims(pToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+	return userModel.TokenOutputParse{}, nil
+	/*token, err := jwt.ParseWithClaims(pToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("invalid signing method")
 		}
@@ -109,5 +111,5 @@ func (s *AuthService) ParseToken(pToken, signingKey string) (userModel.TokenOutp
 	return userModel.TokenOutputParse{
 		UsersId: user.Id,
 		RolesId: role.Id,
-	}, nil
+	}, nil*/
 }
