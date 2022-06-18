@@ -1,10 +1,22 @@
 import {Reducer} from "redux";
 
 
+
+type Article = undefined | {
+    text: string,
+    images: {
+        index: number,
+        file: File
+    }
+}
+
+
 type AppState = typeof initialState
 const initialState = {
     isDragging: false,
     isDraggingFiles: false,
+
+    article: undefined as Article,
 }
 
 
@@ -19,6 +31,12 @@ export const appReducer: Reducer<AppState> = (state = initialState, action) => {
             ...state,
             isDraggingFiles: action.payload as SetDraggingFilesActionPayload
         }
+
+        case 'setArticle': return {
+            ...state,
+            article: action.payload
+        }
+
         default: return state
     }
 }
@@ -32,7 +50,6 @@ const setDragging = (isDragging = true) => ({
     type: 'setDragging', payload: isDragging as SetDraggingActionPayload
 })
 
-
 type SetDraggingFilesActionPayload = boolean
 const setDraggingFiles = (isDraggingFiles = true) => ({
     type: 'setDraggingFiles', payload: isDraggingFiles as SetDraggingFilesActionPayload
@@ -40,7 +57,15 @@ const setDraggingFiles = (isDraggingFiles = true) => ({
 
 
 
+type SetArticleActionPayload = Article
+const setArticle = (article: Article) => ({
+    type: 'setArticle', payload: article
+})
+
+
 export const appActions = {
     setDragging,
     setDraggingFiles,
+
+    setArticle,
 }

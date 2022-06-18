@@ -142,12 +142,13 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
 
             <div className={css.content}>
 
-                <textarea value={text} onInput={onTextInput}
-                style={{ width: '100%', height: '70%', resize: 'none' }}/>
+                <textarea value={text} onInput={onTextInput}/>
 
                 <div className={css.imagesBox}>
                     { images.map(im=><ImagePreview file={im} onRemove={onRemove} key={getKey(im)}/>) }
                 </div>
+
+                <button>Сохранить</button>
 
             </div>
 

@@ -7,6 +7,8 @@ import Article from "./pages/Article";
 import {useAppDispatch} from "./redux/hooks";
 import {appActions} from "./redux/appReducer";
 import {useDebounce} from "./hooks/useDebounce";
+import ArticleNew from "./pages/ArticleNew";
+import ArticlePreview from "./pages/ArticlePreview";
 
 function App() {
 
@@ -16,6 +18,8 @@ function App() {
     const onDragEnter = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.preventDefault()
         ev.stopPropagation()
+        //d(appActions.setDragging(true))
+        //d(appActions.setDraggingFiles(true))
 /*
 
         d(appActions.setDragging())
@@ -26,9 +30,9 @@ function App() {
             }
         }
 
+*/
         // use kind: 'file'
         console.log('ENTER:', ev)
-*/
 
     }
 
@@ -36,7 +40,7 @@ function App() {
     useDebounce(()=>{
         d(appActions.setDragging(false))
         d(appActions.setDraggingFiles(false))
-    }, 200, [dragging])
+    }, 150, [dragging])
 
     const onDragOver = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.preventDefault()
@@ -59,7 +63,7 @@ function App() {
         ev.stopPropagation()
         //d(appActions.setDragging(false))
         //d(appActions.setDraggingFiles(false))
-        //console.log('LEAVE:', ev)
+        console.log('LEAVE:', ev)
     }
     const onDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.preventDefault()
@@ -84,6 +88,10 @@ function App() {
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
                 <Route path='/article' element={<Article/>}/>
+                <Route path='/article-new' element={<ArticleNew/>}/>
+
+                <Route path='/article-preview' element={<ArticlePreview/>}/>
+
                 <Route path='*' element={<Main/>}/>
             </Routes>
 
