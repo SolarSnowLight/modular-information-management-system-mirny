@@ -134,9 +134,9 @@ func (h *Handler) signInOAuth2(c *gin.Context) {
 	}
 
 	// For fast tests
-	// token, err := configs.AppOAuth2Config.GoogleLogin.Exchange(c, input.Code)
-
-	//_, err = google_oauth2.RevokeToken(token.AccessToken)
+	/*token, _ := configs.AppOAuth2Config.GoogleLogin.Exchange(c, input.Code)
+	_, _ = google_oauth2.RevokeToken(token.AccessToken)
+	return*/
 
 	data, err := h.services.Authorization.LoginUserOAuth2(input.Code)
 	if err != nil {
@@ -166,13 +166,34 @@ func (h *Handler) signInOAuth2(c *gin.Context) {
 // @Failure default {object} errorResponse
 // @Router /auth/refresh [post]
 func (h *Handler) refresh(c *gin.Context) {
-	data, err := h.services.Authorization.Refresh(input)
+	refreshToken, err := c.Cookie(viper.GetString("environment.refresh_token_key"))
+
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	accessToken, _ := c.Get("access_token")
+	authTypeValue, _ := c.Get("auth_type_value")
+	tokenApi, _ := c.Get("token_api")
+
+	data, err := h.services.Authorization.Refresh(userModel.TokenLogoutDataModel{
+		AccessToken:   accessToken.(string),
+		RefreshToken:  refreshToken,
+		AuthTypeValue: authTypeValue.(string),
+		TokenApi:      tokenApi.(*string),
+	}, refreshToken)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, data)
+	c.SetCookie(viper.GetString("environment.refresh_token_key"), data.RefreshToken,
+		30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
+
+	c.JSON(http.StatusOK, userModel.TokenAccessModel{
+		AccessToken: data.AccessToken,
+	})
 }
 
 type LogoutOutputModel struct {

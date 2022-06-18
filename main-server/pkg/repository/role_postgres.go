@@ -22,11 +22,20 @@ func NewRolePostgres(db *sqlx.DB) *RolePostgres {
 /*
 * Функция получения данных о роли
  */
-func (r *RolePostgres) GetRole(column, value string) (rbacModel.RoleModel, error) {
+func (r *RolePostgres) GetRole(column, value interface{}) (rbacModel.RoleModel, error) {
 	var user rbacModel.RoleModel
-	query := fmt.Sprintf("SELECT * FROM %s WHERE %s=$1", tableConstants.ROLES_TABLE, column)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE %s=$1", tableConstants.ROLES_TABLE, column.(string))
 
-	err := r.db.Get(&user, query, value)
+	var err error
+
+	switch value.(type) {
+	case int:
+		err = r.db.Get(&user, query, value.(int))
+		break
+	case string:
+		err = r.db.Get(&user, query, value.(string))
+		break
+	}
 
 	return user, err
 }

@@ -22,11 +22,20 @@ func NewAuthTypePostgres(db *sqlx.DB) *AuthTypePostgres {
 /*
 * Функция получения данных о роли
  */
-func (r *AuthTypePostgres) GetAuthType(column, value string) (userModel.AuthTypeModel, error) {
+func (r *AuthTypePostgres) GetAuthType(column, value interface{}) (userModel.AuthTypeModel, error) {
 	var data userModel.AuthTypeModel
-	query := fmt.Sprintf("SELECT * FROM %s WHERE %s=$1", tableConstants.AUTH_TYPES_TABLE, column)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE %s=$1", tableConstants.AUTH_TYPES_TABLE, column.(string))
 
-	err := r.db.Get(&data, query, value)
+	var err error
+
+	switch value.(type) {
+	case int:
+		err = r.db.Get(&data, query, value.(int))
+		break
+	case string:
+		err = r.db.Get(&data, query, value.(string))
+		break
+	}
 
 	return data, err
 }

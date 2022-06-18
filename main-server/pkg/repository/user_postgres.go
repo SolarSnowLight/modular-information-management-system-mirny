@@ -19,11 +19,20 @@ func NewUserPostgres(db *sqlx.DB) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
-func (r *UserPostgres) GetUser(column, value string) (userModel.UserModel, error) {
+func (r *UserPostgres) GetUser(column, value interface{}) (userModel.UserModel, error) {
 	var user userModel.UserModel
-	query := fmt.Sprintf("SELECT * FROM %s WHERE %s=$1", tableConstants.USERS_TABLE, column)
+	query := fmt.Sprintf("SELECT * FROM %s WHERE %s=$1", tableConstants.USERS_TABLE, column.(string))
 
-	err := r.db.Get(&user, query, value)
+	var err error
+
+	switch value.(type) {
+	case int:
+		err = r.db.Get(&user, query, value.(int))
+		break
+	case string:
+		err = r.db.Get(&user, query, value.(string))
+		break
+	}
 
 	return user, err
 }

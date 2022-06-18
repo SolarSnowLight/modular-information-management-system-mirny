@@ -3,7 +3,7 @@ package user
 // Модель для работы с экземпляром пользовательских данных из таблицы users
 type UserModel struct {
 	Id       int    `json:"id" db:"id"`
-	Uuid     string `json:"name" binding:"required" db:"uuid"`
+	Uuid     string `json:"uuid" binding:"required" db:"uuid"`
 	Email    string `json:"email" binding:"required" db:"email"`
 	Password string `json:"password" binding:"required" db:"password"`
 }

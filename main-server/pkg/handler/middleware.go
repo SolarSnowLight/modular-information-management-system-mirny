@@ -60,6 +60,35 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	c.Set(accessTokenCtx, headerParts[1])
 }
 
+func (h *Handler) userIdentityLogout(c *gin.Context) {
+	header := c.GetHeader(authorizationHeader)
+
+	if header == "" {
+		newErrorResponse(c, http.StatusUnauthorized, "Пустой заголовок авторизации!")
+		return
+	}
+
+	headerParts := strings.Split(header, " ")
+	if len(headerParts) != 2 {
+		newErrorResponse(c, http.StatusUnauthorized, "Не корректный авторизационный заголовок!")
+		return
+	}
+
+	data, err := h.services.Token.ParseTokenWithoutValid(headerParts[1], viper.GetString("token.signing_key_access"))
+
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	// Добавление к контексту дополнительных данных о пользователе
+	c.Set(usersCtx, data.UsersId)
+	c.Set(rolesCtx, data.RolesId)
+	c.Set(authTypeValueCtx, data.AuthType.Value)
+	c.Set(tokenApiCtx, data.TokenApi)
+	c.Set(accessTokenCtx, headerParts[1])
+}
+
 func getUserId(c *gin.Context) (int, error) {
 	id, ok := c.Get(usersCtx)
 	if !ok {

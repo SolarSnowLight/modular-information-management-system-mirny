@@ -46,9 +46,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST(route.AUTH_SIGN_UP_ROUTE, h.signUp)
 		auth.POST(route.AUTH_SIGN_IN_ROUTE, h.signIn)
 		auth.POST(route.AUTH_SIGN_IN_GOOGLE_ROUTE, h.signInOAuth2)
-		auth.POST(route.AUTH_REFRESH_TOKEN_ROUTE, h.refresh)
-		auth.POST(route.AUTH_LOGOUT_ROUTE, h.userIdentity, h.logout)
 		auth.GET(route.AUTH_ACTIVATE_ROUTE, h.activate)
+
+		// With middlewares (for get data from access token)
+		auth.POST(route.AUTH_REFRESH_TOKEN_ROUTE, h.userIdentityLogout, h.refresh)
+		auth.POST(route.AUTH_LOGOUT_ROUTE, h.userIdentity, h.logout)
 	}
 
 	/*api := router.Group("/api", h.userIdentity)

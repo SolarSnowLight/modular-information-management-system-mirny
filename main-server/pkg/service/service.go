@@ -9,7 +9,7 @@ type Authorization interface {
 	CreateUser(user userModel.UserRegisterModel) (userModel.UserAuthDataModel, error)
 	LoginUser(user userModel.UserLoginModel) (userModel.UserAuthDataModel, error)
 	LoginUserOAuth2(code string) (userModel.UserAuthDataModel, error)
-	Refresh(refreshToken string) (userModel.UserAuthDataModel, error)
+	Refresh(data userModel.TokenLogoutDataModel, refreshToken string) (userModel.UserAuthDataModel, error)
 	Logout(tokens userModel.TokenLogoutDataModel) (bool, error)
 	Activate(link string) (bool, error)
 
@@ -20,6 +20,7 @@ type Authorization interface {
 
 type Token interface {
 	ParseToken(token, signingKey string) (userModel.TokenOutputParse, error)
+	ParseTokenWithoutValid(token, signingKey string) (userModel.TokenOutputParse, error)
 }
 
 type AuthType interface {
@@ -32,8 +33,9 @@ type Service struct {
 }
 
 func NewService(repos *repository.Repository) *Service {
+	tokenService := NewTokenService(repos.Role, repos.User, repos.AuthType)
 	return &Service{
-		Authorization: NewAuthService(repos.Authorization),
-		Token:         NewTokenService(repos.Role, repos.User, repos.AuthType),
+		Token:         tokenService,
+		Authorization: NewAuthService(repos.Authorization, *tokenService),
 	}
 }

@@ -3,16 +3,22 @@ package service
 import (
 	userModel "main-server/pkg/model/user"
 	"main-server/pkg/repository"
+
+	"github.com/spf13/viper"
 )
 
 // Структура репозитория
 type AuthService struct {
-	repo repository.Authorization
+	repo         repository.Authorization
+	tokenService TokenService
 }
 
 // Функция создания нового репозитория
-func NewAuthService(repo repository.Authorization) *AuthService {
-	return &AuthService{repo: repo}
+func NewAuthService(repo repository.Authorization, tokenService TokenService) *AuthService {
+	return &AuthService{
+		repo:         repo,
+		tokenService: tokenService,
+	}
 }
 
 /*
@@ -39,8 +45,14 @@ func (s *AuthService) LoginUserOAuth2(code string) (userModel.UserAuthDataModel,
 /*
 *	Refresh user
  */
-func (s *AuthService) Refresh(refreshToken userModel.TokenRefreshModel) (userModel.UserAuthDataModel, error) {
-	return s.repo.Refresh(refreshToken)
+func (s *AuthService) Refresh(data userModel.TokenLogoutDataModel, refreshToken string) (userModel.UserAuthDataModel, error) {
+	token, err := s.tokenService.ParseTokenWithoutValid(refreshToken, viper.GetString("token.signing_key_refresh"))
+
+	if err != nil {
+		return userModel.UserAuthDataModel{}, err
+	}
+
+	return s.repo.Refresh(data, refreshToken, token)
 }
 
 /*

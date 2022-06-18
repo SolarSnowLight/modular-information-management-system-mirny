@@ -9,4 +9,7 @@ const (
 
 	// Revoke token
 	OAUTH2_REVOKE_TOKEN_ROUTE = "https://oauth2.googleapis.com/revoke?token="
+
+	// Refresh token
+	OAUTH2_REFRESH_TOKEN_ROUTE = "https://oauth2.googleapis.com/token?client_id="
 )
