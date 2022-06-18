@@ -78,17 +78,6 @@ const docTemplate = `{
                 ],
                 "summary": "Logout",
                 "operationId": "logout",
-                "parameters": [
-                    {
-                        "description": "credentials",
-                        "name": "input",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/user.TokenDataModel"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "data",
@@ -458,17 +447,6 @@ const docTemplate = `{
                 }
             }
         },
-        "user.TokenDataModel": {
-            "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "refresh_token": {
-                    "type": "string"
-                }
-            }
-        },
         "user.TokenRefreshModel": {
             "type": "object",
             "required": [
@@ -476,6 +454,37 @@ const docTemplate = `{
             ],
             "properties": {
                 "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UserJSONBModel": {
+            "type": "object",
+            "required": [
+                "name",
+                "nickname",
+                "surname"
+            ],
+            "properties": {
+                "date_birth": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "nickname": {
+                    "type": "string"
+                },
+                "patronymic": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "surname": {
                     "type": "string"
                 }
             }
@@ -498,42 +507,18 @@ const docTemplate = `{
         "user.UserRegisterModel": {
             "type": "object",
             "required": [
-                "date_birth",
+                "data",
                 "email",
-                "gender",
-                "name",
-                "nickname",
-                "password",
-                "patronymic",
-                "phone",
-                "surname"
+                "password"
             ],
             "properties": {
-                "date_birth": {
-                    "type": "string"
+                "data": {
+                    "$ref": "#/definitions/user.UserJSONBModel"
                 },
                 "email": {
                     "type": "string"
                 },
-                "gender": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nickname": {
-                    "type": "string"
-                },
                 "password": {
-                    "type": "string"
-                },
-                "patronymic": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "surname": {
                     "type": "string"
                 }
             }

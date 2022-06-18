@@ -55,6 +55,7 @@ func main() {
 
 	// Инициализация OAuth2 сервиса авторизации
 	configs.InitOAuth2Config()
+	configs.InitVKAuthConfig()
 
 	// dependency injection
 	repos := repository.NewRepository(db)

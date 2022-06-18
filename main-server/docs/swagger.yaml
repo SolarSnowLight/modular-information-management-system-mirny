@@ -24,19 +24,33 @@ definitions:
     required:
     - access_token
     type: object
-  user.TokenDataModel:
-    properties:
-      access_token:
-        type: string
-      refresh_token:
-        type: string
-    type: object
   user.TokenRefreshModel:
     properties:
       refresh_token:
         type: string
     required:
     - refresh_token
+    type: object
+  user.UserJSONBModel:
+    properties:
+      date_birth:
+        type: string
+      gender:
+        type: boolean
+      name:
+        type: string
+      nickname:
+        type: string
+      patronymic:
+        type: string
+      phone:
+        type: string
+      surname:
+        type: string
+    required:
+    - name
+    - nickname
+    - surname
     type: object
   user.UserLoginModel:
     properties:
@@ -50,34 +64,16 @@ definitions:
     type: object
   user.UserRegisterModel:
     properties:
-      date_birth:
-        type: string
+      data:
+        $ref: '#/definitions/user.UserJSONBModel'
       email:
-        type: string
-      gender:
-        type: boolean
-      name:
-        type: string
-      nickname:
         type: string
       password:
         type: string
-      patronymic:
-        type: string
-      phone:
-        type: string
-      surname:
-        type: string
     required:
-    - date_birth
+    - data
     - email
-    - gender
-    - name
-    - nickname
     - password
-    - patronymic
-    - phone
-    - surname
     type: object
 host: localhost:8000
 info:
@@ -123,13 +119,6 @@ paths:
       - application/json
       description: Выход из аккаунта
       operationId: logout
-      parameters:
-      - description: credentials
-        in: body
-        name: input
-        required: true
-        schema:
-          $ref: '#/definitions/user.TokenDataModel'
       produces:
       - application/json
       responses:
