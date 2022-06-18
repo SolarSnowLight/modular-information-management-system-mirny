@@ -1,6 +1,4 @@
 import {AnyAction, configureStore, ThunkAction} from '@reduxjs/toolkit'
-import { userReducer } from "./userSlice";
-import { errorsReducer } from './errorsSlice'
 import {
     persistReducer,
     FLUSH,
@@ -14,6 +12,10 @@ import storage from "redux-persist/lib/storage";
 import hardSet from "redux-persist/lib/stateReconciler/hardSet";
 import {PersistConfig} from "redux-persist/es/types";
 import createSagaMiddleware from 'redux-saga'
+import { userReducer } from "./userReducer";
+import {errorsReducer2} from "./errorsReducer2";
+import {loadingReducer2} from "./loadingReducer2";
+import {appReducer} from "./appReducer";
 
 
 
@@ -34,8 +36,12 @@ const userPersistedReducer = persistReducer(
 
 export const store = configureStore({
     reducer: {
+        app: appReducer,
         user: userPersistedReducer,
-        errors: errorsReducer,
+        //errors: errorsReducer,
+        errors2: errorsReducer2,
+        //loading: loadingReducer,
+        loading2: loadingReducer2,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

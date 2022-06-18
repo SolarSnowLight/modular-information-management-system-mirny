@@ -7,11 +7,13 @@
  */
 
 export type ErrorType = {
-    code: 401 | 403
+    code: 401 | 403 | 404
         | 'error' | 'errors'
         | 'connection error' | 'no internet' | 'no server'
-        | 'incorrect data' | 'incorrect login' | 'incorrect password'
-    message?: any
+        | 'incorrect' | 'required'
+        | 'incorrect data'  | 'incorrect login' | 'incorrect password'
+    message?: string
+    extra?: any
 }
 
 export type ServiceData<D> = {

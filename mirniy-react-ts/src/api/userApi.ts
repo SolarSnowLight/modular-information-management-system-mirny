@@ -24,13 +24,17 @@ export type InternalServerError = BadRequest
 export type Default = BadRequest
 
 
+type ResponseData<D> = Promise<AxiosResponse<D|BadRequest>>
+
 
 // 200
-export type LoginResponse = {
+export type AuthResponse = {
     access_token: string
     refresh_token: string
 }
-const login = async (login: string, password: string): Promise<AxiosResponse<LoginResponse|BadRequest>> => {
+const login = async (
+    login: string, password: string
+): ResponseData<AuthResponse> => {
     return ax.post("auth/sign-in", {
         email: login,
         password: password,
@@ -38,9 +42,35 @@ const login = async (login: string, password: string): Promise<AxiosResponse<Log
 }
 
 
+// 200
+export type LogoutResponse = {
+    is_logout: boolean
+}
+const logout = async (
+    accessToken: string|null|undefined, refreshToken: string|null|undefined
+): ResponseData<LogoutResponse> => {
+    return ax.post('auth/logout', {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+    })
+}
 
+
+export type UserRegister = {
+    email: string
+    password: string
+    name: string
+    surname: string
+}
+const signup = async (userData: UserRegister): ResponseData<AuthResponse> => {
+    return ax.post('auth/sign-up',{
+        ...userData
+    })
+}
 
 
 export const userApi = {
-    login
+    login,
+    logout,
+    signup,
 }
