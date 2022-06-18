@@ -1,7 +1,9 @@
 package google_oauth2
 
 import (
+	"context"
 	"encoding/json"
+	"main-server/configs"
 	"main-server/pkg/constants/route"
 	userModel "main-server/pkg/model/user"
 	"net/http"
@@ -13,8 +15,23 @@ type VerifyEmailModel struct {
 	VerifyEmail bool `json:"verified_email" binding:"required"`
 }
 
-func VerifyAccessToken(token *oauth2.Token) (bool, error) {
-	response, err := http.Get(route.OAUTH2_TOKEN_INFO_ROUTE + token.AccessToken)
+func RefreshAccessToken(c context.Context, token *oauth2.Token) (*oauth2.Token, error) {
+	tokenSource := configs.AppOAuth2Config.GoogleLogin.TokenSource(c, token)
+	newToken, err := tokenSource.Token()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if newToken.AccessToken != token.AccessToken {
+		return newToken, nil
+	}
+
+	return token, nil
+}
+
+func VerifyAccessToken(accessToken string) (bool, error) {
+	response, err := http.Get(route.OAUTH2_TOKEN_INFO_ROUTE + accessToken)
 
 	var j VerifyEmailModel
 
@@ -39,4 +56,17 @@ func GetUserInfo(token *oauth2.Token) (userModel.UserRegisterOAuth2Model, error)
 	}
 
 	return data, nil
+}
+
+func RevokeToken(accessToken string) (bool, error) {
+	response, err := http.Post(
+		route.OAUTH2_REVOKE_TOKEN_ROUTE+accessToken,
+		"Content-type:application/x-www-form-urlencoded",
+		nil)
+
+	if err != nil {
+		return false, err
+	}
+
+	return (response.StatusCode == 200), nil
 }

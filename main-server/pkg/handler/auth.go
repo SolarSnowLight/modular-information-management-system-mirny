@@ -1,9 +1,7 @@
 package handler
 
 import (
-	"main-server/configs"
 	userModel "main-server/pkg/model/user"
-	"main-server/pkg/service/google_oauth2"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -16,8 +14,8 @@ import (
 // @ID create-account
 // @Accept  json
 // @Produce  json
-// @Param input body model.UserRegisterModel true "account info"
-// @Success 200 {object} model.UserAuthDataModel "data"
+// @Param input body userModel.UserRegisterModel true "account info"
+// @Success 200 {object} userModel.TokenAccessModel "data"
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -51,8 +49,8 @@ func (h *Handler) signUp(c *gin.Context) {
 // @ID login
 // @Accept  json
 // @Produce  json
-// @Param input body model.UserLoginModel true "credentials"
-// @Success 200 {object} model.UserAuthDataModel "data"
+// @Param input body userModel.UserLoginModel true "credentials"
+// @Success 200 {object} userModel.TokenAccessModel "data"
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -83,11 +81,11 @@ func (h *Handler) signIn(c *gin.Context) {
 // @Summary SignInVK
 // @Tags auth
 // @Description Авторизация пользователя через VK
-// @ID login
+// @ID login_vk
 // @Accept  json
 // @Produce  json
-// @Param input body model.UserLoginModel true "credentials"
-// @Success 200 {object} model.UserAuthDataModel "data"
+// @Param input body userModel.UserLoginModel true "credentials"
+// @Success 200 {object} userModel.TokenAccessModel "data"
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -118,11 +116,11 @@ func (h *Handler) signInVK(c *gin.Context) {
 // @Summary SignInOAuth2
 // @Tags auth
 // @Description Авторизация пользователя через Google OAuth2
-// @ID login
+// @ID login_oauth2
 // @Accept  json
 // @Produce  json
-// @Param input body model.UserLoginModel true "credentials"
-// @Success 200 {object} model.UserAuthDataModel "data"
+// @Param input body userModel.GoogleOAuth2Code true "credentials"
+// @Success 200 {object} userModel.TokenAccessModel "data"
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
@@ -135,26 +133,24 @@ func (h *Handler) signInOAuth2(c *gin.Context) {
 		return
 	}
 
-	token, err := configs.AppOAuth2Config.GoogleLogin.Exchange(c, input.Code)
+	// For fast tests
+	// token, err := configs.AppOAuth2Config.GoogleLogin.Exchange(c, input.Code)
 
+	//_, err = google_oauth2.RevokeToken(token.AccessToken)
+
+	data, err := h.services.Authorization.LoginUserOAuth2(input.Code)
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	is_verify, err := google_oauth2.VerifyAccessToken(token)
+	// Добавление токена обновления в http only cookie
+	c.SetCookie(viper.GetString("environment.refresh_token_key"), data.RefreshToken,
+		30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
 
-	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, err.Error())
-		return
-	}
-
-	if !is_verify {
-		newErrorResponse(c, http.StatusBadRequest, "Данный токен не принадлежит данному пользователю!")
-		return
-	}
-
-	c.JSON(http.StatusOK, input)
+	c.JSON(http.StatusOK, userModel.TokenAccessModel{
+		AccessToken: data.AccessToken,
+	})
 }
 
 // @Summary Refresh
@@ -163,20 +159,13 @@ func (h *Handler) signInOAuth2(c *gin.Context) {
 // @ID refresh
 // @Accept  json
 // @Produce  json
-// @Param input body model.TokenRefreshModel true "credentials"
-// @Success 200 {object} model.UserAuthDataModel "data"
+// @Param input body userModel.TokenRefreshModel true "credentials"
+// @Success 200 {object} userModel.TokenAccessModel "data"
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /auth/refresh [post]
 func (h *Handler) refresh(c *gin.Context) {
-	var input userModel.TokenRefreshModel
-
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
-		return
-	}
-
 	data, err := h.services.Authorization.Refresh(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -196,24 +185,38 @@ type LogoutOutputModel struct {
 // @ID logout
 // @Accept  json
 // @Produce  json
-// @Param input body model.TokenDataModel true "credentials"
 // @Success 200 {object} LogoutOutputModel "data"
 // @Failure 400,404 {object} errorResponse
 // @Failure 500 {object} errorResponse
 // @Failure default {object} errorResponse
 // @Router /auth/logout [post]
 func (h *Handler) logout(c *gin.Context) {
-	var input userModel.TokenDataModel
+	refreshToken, err := c.Cookie(viper.GetString("environment.refresh_token_key"))
 
-	if err := c.BindJSON(&input); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, "invalid input body")
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	data, err := h.services.Authorization.Logout(input)
+	accessToken, _ := c.Get("access_token")
+	authTypeValue, _ := c.Get("auth_type_value")
+	tokenApi, _ := c.Get("token_api")
+
+	data, err := h.services.Authorization.Logout(userModel.TokenLogoutDataModel{
+		AccessToken:   accessToken.(string),
+		RefreshToken:  refreshToken,
+		AuthTypeValue: authTypeValue.(string),
+		TokenApi:      tokenApi.(*string),
+	})
+
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	if data {
+		c.SetCookie(viper.GetString("environment.refresh_token_key"), "",
+			30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
 	}
 
 	c.JSON(http.StatusOK, LogoutOutputModel{
@@ -222,7 +225,7 @@ func (h *Handler) logout(c *gin.Context) {
 }
 
 // @Summary Activate
-// @Tags activate
+// @Tags auth
 // @Description Активация аккаунта по почте
 // @ID activate
 // @Accept  json
