@@ -7,7 +7,7 @@ type Article = undefined | {
     images: {
         index: number,
         file: File
-    }
+    }[]
 }
 
 

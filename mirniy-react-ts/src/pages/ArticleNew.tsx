@@ -2,10 +2,11 @@
 import css from './ArticleNew.module.scss'
 
 import React, {useEffect, useRef, useState} from "react";
-import {useAppSelector} from "../redux/hooks";
+import {useAppDispatch, useAppSelector} from "../redux/hooks";
 import {useObjectToKey} from "../hooks/useOjectToKey";
 import {nonEmpty} from "@rrainpath/ts-utils";
 import {useNavigate} from "react-router-dom";
+import {appActions} from "../redux/appReducer";
 
 
 
@@ -22,9 +23,12 @@ const imageFiles = [
 
 
 const imageExtensions = /\.((jpg)|(jpeg)|(png)|(webp)|(bmp)|(jfif))$/i
+const imageTag =/<image[ \n]+id=(?<id>\d+)[ \n]*\/>/g // need to wrap into RegExp to prevent endless loop
 
 
 const ArticleNew = () => {
+
+    const d = useAppDispatch()
 
     const [text, setText] = useState(
         `some content
@@ -61,6 +65,39 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
     const navigate = useNavigate()
 
     const prepareArticle = () => {
+        const regexp = RegExp(imageTag)
+
+        const idToFile = new Map<number,File>()
+        images.forEach(it=>idToFile.set(getId(it),it))
+
+        const imageItems = [] as { index:number, file: File }[]
+
+        //console.log(regexp)
+        let clearedText = ''
+
+        let result: RegExpExecArray|null
+        let pos = 0
+        let shiftBack = 0
+        while(result = regexp.exec(text)){
+            const s = result.index
+            const clearedIndex = s-shiftBack
+            const len = result[0].length
+            shiftBack += len
+            const id = +result.groups!.id
+            const file = idToFile.get(id)!
+            imageItems.push({ index: clearedIndex, file: file })
+            //console.log('id to file:',id,file)
+            //console.log(result)
+            clearedText += text.substring(pos,s)
+            pos = s+len
+        }
+        clearedText += text.substring(pos)
+        //console.log(clearedText)
+
+        d(appActions.setArticle({
+            text: clearedText,
+            images: imageItems
+        }))
 
         navigate('/article-preview')
     }
