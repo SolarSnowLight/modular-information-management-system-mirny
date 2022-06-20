@@ -1,4 +1,4 @@
-import Axios from "axios"
+import Axios, {AxiosError} from "axios"
 import axios, {AxiosResponse} from "axios"
 
 const ip = 'localhost'
@@ -12,34 +12,43 @@ const ax = Axios.create({
 })
 
 
+// todo delete token if it not valid after interceptor validation
 
+ax.interceptors.response.use(
+    (config) => config,
+    async (error: Error|AxiosError) => {
+        //console.log('ERROR:',error)
+        if (Axios.isAxiosError(error) && error.config && error.response){
 
-ax.interceptors.response.use((config) => {
-    return config;
-}, async (error) => {
-    // Для повтора исходного запроса
-    const originalRequest = error.config;
+            // Для повтора исходного запроса
+            const originalRequest = error.config;
 
-    // Обновление токена
-    if((error.response.status === 401)
-        && (error.config)
-        && (!error.config._isRetry)){
-        originalRequest._isRetry = true;
-        try{
-            const response = await ax.post<AuthResponse>(`auth/refresh`)
+            // Обновление токена
+            if(
+                error.response.status === 401
+                && (error.config)
+                // @ts-ignore
+                && (!error.config._isRetry))
+            {
+                // @ts-ignore
+                originalRequest._isRetry = true;
 
+                //console.log('Authorization:', originalRequest.headers.Authorization)
+                await ax.post<AuthResponse>(`auth/refresh`, undefined, {
+                    headers: {
+                        Authorization: originalRequest.headers?.Authorization ?? ''
+                    }
+                })
 
-            //localStorage.setItem('token', response.data.accessToken);
+                //localStorage.setItem('token', response.data.accessToken);
 
-
-            return ax.request(originalRequest);
-        }catch(e){
-            console.log(e);
+                await ax.request(originalRequest);
+            }
         }
-    }
 
-    throw error;
-});
+        throw error
+    }
+)
 
 
 
