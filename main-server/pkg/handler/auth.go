@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"main-server/configs"
 	userModel "main-server/pkg/model/user"
 	"net/http"
 
@@ -37,6 +38,7 @@ func (h *Handler) signUp(c *gin.Context) {
 	// Добавление токена обновления в http only cookie
 	c.SetCookie(viper.GetString("environment.refresh_token_key"), data.RefreshToken,
 		30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
+	c.SetSameSite(configs.HTTPSameSite)
 
 	c.JSON(http.StatusOK, userModel.TokenAccessModel{
 		AccessToken: data.AccessToken,
@@ -72,6 +74,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	// Добавление токена обновления в http only cookie
 	c.SetCookie(viper.GetString("environment.refresh_token_key"), data.RefreshToken,
 		30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
+	c.SetSameSite(configs.HTTPSameSite)
 
 	c.JSON(http.StatusOK, userModel.TokenAccessModel{
 		AccessToken: data.AccessToken,
@@ -107,6 +110,7 @@ func (h *Handler) signInVK(c *gin.Context) {
 	// Добавление токена обновления в http only cookie
 	c.SetCookie(viper.GetString("environment.refresh_token_key"), data.RefreshToken,
 		30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
+	c.SetSameSite(configs.HTTPSameSite)
 
 	c.JSON(http.StatusOK, userModel.TokenAccessModel{
 		AccessToken: data.AccessToken,
@@ -147,6 +151,7 @@ func (h *Handler) signInOAuth2(c *gin.Context) {
 	// Добавление токена обновления в http only cookie
 	c.SetCookie(viper.GetString("environment.refresh_token_key"), data.RefreshToken,
 		30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
+	c.SetSameSite(configs.HTTPSameSite)
 
 	c.JSON(http.StatusOK, userModel.TokenAccessModel{
 		AccessToken: data.AccessToken,
@@ -190,6 +195,7 @@ func (h *Handler) refresh(c *gin.Context) {
 
 	c.SetCookie(viper.GetString("environment.refresh_token_key"), data.RefreshToken,
 		30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
+	c.SetSameSite(configs.HTTPSameSite)
 
 	c.JSON(http.StatusOK, userModel.TokenAccessModel{
 		AccessToken: data.AccessToken,
@@ -238,6 +244,7 @@ func (h *Handler) logout(c *gin.Context) {
 	if data {
 		c.SetCookie(viper.GetString("environment.refresh_token_key"), "",
 			30*24*60*60*1000, "/", viper.GetString("environment.domain"), false, true)
+		c.SetSameSite(configs.HTTPSameSite)
 	}
 
 	c.JSON(http.StatusOK, LogoutOutputModel{

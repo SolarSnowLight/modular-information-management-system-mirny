@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 
 	_ "main-server/docs"
 
@@ -32,10 +33,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	// Настройка CORS-политики
 	router.Use(cors.New(cors.Config{
-		AllowAllOrigins: true, // для тестов
-		// AllowOrigins:     []string{"http://localhost:3000"},
+		//AllowAllOrigins: true, // для тестов
+		AllowOrigins:     []string{viper.GetString("client_url")},
 		AllowMethods:     []string{"POST", "GET"},
-		AllowHeaders:     []string{"Origin", "Content-type"},
+		AllowHeaders:     []string{"Origin", "Content-type", "Authorization"},
 		AllowCredentials: true,
 	}))
 
