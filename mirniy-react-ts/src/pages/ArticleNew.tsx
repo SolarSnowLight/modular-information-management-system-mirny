@@ -1,26 +1,14 @@
 
 import css from './ArticleNew.module.scss'
 
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../redux/hooks";
 import {useObjectToKey} from "../hooks/useOjectToKey";
-import {nonEmpty} from "@rrainpath/ts-utils";
 import {useNavigate} from "react-router-dom";
 import {appActions} from "../redux/appReducer";
 import ArticlePreview from "./ArticlePreview";
 
 
-
-/*import img1 from 'src/assets/images/0yhksE.jpg'
-import img2 from 'src/assets/images/17-02-19_12-55-39.jpg'
-import img3 from 'src/assets/images/Bleach.jpg'
-import img4 from 'src/assets/images/Bleach Ichigo.jpg'
-const imageFiles = [
-    img1,
-    img2,
-    img3,
-    img4
-] as (string|File)[]*/
 
 
 const imageExtensions = /\.((jpg)|(jpeg)|(png)|(webp)|(bmp)|(jfif))$/i
@@ -31,6 +19,8 @@ const ArticleNew = () => {
 
     const d = useAppDispatch()
 
+
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
     const [text, setText] = useState(
         `some content
 Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque culpa dicta dignissimos doloremque esse facilis illum, maxime minima nihil officia officiis pariatur quae quasi quod saepe sunt unde. Debitis.`
@@ -39,12 +29,21 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
         setText(ev.currentTarget.value)
     }
 
+    const [newSelection, setNewSelection] = useState(-1)
+    useLayoutEffect(()=>{
+        if (newSelection>=0 && textareaRef.current){
+            textareaRef.current.selectionStart = newSelection
+            textareaRef.current.selectionEnd = newSelection
+            setNewSelection(-1)
+            textareaRef.current.focus()
+        }
+    },[newSelection])
+
     const { isDraggingFiles } = useAppSelector(s=>s.app)
 
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
-    const divRef = useRef<HTMLDivElement>(null)
+    //const divRef = useRef<HTMLDivElement>(null)
 
-    const [divText, setDivText] = useState('')
+    /*const [divText, setDivText] = useState('')
     const onDivInput = (ev: React.ChangeEvent<HTMLDivElement>) => {
         const innerText = ev.currentTarget.innerText
         if (innerText===divText) return;
@@ -53,18 +52,22 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
             return
         }
         setDivText(innerText)
-    }
+    }*/
 
-    const getSelection = () => {
+    /*const getSelection = () => {
         const area = textareaRef.current
         if (area) {
             console.log('selection start:',area.selectionStart)
             console.log('selection end:',area.selectionEnd)
         }
-    }
+    }*/
 
-    const navigate = useNavigate()
+    /*const navigate = useNavigate()*/
 
+    const getId = useObjectToKey()
+
+    const [images, setImages] = useState([] as File[])
+    const [showPreview, setShowPreview] = useState(false)
 
     const prepareArticle = () => {
         const regexp = RegExp(imageTag)
@@ -106,27 +109,8 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
     }
 
 
-    const rangeTest = () => {
-        const textNode = textareaRef.current?.childNodes[0]
-        if (textNode){
-            const range = document.createRange()
-            range.setStart(textNode,0)
-            range.setEnd(textNode,10)
-            console.log('RANGE:',range)
-            console.log('RECTS:',range.getClientRects())
-        }
-        const divTextNode = divRef.current?.childNodes[0]
-        if (divTextNode){
-            const range = document.createRange()
-            range.setStart(divTextNode,0)
-            range.setEnd(divTextNode,10)
-            console.log('RANGE:',range)
-            console.log('RECTS:',range.getClientRects())
-        }
-    }
 
 
-    const [images, setImages] = useState([] as File[])
 
     const onImagesDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         if (isDraggingFiles) {
@@ -148,21 +132,19 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
         setImages(images.filter(it=>it!==file))
     }
 
-    const getId = useObjectToKey()
 
-    const onPaste = (id: number) => {
+    const onImageTagPaste = (id: number) => {
         const area = textareaRef.current
         if (area){
             const s = area.selectionStart
             const oldLen = text.length
             const newText = text.substring(0,s)+`<image id=${id}/>`+text.substring(s)
             setText(newText)
-            // todo set selection
-            //area.selectionStart = s + (newText.length-oldLen)
+            setNewSelection(s+(newText.length-oldLen))
+
         }
     }
 
-    const [showPreview, setShowPreview] = useState(false)
 
 
 
@@ -178,7 +160,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
         </div> }
 
         <div className={css.articleBox}>
-            <textarea value={text} onInput={onTextInput} ref={textareaRef}/>
+            <textarea value={text} onInput={onTextInput} ref={textareaRef} />
             {/*<div ref={divRef} onInput={onDivInput}
                  contentEditable dangerouslySetInnerHTML={{__html: divText}}/>*/}
             {/*<button onClick={rangeTest}>Test ranges</button>*/}
@@ -190,7 +172,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
 
             { images.map(it=>
                 <ImageItem file={it} id={getId(it)} key={getId(it)}
-                           onRemove={onRemove} onPaste={onPaste}/>
+                           onRemove={onRemove} onPaste={onImageTagPaste}/>
             ) }
 
             {
@@ -228,12 +210,12 @@ const ImageItem = (
         reader.readAsDataURL(file)
     }, [file])
 
-    const onDragStart = (ev: React.DragEvent<HTMLDivElement>) => {
+    /*const onDragStart = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.dataTransfer.setData('application/json', JSON.stringify({
             type: 'imageItem', id: id
         }))
         ev.dataTransfer.effectAllowed = 'move'
-    }
+    }*/
 
 
     const [isHovered, setIsHovered] = useState(false)
@@ -279,3 +261,27 @@ function walkFileTree(fsItem: FileSystemEntry|null, onFile: (file:File)=>void){
         )
     }
 }
+
+
+
+
+
+
+/*const rangeTest = () => {
+        const textNode = textareaRef.current?.childNodes[0]
+        if (textNode){
+            const range = document.createRange()
+            range.setStart(textNode,0)
+            range.setEnd(textNode,10)
+            console.log('RANGE:',range)
+            console.log('RECTS:',range.getClientRects())
+        }
+        const divTextNode = divRef.current?.childNodes[0]
+        if (divTextNode){
+            const range = document.createRange()
+            range.setStart(divTextNode,0)
+            range.setEnd(divTextNode,10)
+            console.log('RANGE:',range)
+            console.log('RECTS:',range.getClientRects())
+        }
+    }*/

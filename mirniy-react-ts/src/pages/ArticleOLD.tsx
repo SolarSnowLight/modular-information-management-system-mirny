@@ -10,7 +10,7 @@ import { useObjectToKey } from "../hooks/useOjectToKey";
 
 const imageExtensions = /\.((jpg)|(jpeg)|(png)|(webp)|(bmp)|(jfif))$/i;
 
-function Article() {
+function ArticleOLD() {
   const { isDraggingFiles } = useAppSelector((s) => s.app);
 
   const [text, setText] = useState(
@@ -175,7 +175,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
   );
 }
 
-export default Article;
+export default ArticleOLD;
 
 const ImagePreview = ({
   file,
