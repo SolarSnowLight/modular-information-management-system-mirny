@@ -1,14 +1,13 @@
-import Axios, {AxiosResponse} from "axios"
-import axios from "axios";
+import Axios from "axios"
+import axios, {AxiosResponse} from "axios"
 
 const ip = 'localhost'
 const port = '5000'
 const basePath = ""
 const API_URL = `http://${ip}:${port}/${basePath}`
-const baseUrl = API_URL
 
 const ax = Axios.create({
-    baseURL: baseUrl,
+    baseURL: API_URL,
     withCredentials: true
 })
 
@@ -27,9 +26,7 @@ ax.interceptors.response.use((config) => {
         && (!error.config._isRetry)){
         originalRequest._isRetry = true;
         try{
-            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {
-                withCredentials: true,
-            });
+            const response = await ax.post<AuthResponse>(`auth/refresh`)
 
 
             //localStorage.setItem('token', response.data.accessToken);

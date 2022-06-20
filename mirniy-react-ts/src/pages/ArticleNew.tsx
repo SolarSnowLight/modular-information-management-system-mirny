@@ -7,6 +7,7 @@ import {useObjectToKey} from "../hooks/useOjectToKey";
 import {nonEmpty} from "@rrainpath/ts-utils";
 import {useNavigate} from "react-router-dom";
 import {appActions} from "../redux/appReducer";
+import ArticlePreview from "./ArticlePreview";
 
 
 
@@ -64,6 +65,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
 
     const navigate = useNavigate()
 
+
     const prepareArticle = () => {
         const regexp = RegExp(imageTag)
 
@@ -99,7 +101,8 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
             images: imageItems
         }))
 
-        navigate('/article-preview')
+        //navigate('/article-preview')
+        setShowPreview(true)
     }
 
 
@@ -159,7 +162,20 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
         }
     }
 
+    const [showPreview, setShowPreview] = useState(false)
+
+
+
     return <div className={css.grid}>
+
+        { showPreview && <div className={css.previewFrame}>
+            <div className={css.closeFrame} onClick={()=>setShowPreview(false)}>
+                X
+            </div>
+            <div className={css.previewContent}>
+                <ArticlePreview/>
+            </div>
+        </div> }
 
         <div className={css.articleBox}>
             <textarea value={text} onInput={onTextInput} ref={textareaRef}/>
