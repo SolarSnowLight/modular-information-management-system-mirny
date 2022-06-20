@@ -1,14 +1,48 @@
 import Axios, {AxiosResponse} from "axios"
+import axios from "axios";
 
 const ip = 'localhost'
-const port = '8000'
+const port = '5000'
 const basePath = ""
-const baseUrl = `http://${ip}:${port}/${basePath}`
+const API_URL = `http://${ip}:${port}/${basePath}`
+const baseUrl = API_URL
 
 const ax = Axios.create({
     baseURL: baseUrl,
     withCredentials: true
 })
+
+
+
+
+ax.interceptors.response.use((config) => {
+    return config;
+}, async (error) => {
+    // Для повтора исходного запроса
+    const originalRequest = error.config;
+
+    // Обновление токена
+    if((error.response.status === 401)
+        && (error.config)
+        && (!error.config._isRetry)){
+        originalRequest._isRetry = true;
+        try{
+            const response = await axios.get<AuthResponse>(`${API_URL}/refresh`, {
+                withCredentials: true,
+            });
+
+
+            //localStorage.setItem('token', response.data.accessToken);
+
+
+            return ax.request(originalRequest);
+        }catch(e){
+            console.log(e);
+        }
+    }
+
+    throw error;
+});
 
 
 
@@ -49,9 +83,10 @@ export type LogoutResponse = {
 const logout = async (
     accessToken: string|null|undefined, refreshToken: string|null|undefined
 ): ResponseData<LogoutResponse> => {
-    return ax.post('auth/logout', {
-        access_token: accessToken,
-        refresh_token: refreshToken,
+    return ax.post('auth/logout', undefined, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
     })
 }
 
@@ -61,10 +96,25 @@ export type UserRegister = {
     password: string
     name: string
     surname: string
+    patronymic: string
+    nickname: string
+    sex: boolean
+    phone: string
+    birthDate: string
 }
 const signup = async (userData: UserRegister): ResponseData<AuthResponse> => {
     return ax.post('auth/sign-up',{
-        ...userData
+        email: userData.email,
+        password: userData.password,
+        data: {
+            name: userData.name,
+            surname: userData.surname,
+            patronymic: userData.patronymic,
+            date_birth: userData.birthDate,
+            phone: userData.phone,
+            gender: userData.sex,
+            nickname: userData.nickname,
+        }
     })
 }
 

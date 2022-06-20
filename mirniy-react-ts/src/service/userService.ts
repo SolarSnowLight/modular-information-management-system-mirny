@@ -19,12 +19,23 @@ const login = async (login: string, password: string): Promise<ServiceData<AuthS
                 }}
             }
             data = data as BadRequest
-            if (status===401) {
-                return { error: { code: 'incorrect data', message: data.message } }
-            }
             return { error: { code: 'error', message: data.message } }
         },
         (error: AxiosError) => {
+            if (error.response){
+                const status = error.response.status
+                const data = error.response.data as BadRequest
+
+                if (status===400)
+                    return { error: { code: 'error', message: data.message } }
+                if (status===401)
+                    return { error: { code: 'incorrect data', message: data.message } }
+                if (status===500)
+                    return { error: { code: 500, message: data.message } }
+
+                return { error: { code: 'error', message: data.message } }
+            }
+            //console.log(error)
             // error.code: "ERR_NETWORK" when server not found on localhost - крч ошибка соединения с сервером
             return { error: { code: 'connection error' } }
         }
@@ -50,12 +61,23 @@ const logout = async (
                 }}
             }
             data = data as BadRequest
-            if (status===401) {
-                return { error: { code: 401, message: data.message } }
-            }
             return { error: { code: 'error', message: data.message } }
         },
         (error: AxiosError) => {
+            if (error.response){
+                const status = error.response.status
+                const data = error.response.data as BadRequest
+
+                if (status===400)
+                    return { error: { code: 'error', message: data.message } }
+                if (status===401)
+                    return { error: { code: 401, message: data.message } }
+                if (status===500)
+                    return { error: { code: 500, message: data.message } }
+
+                return { error: { code: 'error', message: data.message } }
+            }
+            //console.log(error)
             // error.code: "ERR_NETWORK" when server not found on localhost - крч ошибка соединения с сервером
             return { error: { code: 'connection error' } }
         }
@@ -80,6 +102,20 @@ const signup = async (userData: UserRegister): Promise<ServiceData<AuthService>>
             return { error: { code: 'error', message: data.message } }
         },
         (error: AxiosError) => {
+            if (error.response){
+                const status = error.response.status
+                const data = error.response.data as BadRequest
+
+                if (status===400)
+                    return { error: { code: 'error', message: data.message } }
+                if (status===401)
+                    return { error: { code: 401, message: data.message } }
+                if (status===500)
+                    return { error: { code: 500, message: data.message } }
+
+                return { error: { code: 'error', message: data.message } }
+            }
+            //console.log(error)
             // error.code: "ERR_NETWORK" when server not found on localhost - крч ошибка соединения с сервером
             return { error: { code: 'connection error' } }
         }

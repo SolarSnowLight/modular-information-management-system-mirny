@@ -23,11 +23,11 @@ function Main(){
             <button>Вход & Выход</button>
         </Link>
         {/*<button onClick={makeError}>Error</button>*/}
-        <Link to={'/article'}>
+        {/*<Link to={'/article'}>
             <button>Статья</button>
-        </Link>
+        </Link>*/}
         <Link to={'/article-new'}>
-            <button>Статья New</button>
+            <button>Статья</button>
         </Link>
     </>
 }
