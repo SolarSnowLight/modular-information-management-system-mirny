@@ -90,11 +90,16 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
             shiftBack += len
             const id = +result.groups!.id
             const file = idToFile.get(id)!
-            imageItems.push({ index: clearedIndex, file: file })
-            //console.log('id to file:',id,file)
-            //console.log(result)
-            clearedText += text.substring(pos,s)
-            pos = s+len
+            if (!file){
+                alert(`Картинка с id=${id} в теге ${result[0]} (startIndex=${s}, endIndex=${s+len}) не найдена!`)
+                return
+            } else {
+                imageItems.push({ index: clearedIndex, file: file })
+                //console.log('id to file:',id,file)
+                //console.log(result)
+                clearedText += text.substring(pos,s)
+                pos = s+len
+            }
         }
         clearedText += text.substring(pos)
         //console.log(clearedText)
@@ -114,7 +119,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
 
     const onImagesDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         if (isDraggingFiles) {
-            console.log('IMAGES DROP:',ev)
+            //console.log('IMAGES DROP:',ev)
 
             const addImg = (file: File) => {
                 if (imageExtensions.test(file.name))
