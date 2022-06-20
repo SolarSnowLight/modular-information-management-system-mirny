@@ -1,7 +1,7 @@
 
 import css from './ArticleNew.module.scss'
 
-import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "../redux/hooks";
 import {useObjectToKey} from "../hooks/useOjectToKey";
 import {useNavigate} from "react-router-dom";
@@ -29,12 +29,12 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
         setText(ev.currentTarget.value)
     }
 
-    const [newSelection, setNewSelection] = useState(-1)
+    const [newSelection, setNewSelection] = useState(undefined as undefined|{ s:number, e:number })
     useLayoutEffect(()=>{
-        if (newSelection>=0 && textareaRef.current){
-            textareaRef.current.selectionStart = newSelection
-            textareaRef.current.selectionEnd = newSelection
-            setNewSelection(-1)
+        if (newSelection && textareaRef.current){
+            textareaRef.current.selectionStart = newSelection.s
+            textareaRef.current.selectionEnd = newSelection.e
+            setNewSelection(undefined)
             textareaRef.current.focus()
         }
     },[newSelection])
@@ -69,28 +69,30 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
     const [images, setImages] = useState([] as File[])
     const [showPreview, setShowPreview] = useState(false)
 
+
     const prepareArticle = () => {
-        const regexp = RegExp(imageTag)
+        imageTag.lastIndex = 0
 
         const idToFile = new Map<number,File>()
         images.forEach(it=>idToFile.set(getId(it),it))
 
         const imageItems = [] as { index:number, file: File }[]
 
-        //console.log(regexp)
+        //console.log(imageTag)
         let clearedText = ''
 
         let result: RegExpExecArray|null
         let pos = 0
         let shiftBack = 0
-        while(result = regexp.exec(text)){
+        while(result = imageTag.exec(text)){
             const s = result.index
             const clearedIndex = s-shiftBack
             const len = result[0].length
             shiftBack += len
             const id = +result.groups!.id
-            const file = idToFile.get(id)!
+            const file = idToFile.get(id)
             if (!file){
+                setNewSelection({s: s, e: s+len})
                 alert(`Картинка с id=${id} в теге ${result[0]} (startIndex=${s}, endIndex=${s+len}) не найдена!`)
                 return
             } else {
@@ -145,7 +147,8 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
             const oldLen = text.length
             const newText = text.substring(0,s)+`<image id=${id}/>`+text.substring(s)
             setText(newText)
-            setNewSelection(s+(newText.length-oldLen))
+            const newSel = s+(newText.length-oldLen)
+            setNewSelection({s: newSel, e: newSel})
 
         }
     }
