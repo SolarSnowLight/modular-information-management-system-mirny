@@ -51,6 +51,10 @@ type ErrorsDraft2 = {
             password?: ErrorType[],
             name?: ErrorType[],
             surname?: ErrorType[],
+            patronymic?: ErrorType[],
+            nickname?: ErrorType[],
+            phone?: ErrorType[],
+            birthDate?: ErrorType[],
         }
     },
 }
@@ -78,6 +82,10 @@ const initialState = {
             password: [] as ErrorType[],
             name: [] as ErrorType[],
             surname: [] as ErrorType[],
+            patronymic: [] as ErrorType[],
+            nickname: [] as ErrorType[],
+            phone: [] as ErrorType[],
+            birthDate: [] as ErrorType[],
         }
     },
 }

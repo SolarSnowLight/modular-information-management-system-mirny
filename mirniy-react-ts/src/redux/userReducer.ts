@@ -200,6 +200,10 @@ const logout = (): AppThunk =>
     }
 
 
+const emailPattern = /^.+@.+$/
+const phonePattern = /^\+(\d\D*){9,15}$/
+const birthDatePattern = /^\D*(?<day>\d{1,2})\D+(?<month>\d{1,2})\D+(?<year>\d{4})\D*$/
+
 const signup = (userData: UserRegister): AppThunk =>
     async (dispatch, getState) => {
 
@@ -215,6 +219,14 @@ const signup = (userData: UserRegister): AppThunk =>
             dispatch(errorsActions2.addError({
                 signup: { errors: { email: [
                     { code: 'required', message: 'email обязателен' }
+                ]}}
+            }))
+        }
+        if (!emailPattern.test(userData.email)) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addError({
+                signup: { errors: { email: [
+                    { code: 'incorrect', message: 'Неправильный email' }
                 ]}}
             }))
         }
@@ -238,7 +250,7 @@ const signup = (userData: UserRegister): AppThunk =>
             anyPrevalidationError = true
             dispatch(errorsActions2.addError({
                 signup: { errors: { name: [
-                    { code: 'required', message: 'Имя обязателено' }
+                    { code: 'required', message: 'Имя обязательно' }
                 ]}}
             }))
         }
@@ -250,8 +262,80 @@ const signup = (userData: UserRegister): AppThunk =>
                 ]}}
             }))
         }
+        if (userData.patronymic.length <= 0) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addError({
+                signup: { errors: { patronymic: [
+                    { code: 'required', message: 'Отчество обязательно' }
+                ]}}
+            }))
+        }
+        if (userData.nickname.length <= 0) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addError({
+                signup: { errors: { nickname: [
+                    { code: 'required', message: 'Никнейм обязателен' }
+                ]}}
+            }))
+        }
+        if (userData.phone.length <= 0) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addError({
+                signup: { errors: { phone: [
+                    { code: 'required', message: 'Телефон обязателен' }
+                ]}}
+            }))
+        }
+        let phoneMatch = phonePattern.exec(userData.phone)
+        if (!phoneMatch) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addError({
+                signup: { errors: { phone: [
+                    { code: 'incorrect', message: "Телефон должен начинаться с '+' и иметь 9-15 цифр, разделённых как угодно" }
+                ]}}
+            }))
+        }
+
+        if (userData.birthDate.length <= 0) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addError({
+                signup: { errors: { birthDate: [
+                    { code: 'required', message: 'Дата рождения обязательна' }
+                ]}}
+            }))
+        }
+        let birthDateMatch = birthDatePattern.exec(userData.birthDate)
+        if (!birthDateMatch) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addError({
+                signup: { errors: { birthDate: [
+                    { code: 'incorrect', message: "Дата рождения должна быть в формате 31-12-2000 или 1-2-2000" }
+                ]}}
+            }))
+        }
+        const year0 = +birthDateMatch!.groups!.year
+        const month0 = +birthDateMatch!.groups!.month
+        const day0 = +birthDateMatch!.groups!.day
+        const birthDate = new Date(year0, month0-1, day0)
+        const year = birthDate.getFullYear()
+        const month = birthDate.getMonth()+1
+        const day = birthDate.getDate()
+        if (year!==year0 || month!==month0 || day!==day0) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addError({
+                signup: { errors: { birthDate: [
+                            { code: 'incorrect', message: "Дата рождения некорректна" }
+                        ]}}
+            }))
+        }
+
 
         if (anyPrevalidationError) return
+
+        userData.phone = '+'+userData.phone.replaceAll(/\D/g,"")
+        userData.birthDate = `${(day+'').padStart(2,'0')}-${(month+'').padStart(2,'0')}-${(year+'').padStart(4,'0')}`
+
+        console.log('userData', userData)
 
 
         dispatch(loadingActions2.setLoading('signup'))
@@ -267,6 +351,13 @@ const signup = (userData: UserRegister): AppThunk =>
                     signup: { common: [
                         { code: 'connection error', message: 'Ошибка соединения с сервером' }
                     ]}
+                }))
+                return
+            case 500:
+                dispatch(errorsActions2.addError({
+                    signup: { common: [
+                            { code: 'error', message: error.message }
+                        ]}
                 }))
                 return
             default:

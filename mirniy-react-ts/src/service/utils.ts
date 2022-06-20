@@ -7,7 +7,7 @@
  */
 
 export type ErrorType = {
-    code: 401 | 403 | 404
+    code: 401 | 403 | 404 | 500
         | 'error' | 'errors'
         | 'connection error' | 'no internet' | 'no server'
         | 'incorrect' | 'required'

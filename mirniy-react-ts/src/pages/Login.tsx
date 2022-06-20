@@ -40,7 +40,7 @@ function Login(){
 
     return <div>
         <div>access jwt: {accessJwt+''}</div>
-        <div>refresh jwt: {refreshJwt+''}</div>
+       {/* <div>refresh jwt: {refreshJwt+''}</div>*/}
         {/*<div>userid: {decodeJwt(accessJwt??'').users_id}</div>*/}
 
         <div>Вход</div>
