@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Main from "./pages/Main";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Article from "./pages/Article";
+import ArticleOLD from "./pages/ArticleOLD";
 import {useAppDispatch} from "./redux/hooks";
 import {appActions} from "./redux/appReducer";
 import {useDebounce} from "./hooks/useDebounce";
@@ -73,9 +73,9 @@ function App() {
     }
 
 
-    const [showOverlay, setShowOverlay] = useState(false)
+    /*const [showOverlay, setShowOverlay] = useState(false)
     const [first, setFirst] = useState(false)
-    const [second, setSecond] = useState(false)
+    const [second, setSecond] = useState(false)*/
     //if (!first) setTimeout(()=>{setShowOverlay(true); setFirst(true)}, 5000)
     //if (!second) setTimeout(()=>{setShowOverlay(false); setSecond(true)}, 10000)
 
@@ -87,19 +87,16 @@ function App() {
             <Routes>
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
-                <Route path='/article' element={<Article/>}/>
-                <Route path='/article-new' element={<ArticleNew/>}/>
-
-                <Route path='/article-preview' element={<ArticlePreview/>}/>
+                <Route path='/article' element={<ArticleNew/>}/>
 
                 <Route path='*' element={<Main/>}/>
             </Routes>
 
-            { showOverlay && <div style={{
+            {/*{ showOverlay && <div style={{
                 position: 'fixed', top: 0, left: 0,
                 width: '100%', height: '100vh', background: 'yellow' }}>
 
-            </div> }
+            </div> }*/}
 
         </div>
     </>

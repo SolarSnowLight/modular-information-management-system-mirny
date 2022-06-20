@@ -26,7 +26,7 @@ function Main(){
         {/*<Link to={'/article'}>
             <button>Статья</button>
         </Link>*/}
-        <Link to={'/article-new'}>
+        <Link to={'/article'}>
             <button>Статья</button>
         </Link>
     </>

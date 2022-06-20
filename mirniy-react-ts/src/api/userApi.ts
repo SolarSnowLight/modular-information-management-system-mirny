@@ -1,4 +1,4 @@
-import Axios from "axios"
+import Axios, {AxiosError} from "axios"
 import axios, {AxiosResponse} from "axios"
 import { IArticle } from "src/models/IArticle"
 
