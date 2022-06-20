@@ -29,7 +29,7 @@ function Login(){
 
 
     const makeLogin = () => {
-        d(userActions.login(login,password))
+        d(userActions.login(login, password))
     }
     const makeLogout = () => {
         d(userActions.logout())

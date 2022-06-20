@@ -8,6 +8,8 @@ import {nonEmpty} from "@rrainpath/ts-utils";
 import {useNavigate} from "react-router-dom";
 import {appActions} from "../redux/appReducer";
 import ArticlePreview from "./ArticlePreview";
+import { IArticle } from 'src/models/IArticle';
+import { userActions } from 'src/redux/userReducer';
 
 
 
@@ -28,8 +30,14 @@ const imageTag =/<image[ \n]+id=(?<id>\d+)[ \n]*\/>/g // need to wrap into RegEx
 
 
 const ArticleNew = () => {
+    const { accessJwt, refreshJwt, user } = useAppSelector(s=>s.user)
 
     const d = useAppDispatch()
+
+    // Create article
+    const makeArticle = (data: IArticle) => {
+        d(userActions.createArticle(data))
+    }
 
     const [text, setText] = useState(
         `some content
@@ -65,8 +73,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
 
     const navigate = useNavigate()
 
-
-    const prepareArticle = () => {
+    const prepareArticle = (withModal: boolean = true) => {
         const regexp = RegExp(imageTag)
 
         const idToFile = new Map<number,File>()
@@ -96,13 +103,20 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
         clearedText += text.substring(pos)
         //console.log(clearedText)
 
-        d(appActions.setArticle({
+        if(withModal){
+            d(appActions.setArticle({
+                text: clearedText,
+                images: imageItems
+            }))
+    
+            //navigate('/article-preview')
+            setShowPreview(true)
+        }
+
+        return {
             text: clearedText,
             images: imageItems
-        }))
-
-        //navigate('/article-preview')
-        setShowPreview(true)
+        };
     }
 
 
@@ -183,7 +197,14 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
                  contentEditable dangerouslySetInnerHTML={{__html: divText}}/>*/}
             {/*<button onClick={rangeTest}>Test ranges</button>*/}
             {/*<button onClick={getSelection}>Get selection</button>*/}
-            <button onClick={prepareArticle}>Предпросмотр статьи</button>
+            <button onClick={(e) => {prepareArticle();}}>Предпросмотр статьи</button>
+            <button onClick={(e) => {
+                const data = prepareArticle(false);
+                makeArticle(data as IArticle);
+            }}>Сохранение</button>
+            <button onClick={(e) => {
+                console.log(prepareArticle(false).images);
+            }}>Загрузка статьи с сервера</button>
         </div>
 
         <div className={css.imagesBox} onDrop={onImagesDrop}>

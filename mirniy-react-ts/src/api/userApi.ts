@@ -1,5 +1,6 @@
 import Axios from "axios"
 import axios, {AxiosResponse} from "axios"
+import { IArticle } from "src/models/IArticle"
 
 const ip = 'localhost'
 const port = '5000'
@@ -11,8 +12,11 @@ const ax = Axios.create({
     withCredentials: true
 })
 
-
-
+/*ax.interceptors.request.use((config) => {
+    // На каждый запрос будет закреплён токен доступа
+    config.headers!.Authorization = `Bearer ${localStorage.getItem('token')}`;
+    return config;
+});*/
 
 ax.interceptors.response.use((config) => {
     return config;
@@ -26,11 +30,13 @@ ax.interceptors.response.use((config) => {
         && (!error.config._isRetry)){
         originalRequest._isRetry = true;
         try{
-            const response = await ax.post<AuthResponse>(`auth/refresh`)
+            const response = await ax.post<AuthResponse>('auth/refresh', undefined, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            })
 
-
-            //localStorage.setItem('token', response.data.accessToken);
-
+            localStorage.setItem('token', response.data.access_token);
 
             return ax.request(originalRequest);
         }catch(e){
@@ -116,8 +122,25 @@ const signup = async (userData: UserRegister): ResponseData<AuthResponse> => {
 }
 
 
+/* Upload article */
+export type CreateArticleResponse = {
+    is_created: boolean
+}
+
+const createArticle = async (
+    data: FormData
+): ResponseData<CreateArticleResponse> => {
+    return ax.post("user/article/create", data, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+    })
+}
+/***/
+
 export const userApi = {
     login,
     logout,
     signup,
+    createArticle
 }

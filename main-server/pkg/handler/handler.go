@@ -29,6 +29,9 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
+	router.MaxMultipartMemory = 50 << 20 // 50 MiB
+	router.Static("/main-server/", "./public")
+
 	router.LoadHTMLGlob("pkg/templates/*")
 
 	// Настройка CORS-политики
@@ -52,6 +55,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		// With middlewares (for get data from access token)
 		auth.POST(route.AUTH_REFRESH_TOKEN_ROUTE, h.userIdentityLogout, h.refresh)
 		auth.POST(route.AUTH_LOGOUT_ROUTE, h.userIdentity, h.logout)
+	}
+
+	user := router.Group(route.USER_MAIN_ROUTE, h.userIdentity)
+	{
+		user.POST(route.USER_CREATE_ARTICLE_ROUTE, h.createArticle)
 	}
 
 	/*api := router.Group("/api", h.userIdentity)
