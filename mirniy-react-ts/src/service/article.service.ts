@@ -12,6 +12,7 @@ import { ServiceData } from "./utils";
 type ArticleServiceResponse = {
   is_created: boolean;
 };
+
 const createArticle = async (
   uploadData: FormData
 ): Promise<ServiceData<ArticleServiceResponse>> => {
@@ -55,6 +56,34 @@ const createArticle = async (
   );
 };
 
+type ArticleFileServiceResponse = {
+  index: number;
+  filename: string;
+  filepath: string;
+};
+
+type GetArticleServiceResponse = {
+  title: string;
+  text: string;
+  files: ArticleFileServiceResponse[];
+};
+
+const getArticle = async (): Promise<ServiceData<GetArticleServiceResponse>> => {
+  return userApi.getArticle().then(
+    (response) => {
+      let { status, data } = response;
+      if (status == 200) {
+        data = data as GetArticleServiceResponse;
+
+        return data;
+      }
+
+      return {};
+    }
+  );
+};
+
 export const articleService = {
   createArticle,
+  getArticle
 };

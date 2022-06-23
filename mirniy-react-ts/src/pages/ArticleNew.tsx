@@ -19,12 +19,18 @@ const imageTag =/<image[ \n]+id=(?<id>\d+)[ \n]*\/>/g // need to wrap into RegEx
 
 const ArticleNew = () => {
     const { accessJwt, refreshJwt, user } = useAppSelector(s=>s.user)
-
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
     const d = useAppDispatch()
 
     // Create article
     const makeArticle = (data: IArticle) => {
+        console.log(data);
         d(userActions.createArticle(data))
+    }
+
+    // Get article
+    const makeGetArticle = () => {
+        d(userActions.getArticle())
     }
 
     const [text, setText] = useState(
@@ -69,14 +75,12 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
     }*/
 
     /*const navigate = useNavigate()*/
-
-    const prepareArticle = (withModal: boolean = true) => {
     const getId = useObjectToKey()
 
     const [images, setImages] = useState([] as File[])
     const [showPreview, setShowPreview] = useState(false)
 
-    const prepareArticle = () => {
+    const prepareArticle = (withModal: boolean = true) => {
         const regexp = RegExp(imageTag)
 
         const idToFile = new Map<number,File>()
@@ -185,7 +189,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
                 makeArticle(data as IArticle);
             }}>Сохранение</button>
             <button onClick={(e) => {
-                console.log(prepareArticle(false).images);
+                makeGetArticle();
             }}>Загрузка статьи с сервера</button>
         </div>
 

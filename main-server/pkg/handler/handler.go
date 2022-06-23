@@ -30,7 +30,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
 	router.MaxMultipartMemory = 50 << 20 // 50 MiB
-	router.Static("/main-server/", "./public")
+	router.Static("/public", "./public")
 
 	router.LoadHTMLGlob("pkg/templates/*")
 
@@ -60,6 +60,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	user := router.Group(route.USER_MAIN_ROUTE, h.userIdentity)
 	{
 		user.POST(route.USER_CREATE_ARTICLE_ROUTE, h.createArticle)
+		user.POST(route.USER_GET_ARTICLE_ROUTE, h.getArticle)
 	}
 
 	/*api := router.Group("/api", h.userIdentity)

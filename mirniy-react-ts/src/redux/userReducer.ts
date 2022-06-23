@@ -65,6 +65,18 @@ const createArticle =
   };
 /***/
 
+/* Get article */
+const getArticle = (): AppThunk =>
+  async (dispatch, getState) => {
+    // request
+    let { data, error } = await articleService
+        .getArticle();
+    
+    
+    console.log(data)
+  };
+/***/
+
 const login =
   (login: string, password: string): AppThunk =>
   async (dispatch, getState) => {
@@ -544,6 +556,7 @@ export const userActions = {
   login,
   logout,
   signup,
-  createArticle
+  createArticle,
+  getArticle
 };
 export const userReducer = userSlice.reducer;

@@ -1,9 +1,11 @@
 package repository
 
 import (
+	articleModel "main-server/pkg/model/article"
 	rbacModel "main-server/pkg/model/rbac"
 	userModel "main-server/pkg/model/user"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/oauth2"
 )
@@ -27,6 +29,8 @@ type Role interface {
 
 type User interface {
 	GetUser(column, value interface{}) (userModel.UserModel, error)
+	CreateArticle(c *gin.Context, title, text string, files []articleModel.FileArticleModel) (bool, error)
+	GetArticle(c *gin.Context) (articleModel.ArticleResponse, error)
 }
 
 type AuthType interface {
