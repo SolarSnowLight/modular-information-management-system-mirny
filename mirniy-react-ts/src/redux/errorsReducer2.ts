@@ -94,7 +94,7 @@ const initialState = {
 
 export const errorsReducer2: Reducer<ErrorsState2> = (state = initialState, action) => {
     switch (action.type){
-        case 'addErrors':
+        case 'addErrors': {
             const newState = {...state}
             const parts = action.payload as ErrorsDraft2
             for (let k1 in parts){
@@ -120,6 +120,56 @@ export const errorsReducer2: Reducer<ErrorsState2> = (state = initialState, acti
                 }
             }
             return newState
+        }
+
+        // if property exists and set to undefined - it will be reseted
+        case 'addErrors2': {
+            const newState = {...state}
+            const parts = action.payload as ErrorsDraft2
+            for (let k1 in parts) if (k1 in newState) {
+                if (typeof parts[k1] === 'object'){
+                    newState[k1] = {...newState[k1]}
+                    let hasError = false
+
+                    if ('common' in parts[k1]!){
+                        let common = parts[k1]!.common
+                        if (common instanceof Array && common.length>0){
+                            newState[k1]!.common = [...newState[k1]!.common, ...common]
+                        } else if (common === undefined){
+                            newState[k1]!.common = initialState[k1]!.common!
+                        }
+                        if (newState[k1]!.common.length > 0) hasError = true
+                    }
+
+                    if ('errors' in parts[k1]!) {
+                        let errors = parts[k1]!.errors
+                        if (typeof errors === 'object'){
+                            for (let k2 in parts[k1]!.errors) if (k2 in newState[k1].errors) {
+                                let prop = parts[k1]!.errors[k2]
+                                if (prop instanceof Array && prop.length > 0) {
+                                    newState[k1].errors = {...newState[k1].errors}
+                                    newState[k1]!.hasError = true
+                                    newState[k1]!.errors[k2] = [...newState[k1]!.errors[k2], ...prop]
+                                } else if (prop === undefined) {
+                                    newState[k1]!.errors[k2] = initialState[k1]!.errors[k2]!
+                                    // todo check has errors
+                                }
+                                if (newState[k1]!.errors[k2]!.length > 0) hasError = true
+                            }
+                        } else if (errors === undefined) {
+                            newState[k1]!.errors = initialState[k1]!.errors!
+                        }
+                    }
+
+                    newState[k1]!.hasError = hasError
+
+                } else if (parts[k1] === undefined){
+                    newState[k1] = initialState[k1]
+                }
+            }
+            return newState
+        }
+
 
         case 'clearErrors':
             const partName = action.payload as keyof ErrorsState2
@@ -137,6 +187,9 @@ export const errorsReducer2: Reducer<ErrorsState2> = (state = initialState, acti
 const addError = (errors: ErrorsDraft2) => ({
     type: 'addErrors', payload: errors
 })
+const addErrors = (errors: ErrorsDraft2) => ({
+    type: 'addErrors2', payload: errors
+})
 
 const clearErrors = (part: keyof ErrorsState2) => ({
     type: 'clearErrors', payload: part
@@ -145,6 +198,7 @@ const clearErrors = (part: keyof ErrorsState2) => ({
 
 export const errorsActions2 = {
     addError,
+    addErrors,
     clearErrors,
 }
 

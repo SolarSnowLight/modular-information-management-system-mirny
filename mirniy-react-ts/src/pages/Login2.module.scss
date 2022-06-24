@@ -1,0 +1,63 @@
+
+@use 'src/common-styles/common';
+
+
+
+.mainFrame {
+    width: 100vw; height: 100vh;
+    background: var(--c-white2);
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+
+.logoPic {
+    width: 42.6%; height: 100%;
+
+    // doesn't work in css
+    //background-image: url("src/assets/images/mir-rab-2.png");
+
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+
+.formFrame {
+    flex-grow: 1; height: 100%;
+    @include common.column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.inputBox {
+    @include common.column;
+    width: 298px;
+}
+.errorContainer {
+    position: relative;
+    height: 30px;
+}
+.errorContainer2 {
+    position: absolute;
+    top: 0; left: 0;
+    //margin: 0 auto;
+    white-space: nowrap;
+    @include common.row;
+    padding-top: 4px;
+    gap: 4px;
+}
+.error {
+    font: 400 12px 'Roboto';
+
+    //@include common.border(1px, solid, #EE1D23, 6px);
+    //padding: 2px 3px 5px 3px;
+
+    padding: 2px 3px 5px 1px;
+
+    height: 20px;
+
+    /* todo Red */
+    color: #EE1D23;
+}

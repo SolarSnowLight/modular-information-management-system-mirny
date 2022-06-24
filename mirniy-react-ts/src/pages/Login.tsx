@@ -1,4 +1,4 @@
-import {useAppDispatch, useAppSelector} from "../redux/hooks";
+import {useAppDispatch, useAppSelector} from "src/redux/hooks";
 import css from './Login.module.scss'
 import {userActions} from "../redux/userReducer";
 import {useState} from "react";
@@ -8,7 +8,7 @@ import {errorsActions2} from "../redux/errorsReducer2";
 
 function Login(){
 
-    const { accessJwt, refreshJwt, user } = useAppSelector(s=>s.user)
+    const { accessJwt, user } = useAppSelector(s=>s.user)
     const { login: loginErrors, logout: logoutErrors } = useAppSelector(s=>s.errors2)
     const { login: loginLoading, logout: logoutLoading } = useAppSelector(s=>s.loading2)
 

@@ -1,29 +1,62 @@
-import React from "react"
-import {ReactComponent as LoadingIcon} from "src/assets/icons/loading-ic.svg"
-import css from "./Ic.module.scss"
+
+import {ReactComponent as LoadingSvg} from "src/assets/icons/loading.svg"
+import css from "./LoadingIc.module.scss"
 
 
 
 
-// Необходимо непосредственно задать размер контейнеру иконки
-const LoadingIc = ({fill, size}: {fill:string, size?: number}) => {
-
-    return <div className={css.box} style={{width: size, height: size}}>
-        <LoadingIcon className={css.icon +" "+ css.loading} fill={fill} stroke={fill}/>
-    </div>
-
-    /*return <div className={css.box} style={{height: size, width: size}}>
-        <LoadingIcon className={css.loading} fill={fill} stroke={fill}/>
-    </div>*/
-
-    /*return <div className={css.box} style={{height: size, width: size}}>
-        <LoadingIcon className={css.loading} fill={fill} stroke={fill}/>
-    </div>*/
+const LoadingIc = (
+    { fill = '#6663ff', size }: { fill?: string, size?: number }
+) => {
+    return <LoadingSvg className={css.loading}
+        style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
+        fill={fill} stroke={fill}/>
+}
+export default LoadingIc
 
 
 
 
-    /*const iconBoxRef = useRef<HTMLDivElement>(null)
+
+//OLD:
+/*
+
+.box {
+    display: flex;
+    align-items: stretch;
+
+}
+.box2 {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+}
+
+
+    .box {
+    display: grid;
+    align-items: stretch;
+    justify-items: stretch;
+    //aspect-ratio: 1/1;
+}
+.icon {
+    height: 100%;
+}
+*/
+/*return <div className={css.box} style={{height: size, width: size}}>
+    <LoadingIcon className={css.loading} fill={fill} stroke={fill}/>
+</div>*/
+
+/*return <div className={css.box} style={{height: size, width: size}}>
+    <LoadingIcon className={css.loading} fill={fill} stroke={fill}/>
+</div>*/
+
+
+
+
+/*
+    const iconBoxRef = useRef<HTMLDivElement>(null)
     const iconBox = iconBoxRef.current
 
 
@@ -48,8 +81,3 @@ const LoadingIc = ({fill, size}: {fill:string, size?: number}) => {
         <LoadingIcon className={css.loading} fill={fill} stroke={fill}/>
     </div>
 */
-
-
-}
-
-export default LoadingIc

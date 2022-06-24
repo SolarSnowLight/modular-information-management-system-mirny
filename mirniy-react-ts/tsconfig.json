@@ -6,7 +6,10 @@
             "dom.iterable",
             "esnext"
         ],
+
+        // allow resolve src folder as module
         "baseUrl":".",
+
         "allowJs": true,
         "skipLibCheck": true,
         "esModuleInterop": true,

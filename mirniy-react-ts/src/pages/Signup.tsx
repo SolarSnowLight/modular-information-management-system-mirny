@@ -6,7 +6,7 @@ import {errorsActions2} from "../redux/errorsReducer2";
 
 
 function Signup(){
-    const { accessJwt, refreshJwt, user } = useAppSelector(s=>s.user)
+    const { accessJwt, user } = useAppSelector(s=>s.user)
     const { signup: signupErrors } = useAppSelector(s=>s.errors2)
     const { signup: signupLoading } = useAppSelector(s=>s.loading2)
     const d = useAppDispatch()

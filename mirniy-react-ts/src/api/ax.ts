@@ -15,7 +15,7 @@ const ax = Axios.create({
 // todo delete token if it not valid after interceptor validation
 
 ax.interceptors.response.use(
-    (config) => config,
+    response => response,
     async (error: Error|AxiosError) => {
         //console.log('ERROR:',error)
         if (Axios.isAxiosError(error) && error.config && error.response){

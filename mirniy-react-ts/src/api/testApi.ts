@@ -1,9 +1,10 @@
 import Axios, {AxiosResponse} from "axios"
 
-//const ip = 'localhost'
-const ip = '62.113.105.170'
+const ip = 'localhost'
+//const ip = '62.113.105.170'
 //const port = '8000'
-const port = '80'
+const port = '8962'
+//const port = '80'
 const basePath = ""
 const baseUrl = `http://${ip}:${port}/${basePath}`
 

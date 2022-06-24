@@ -9,6 +9,7 @@ import {appActions} from "./redux/appReducer";
 import {useDebounce} from "./hooks/useDebounce";
 import ArticleNew from "./pages/ArticleNew";
 import ArticlePreview from "./pages/ArticlePreview";
+import Login2 from "./pages/Login2";
 
 function App() {
 
@@ -87,6 +88,7 @@ function App() {
             <Routes>
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
+                <Route path='/login2' element={<Login2/>}/>
                 <Route path='/article' element={<ArticleNew/>}/>
 
                 <Route path='*' element={<Main/>}/>

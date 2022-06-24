@@ -1,5 +1,5 @@
 import {BadRequest, AuthResponse, LogoutResponse, userApi, UserRegister} from "../api/userApi";
-import {AxiosError} from "axios";
+import Axios, {AxiosError} from "axios";
 import {ServiceData} from "./utils";
 
 
@@ -18,26 +18,29 @@ const login = async (login: string, password: string): Promise<ServiceData<AuthS
                     refreshToken: data.refresh_token
                 }}
             }
-            data = data as BadRequest
-            return { error: { code: 'error', message: data.message } }
+            data = data as BadRequest|undefined
+            return { error: { code: 'error', message: data?.message } }
         },
-        (error: AxiosError) => {
-            if (error.response){
-                const status = error.response.status
-                const data = error.response.data as BadRequest
+        (error: Error|AxiosError) => {
+            if (Axios.isAxiosError(error)){
+                if (error.code==='ERR_NETWORK')
+                    // error.code: "ERR_NETWORK" when server not found
+                    return { error: { code: 'connection error' } }
+                if (error.response){
+                    const status = error.response.status
+                    const data = error.response.data as BadRequest|undefined
 
-                if (status===400)
-                    return { error: { code: 'error', message: data.message } }
-                if (status===401)
-                    return { error: { code: 'incorrect data', message: data.message } }
-                if (status===500)
-                    return { error: { code: 500, message: data.message } }
+                    if (status===400)
+                        return { error: { code: 'error', message: data?.message } }
+                    if (status===401)
+                        return { error: { code: 'incorrect data', message: data?.message } }
+                    if (status===500)
+                        return { error: { code: 500, message: data?.message } }
 
-                return { error: { code: 'error', message: data.message } }
+                    return { error: { code: 'error', message: data?.message } }
+                }
             }
-            //console.log(error)
-            // error.code: "ERR_NETWORK" when server not found on localhost - крч ошибка соединения с сервером
-            return { error: { code: 'connection error' } }
+            return { error: { code: 'error' } }
         }
     )
 }
@@ -49,9 +52,9 @@ type LogoutService = {
     isLogout: boolean
 }
 const logout = async (
-    accessToken: string|null|undefined, refreshToken: string|null|undefined
+    accessToken: string|null|undefined
 ): Promise<ServiceData<LogoutService>> => {
-    return userApi.logout(accessToken, refreshToken).then(
+    return userApi.logout(accessToken).then(
         response => {
             let { status, data } = response
             if (status===200) {

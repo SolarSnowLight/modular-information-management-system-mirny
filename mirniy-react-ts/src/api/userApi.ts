@@ -17,7 +17,7 @@ export type InternalServerError = BadRequest
 export type Default = BadRequest
 
 
-type ResponseData<D> = Promise<AxiosResponse<D|BadRequest>>
+type ResponseData<D> = Promise<AxiosResponse<D|BadRequest|undefined>>
 
 
 // 200
@@ -40,7 +40,7 @@ export type LogoutResponse = {
     is_logout: boolean
 }
 const logout = async (
-    accessToken: string|null|undefined, refreshToken: string|null|undefined
+    accessToken: string|null|undefined
 ): ResponseData<LogoutResponse> => {
     return ax.post('auth/logout', undefined, {
         headers: {

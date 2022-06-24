@@ -11,8 +11,12 @@ import ArticlePreview from "./ArticlePreview";
 
 
 
+
+
 const imageExtensions = /\.((jpg)|(jpeg)|(png)|(webp)|(bmp)|(jfif))$/i
-const imageTag =/<image[ \n]+id=(?<id>\d+)[ \n]*\/>/g // need to wrap into RegExp to prevent endless loop
+const imageTag =/<image[ \n]+id=(?<id>\d+)[ \n]*\/>/g
+
+const wordExtensions = /\.((doc)|(docx))$/i
 
 
 const ArticleNew = () => {
@@ -69,6 +73,41 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
     const [images, setImages] = useState([] as File[])
     const [showPreview, setShowPreview] = useState(false)
 
+    const [word, setWord] = useState(undefined as undefined|File)
+
+    useEffect(()=>{
+        if (word){
+            const reader = new FileReader();
+            reader.onabort = () => console.log("file reading was aborted");
+            reader.onerror = () => console.log("file reading has failed");
+            reader.onload = (ev) => {
+                /*textract.fromUrl(ev.target?.result as string, (err,text)=>{
+                    console.log('err:', err)
+                    console.log('text:', text)
+                });*/
+
+                /*mammoth.convertToHtml(ev.target?.result)
+                    .then(function(result){
+                        //var html = result.value; // The generated HTML
+                        //var messages = result.messages; // Any messages, such as warnings during conversion
+                        console.log('word:',result.value)
+                    })
+                    .done();*/
+            };
+            reader.readAsArrayBuffer(word)
+            //reader.readAsDataURL(word);
+
+
+            console.log("I AM HERE")
+
+
+
+            /*textract.fromFileWithPath(word.name, (err,text)=>{
+                console.log('err:', err)
+                console.log('text:', text)
+            })*/
+        }
+    },[word])
 
     const prepareArticle = () => {
         imageTag.lastIndex = 0
@@ -119,18 +158,20 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
 
 
 
-    const onImagesDrop = (ev: React.DragEvent<HTMLDivElement>) => {
+    const onFilesDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         if (isDraggingFiles) {
             //console.log('IMAGES DROP:',ev)
 
-            const addImg = (file: File) => {
+            const addFile = (file: File) => {
                 if (imageExtensions.test(file.name))
                     setImages(images=>[...images, file])
+                else if (wordExtensions.test(file.name))
+                    setWord(file)
             }
 
             for (const item of ev.dataTransfer.items){
                 const fsItem = item.webkitGetAsEntry()
-                walkFileTree(fsItem, addImg)
+                walkFileTree(fsItem, addFile)
             }
         }
     }
@@ -176,7 +217,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
             <button onClick={prepareArticle}>Предпросмотр статьи</button>
         </div>
 
-        <div className={css.imagesBox} onDrop={onImagesDrop}>
+        <div className={css.imagesBox} onDrop={onFilesDrop}>
 
             { images.map(it=>
                 <ImageItem file={it} id={getId(it)} key={getId(it)}

@@ -1,0 +1,30 @@
+
+
+@mixin row {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+@mixin column {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+@mixin abs {
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+}
+
+@mixin center {
+    display: grid;
+    align-content: center;
+    justify-content: center;
+}
+
+
+
+
+@mixin border($thickness, $type, $color, $radius){
+    border: $thickness $type $color;
+    border-radius: $radius;
+}

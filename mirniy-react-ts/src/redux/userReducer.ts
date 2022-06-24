@@ -13,7 +13,6 @@ type User = {
 // Define a type for the slice state
 export interface UserState {
     accessJwt: string|null|undefined
-    refreshJwt: string|null|undefined
     user: User|undefined
 }
 
@@ -21,7 +20,6 @@ export interface UserState {
 // Define the initial state using that type
 const initialState: UserState = {
     accessJwt: undefined,
-    refreshJwt: undefined,
     user: undefined,
 }
 
@@ -32,9 +30,8 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         // Use the PayloadAction type to declare the contents of `action.payload`
-        setJwt: (state, action: PayloadAction<{ accessJwt: string|null, refreshJwt: string|null }>) => {
+        setJwt: (state, action: PayloadAction<{ accessJwt: string|null }>) => {
             state.accessJwt = action.payload.accessJwt
-            state.refreshJwt = action.payload.refreshJwt
         },
         setUser: (state, action: PayloadAction<User>) => {
             state.user = action.payload
@@ -50,21 +47,29 @@ const login = (login: string, password: string): AppThunk =>
         let state = getState()
         if(state.loading2.login) return
 
-        dispatch(errorsActions2.clearErrors('login'))
+        dispatch(errorsActions2.addErrors({ login: undefined }))
 
         let anyPrevalidationError = false
         // prevalidation
         if (login.length<=0){
             anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
+            dispatch(errorsActions2.addErrors({
                 login: { errors: { login: [
-                    { code: 'required', message: 'Логин обязателен' }
+                    { code: 'required', message: 'Email обязателен' }
+                ]}}
+            }))
+        }
+        if (!emailPattern.test(login)) {
+            anyPrevalidationError = true
+            dispatch(errorsActions2.addErrors({
+                login: { errors: { login: [
+                    { code: 'incorrect', message: 'Неправильный email' }
                 ]}}
             }))
         }
         if (password.length<=0){
             anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
+            dispatch(errorsActions2.addErrors({
                 login: { errors: { password: [
                     { code: 'required', message: 'Пароль обязателен' }
                 ]}}
@@ -72,7 +77,7 @@ const login = (login: string, password: string): AppThunk =>
         }
         if (password.length<6){
             anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
+            dispatch(errorsActions2.addErrors({
                 login: { errors: { password: [
                     { code: 'incorrect password', message: 'Пароль должен быть не короче 6 символов' }
                 ]}}
@@ -83,30 +88,37 @@ const login = (login: string, password: string): AppThunk =>
 
 
         dispatch(loadingActions2.setLoading('login'))
-
         // request
         let { data, error } = await userService.login(login, password)
             .finally(()=>dispatch(loadingActions2.setLoading('login',false)))
+            .catch(err=>{
+                dispatch(errorsActions2.addErrors({
+                    login: { common: [
+                            { code: 'error', message: 'Ошибка' }
+                        ]}
+                }))
+                throw err
+            })
 
 
         // error check
         if (error) switch (error.code){
             case "connection error":
-                dispatch(errorsActions2.addError({
+                dispatch(errorsActions2.addErrors({
                     login: { common: [
                         { code: 'connection error', message: 'Ошибка соединения с сервером' }
                     ]}
                 }))
                 return
             case "incorrect data":
-                dispatch(errorsActions2.addError({
+                dispatch(errorsActions2.addErrors({
                     login: { common: [
                         { code: 'incorrect data', message: 'Неправильный логин или пароль' }
                     ]}
                 }))
                 return
             default:
-                dispatch(errorsActions2.addError({
+                dispatch(errorsActions2.addErrors({
                     login: { common: [
                         { code: 'error', message: 'Ошибка' }
                     ]}
@@ -118,8 +130,7 @@ const login = (login: string, password: string): AppThunk =>
         data = data!
 
         dispatch(setJwt({
-            accessJwt: data.accessToken,
-            refreshJwt: data.refreshToken
+            accessJwt: data.accessToken
         }))
 
 
@@ -140,10 +151,10 @@ const logout = (): AppThunk =>
 
         dispatch(errorsActions2.clearErrors('logout'))
 
-        let { accessJwt, refreshJwt } = state.user
+        let { accessJwt } = state.user
 
 
-        if (!accessJwt && !refreshJwt) {
+        if (!accessJwt) {
             dispatch(errorsActions2.addError({
                 logout: { common:[
                     { code: 401, message: 'Вы не вошли в систему' }
@@ -154,7 +165,7 @@ const logout = (): AppThunk =>
 
         dispatch(loadingActions2.setLoading('logout'))
 
-        let { data, error } = await userService.logout(accessJwt, refreshJwt)
+        let { data, error } = await userService.logout(accessJwt)
             .finally(()=>dispatch(loadingActions2.setLoading('logout',false)))
 
         // error check
@@ -195,9 +206,10 @@ const logout = (): AppThunk =>
             return
         }
 
-        dispatch(setJwt({ accessJwt: null, refreshJwt: null }))
+        dispatch(setJwt({ accessJwt: null }))
         dispatch(setUser(null))
     }
+
 
 
 const emailPattern = /^.+@.+$/
@@ -376,8 +388,7 @@ const signup = (userData: UserRegister): AppThunk =>
 
 
         dispatch(setJwt({
-            accessJwt: data.accessToken,
-            refreshJwt: data.refreshToken
+            accessJwt: data.accessToken
         }))
 
 
