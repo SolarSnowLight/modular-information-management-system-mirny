@@ -18,3 +18,8 @@ code {
     font-weight: 400;
     src: local('Roboto'), url('src/assets/fonts/Roboto/Roboto-Regular.ttf') format('truetype');
 }
+@font-face {
+    font-family: 'Roboto';
+    font-weight: 500;
+    src: local('Roboto'), url('src/assets/fonts/Roboto/Roboto-Medium.ttf') format('truetype');
+}

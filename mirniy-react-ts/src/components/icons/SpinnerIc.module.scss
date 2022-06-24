@@ -1,0 +1,13 @@
+
+
+
+.loading {
+    //width: 100%;
+    //aspect-ratio: 1/1;
+    //animation: rotation 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    //animation: rotation 1.5s cubic-bezier(0.35, 0.35, 0.39, 1.69) infinite;
+    animation: rotation 1s linear infinite;
+}
+@keyframes rotation {
+    100% { transform: rotate(360deg); }
+}

@@ -8,6 +8,9 @@ import {errorsActions2} from "../redux/errorsReducer2";
 import {userActions} from "../redux/userReducer";
 import LoadingIc from "../components/icons/LoadingIc";
 import Space from "../components/Space";
+import Button1 from "../components/Button1";
+import SpinnerIc from "../components/icons/SpinnerIc";
+import {Link} from "react-router-dom";
 
 
 // todo crop image, image shadow
@@ -45,13 +48,22 @@ function Login2(){
         <div className={css.logoPic} style={{ backgroundImage: `url(${mirRab2})` }}></div>
 
         <div className={css.formFrame}>
-            <div>Вход</div>
-            <div>Ещё нет аккаунта?</div><div>Зарегистрироваться</div>
+            <div className={css.enterTitle}>Вход</div>
 
-            <Space h={30}/>
+            <Space h={12} />
+
+            <div className={css.textContainer}>
+                <span className={css.noAccount}>Ещё нет аккаунта?</span>
+                <span style={{ whiteSpace: "break-spaces" }}>  </span>
+                <Link to='/signup'><span className={css.signup}>
+                    Зарегистрироваться
+                </span></Link>
+            </div>
+
+            <Space h={70}/>
 
             <div className={css.inputBox}>
-                <Input1 h={45} title='Email' placeholder='Введите email'
+                <Input1 h={54} title='Email' placeholder='Введите email'
                         value={login} onInput={onLoginInput} hasError={loginErrors.errors.login.length > 0}/>
                 <div className={css.errorContainer}>
                     { loginErrors.errors.login.length > 0 && <div className={css.errorContainer2}>
@@ -61,7 +73,7 @@ function Login2(){
             </div>
 
             <div className={css.inputBox}>
-                <Input1 h={45} title='Пароль' placeholder='Введите пароль' hideable hide
+                <Input1 h={54} title='Пароль' placeholder='Введите пароль' hideable hide
                         value={password} onInput={onPwdInput} hasError={loginErrors.errors.password.length > 0}/>
                 <div className={css.errorContainer}>
                     { loginErrors.errors.password.length > 0 && <div className={css.errorContainer2}>
@@ -70,9 +82,15 @@ function Login2(){
                 </div>
             </div>
 
+            <Space h={12} />
+
             <div className={css.inputBox}>
-                <button onClick={makeLogin}>Login</button>
-                { loginLoading && <LoadingIc size={30}/> }
+                <div className={css.btnBox}>
+                    <Button1 h={54} onClick={makeLogin} title={loginLoading?'':'Далее'}/>
+                    { loginLoading && <div className={css.spinnerBox}>
+                        <SpinnerIc circleColor='#ffffff33' indicatorColor='white' size={24}/>
+                    </div> }
+                </div>
                 <div className={css.errorContainer}>
                     { loginErrors.common.length > 0 && <div className={css.errorContainer2}>
                         { loginErrors.common.map(it=><div className={css.error} key={it.message}>{it.message}</div>) }
@@ -80,10 +98,7 @@ function Login2(){
                 </div>
             </div>
 
-
         </div>
-
-
 
     </div>
 }

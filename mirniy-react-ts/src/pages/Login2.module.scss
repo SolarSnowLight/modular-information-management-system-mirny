@@ -31,13 +31,40 @@
 }
 
 
+.enterTitle {
+    width: 360px;
+    font: 500 43px 'Roboto';
+    color: #424041; // Gray todo extract
+}
+.textContainer {
+    width: 360px;
+}
+.noAccount {
+    font: 400 14px 'Roboto';
+    color: #8B8B8B; // Gray Middle todo extract
+}
+.signup {
+    font: 400 17px 'Roboto';
+    color: #424041; // Gray Middle todo extract
+}
+
+
 .inputBox {
     @include common.column;
-    width: 298px;
+    width: 360px;
 }
+.btnBox {
+    position: relative;
+}
+.spinnerBox {
+    @include common.abs;
+    @include common.center;
+}
+
+
 .errorContainer {
     position: relative;
-    height: 30px;
+    height: 36px;
 }
 .errorContainer2 {
     position: absolute;
@@ -49,14 +76,14 @@
     gap: 4px;
 }
 .error {
-    font: 400 12px 'Roboto';
+    font: 400 14px 'Roboto';
 
     //@include common.border(1px, solid, #EE1D23, 6px);
     //padding: 2px 3px 5px 3px;
 
     padding: 2px 3px 5px 1px;
 
-    height: 20px;
+    height: 24px;
 
     /* todo Red */
     color: #EE1D23;

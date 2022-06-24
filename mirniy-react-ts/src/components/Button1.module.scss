@@ -1,0 +1,19 @@
+
+
+@use 'src/common-styles/common';
+
+
+.btn {
+    all: unset;
+    box-sizing: border-box;
+
+    background: #1F8DCD; // Blue todo extract color
+    border-radius: 4px;
+
+    color: white; // White todo extract color
+    font: 500 22px 'Roboto';
+    padding-bottom: 0.15em;
+    text-align: center;
+
+    cursor: pointer;
+}

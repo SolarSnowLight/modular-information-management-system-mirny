@@ -38,7 +38,6 @@ const Input1 = ({
                 { placeholder && !inputFocused && !value &&
                     <div className={css.placeholderContainer}>
                         <div className={css.placeholder}>{placeholder}</div>
-
                     </div>
                 }
                 <input autoFocus={autofocused}

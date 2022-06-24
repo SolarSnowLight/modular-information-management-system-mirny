@@ -41,12 +41,12 @@ absolute:
 
 .title {
     position: absolute;
-    top: -4px; left: 8px;
-    padding: 0 6px 0 6px;
+    top: -4px; left: 3px;
+    padding: 0 6px 0 11px;
     color: #424041; // Gray // todo extract into props
     background: #FCFCFC; // todo extract into props
     pointer-events: none;
-    font: 400 12px 'Roboto';
+    font: 400 14px 'Roboto';
 }
 
 .placeholderContainer {
@@ -60,9 +60,9 @@ absolute:
     .placeholder {
         color: black; // todo extract into props
         background: transparent;
-        font: 400 16px 'Roboto';
+        font: 400 19px 'Roboto';
         pointer-events: none;
-        padding-bottom: 5px;
+        padding-bottom: 0.15em;
     }
 }
 
@@ -77,8 +77,8 @@ absolute:
         all: unset;
         box-sizing: border-box;
         width: 100%; height: 100%;
-        font-size: 16px;
-        padding-bottom: 5px;
+        font: 400 19px 'Roboto';
+        padding-bottom: 0.15em;
         //vertical-align: super;
         //background: red;
     }
