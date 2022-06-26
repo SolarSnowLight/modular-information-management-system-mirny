@@ -5,7 +5,6 @@ import {ServiceData} from "./utils";
 
 type AuthService = {
     accessToken: string
-    refreshToken: string
 }
 const login = async (login: string, password: string): Promise<ServiceData<AuthService>> => {
     return userApi.login(login,password).then(
@@ -15,7 +14,6 @@ const login = async (login: string, password: string): Promise<ServiceData<AuthS
                 data = data as AuthResponse
                 return { data: {
                     accessToken: data.access_token,
-                    refreshToken: data.refresh_token
                 }}
             }
             data = data as BadRequest|undefined
@@ -98,7 +96,6 @@ const signup = async (userData: UserRegister): Promise<ServiceData<AuthService>>
                 data = data as AuthResponse
                 return { data: {
                         accessToken: data.access_token,
-                        refreshToken: data.refresh_token
                     }}
             }
             data = data as BadRequest

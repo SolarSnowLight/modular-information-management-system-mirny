@@ -1,5 +1,7 @@
 import Axios, {AxiosError} from "axios";
 import {AuthResponse} from "./userApi";
+import {store} from "../redux/store";
+import {userActions} from "../redux/userReducer";
 
 const ip = 'localhost'
 const port = '5000'
@@ -12,42 +14,45 @@ const ax = Axios.create({
 })
 
 
-// todo delete token if it not valid after interceptor validation
 
-ax.interceptors.response.use(
-    response => response,
-    async (error: Error|AxiosError) => {
-        //console.log('ERROR:',error)
-        if (Axios.isAxiosError(error) && error.config && error.response){
 
-            // Для повтора исходного запроса
-            const originalRequest = error.config;
+export function setupAxiosInterceptors(reduxStore: typeof store){
+    ax.interceptors.response.use(
+        response => response,
+        async (error: Error|AxiosError) => {
+            //console.log('ERROR:',error)
+            if (Axios.isAxiosError(error) && error.config && error.response){
 
-            // Обновление токена
-            if(
-                error.response.status === 401
-                && (error.config)
-                // @ts-ignore
-                && (!error.config._isRetry))
-            {
-                // @ts-ignore
-                originalRequest._isRetry = true;
+                // Для повтора исходного запроса
+                // Access token is included from config if it was there
+                // Refresh token is automatically included from cookies
+                const originalRequest = error.config as typeof error.config & { _isRetried?: boolean }
 
-                //console.log('Authorization:', originalRequest.headers.Authorization)
-                await ax.post<AuthResponse>(`auth/refresh`, undefined, {
-                    headers: {
-                        Authorization: originalRequest.headers?.Authorization ?? ''
+                // Обновление токена
+                if (error.response.status === 401)
+                    if (!originalRequest._isRetried){
+                        originalRequest._isRetried = true;
+
+                        const secondResponse = await ax.post<AuthResponse>(`auth/refresh`)
+
+                        const accessJwt = secondResponse.data.access_token
+
+                            //localStorage.setItem('token', secondResponse.data.access_token);
+                            reduxStore.dispatch(userActions.setJwt({ accessJwt }))
+
+                        ;(originalRequest.headers??{}).Authorization = `Bearer ${accessJwt}`
+                        await ax.request(originalRequest);
+                    } else {
+                        reduxStore.dispatch(userActions.setJwt({ accessJwt: null }))
+                        reduxStore.dispatch(userActions.setUser(null))
                     }
-                })
-
-                //localStorage.setItem('token', response.data.accessToken);
-
-                await ax.request(originalRequest);
             }
-        }
 
-        throw error
-    }
-)
+            throw error
+        }
+    )
+}
+
+
 
 export default ax

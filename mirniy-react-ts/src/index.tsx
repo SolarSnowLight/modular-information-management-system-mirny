@@ -12,7 +12,10 @@ import {store} from "./redux/store";
 
 import {PersistGate} from "redux-persist/integration/react";
 import persistStore from "redux-persist/es/persistStore";
+import {setupAxiosInterceptors} from "./api/ax";
 
+
+setupAxiosInterceptors(store)
 
 const persistor = persistStore(store)
 
@@ -21,6 +24,8 @@ const persistor = persistStore(store)
 const root = ReactDOM.createRoot(
     document.getElementById('root') as HTMLElement
 );
+
+
 root.render(
     <React.StrictMode>
         <Provider store={store}>

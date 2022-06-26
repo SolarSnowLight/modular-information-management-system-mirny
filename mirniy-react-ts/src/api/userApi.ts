@@ -23,7 +23,6 @@ type ResponseData<D> = Promise<AxiosResponse<D|BadRequest|undefined>>
 // 200
 export type AuthResponse = {
     access_token: string
-    refresh_token: string
 }
 const login = async (
     login: string, password: string
