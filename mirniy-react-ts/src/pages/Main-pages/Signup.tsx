@@ -1,14 +1,14 @@
-import {userActions} from "../redux/userReducer";
+import {userActions} from "../../redux/userReducer";
 import {useState} from "react";
-import {useAppDispatch, useAppSelector} from "../redux/hooks";
-import LoadingIc from "../components/icons/LoadingIc";
-import {errorsActions2} from "../redux/errorsReducer2";
+import {useAppDispatch, useAppSelector} from "../../redux/hooks";
+import LoadingIc from "../../components/icons/LoadingIc";
+import {errorsActions} from "../../redux/errorsReducer";
 
 
 function Signup(){
     const { accessJwt, user } = useAppSelector(s=>s.user)
-    const { signup: signupErrors } = useAppSelector(s=>s.errors2)
-    const { signup: signupLoading } = useAppSelector(s=>s.loading2)
+    const { signup: signupErrors } = useAppSelector(s=>s.errors)
+    const { signup: signupLoading } = useAppSelector(s=>s.loading)
     const d = useAppDispatch()
 
     const signup = () => {
@@ -28,39 +28,39 @@ function Signup(){
     const [birthDate, setBirthDate] = useState('')
     const onEmailInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(ev.currentTarget.value)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined, errors: { email: undefined } } }))
     }
     const onPwdInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(ev.currentTarget.value)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined, errors: { password: undefined } } }))
     }
     const onNameInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setName(ev.currentTarget.value)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined, errors: { name: undefined } } }))
     }
     const onSurnameInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setSurname(ev.currentTarget.value)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined, errors: { surname: undefined } } }))
     }
     const onPatronymicInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setPatronymic(ev.currentTarget.value)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined, errors: { patronymic: undefined } } }))
     }
     const onNicknameInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setNickname(ev.currentTarget.value)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined, errors: { nickname: undefined } } }))
     }
     const onSexInput = (isMale: boolean) => {
         setSex(isMale)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined } }))
     }
     const onPhoneInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setPhone(ev.currentTarget.value)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined, errors: { phone: undefined } } }))
     }
     const onBirthDateInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setBirthDate(ev.currentTarget.value)
-        d(errorsActions2.clearErrors('signup'))
+        d(errorsActions.addErrors({ signup: { common: undefined, errors: { birthDate: undefined } } }))
     }
 
 

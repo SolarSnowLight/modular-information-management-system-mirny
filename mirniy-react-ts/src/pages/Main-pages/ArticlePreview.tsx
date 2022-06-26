@@ -3,7 +3,7 @@ import css from './ArticlePreview.module.scss'
 
 
 
-import {useAppSelector} from "../redux/hooks";
+import {useAppSelector} from "../../redux/hooks";
 import {useEffect, useState} from "react";
 
 const ArticlePreview = () => {

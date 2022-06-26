@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {AppThunk} from "./store";
 import {userService} from "../service/userService";
-import {loadingActions2} from "./loadingReducer2";
+import {loadingActions} from "./loadingReducer";
 import {UserRegister} from "../api/userApi";
-import {errorsActions2} from "./errorsReducer2";
+import {errorsActions} from "./errorsReducer";
+import {errors, ErrorType} from './errors';
 
 
 type User = {
@@ -41,58 +42,62 @@ const userSlice = createSlice({
 
 
 
-const login = (login: string, password: string): AppThunk =>
+
+
+
+const login = (login: string, password: string): AppThunk<Promise<void|boolean>> =>
     async (dispatch, getState) => {
 
         let state = getState()
-        if(state.loading2.login) return
+        if(state.loading.login) return
 
-        dispatch(errorsActions2.addErrors({ login: undefined }))
+        dispatch(errorsActions.addErrors({ login: undefined }))
 
-        let anyPrevalidationError = false
-        // prevalidation
-        if (login.length<=0){
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addErrors({
-                login: { errors: { login: [
-                    { code: 'required', message: 'Email обязателен' }
-                ]}}
-            }))
+        {
+            let anyPrevalidationError = false
+            let error: ErrorType|undefined
+            // prevalidation
+            if (login.length<=0){
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    login: { errors: { login: [
+                                { code: 'required', message: 'Email обязателен' }
+                            ]}}
+                }))
+            }
+            if (error = errors.checkEmail(login)) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    login: { errors: { login: [error] }}
+                }))
+            }
+            if (password.length<=0){
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    login: { errors: { password: [
+                                { code: 'required', message: 'Пароль обязателен' }
+                            ]}}
+                }))
+            }
+            if (password.length<6){
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    login: { errors: { password: [
+                        errors.of('incorrect', 'Пароль должен быть не короче 6 символов')
+                    ]}}
+                }))
+            }
+
+            if (anyPrevalidationError) return
         }
-        if (!emailPattern.test(login)) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addErrors({
-                login: { errors: { login: [
-                    { code: 'incorrect', message: 'Неправильный email' }
-                ]}}
-            }))
-        }
-        if (password.length<=0){
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addErrors({
-                login: { errors: { password: [
-                    { code: 'required', message: 'Пароль обязателен' }
-                ]}}
-            }))
-        }
-        if (password.length<6){
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addErrors({
-                login: { errors: { password: [
-                    { code: 'incorrect password', message: 'Пароль должен быть не короче 6 символов' }
-                ]}}
-            }))
-        }
-
-        if (anyPrevalidationError) return
 
 
-        dispatch(loadingActions2.setLoading('login'))
+        dispatch(loadingActions.setLoading('login'))
         // request
         let { data, error } = await userService.login(login, password)
-            .finally(()=>dispatch(loadingActions2.setLoading('login',false)))
+            .finally(()=>dispatch(loadingActions.setLoading('login',false)))
             .catch(err=>{
-                dispatch(errorsActions2.addErrors({
+                dispatch(errorsActions.addErrors({
                     login: { common: [
                             { code: 'error', message: 'Ошибка' }
                         ]}
@@ -104,21 +109,21 @@ const login = (login: string, password: string): AppThunk =>
         // error check
         if (error) switch (error.code){
             case "connection error":
-                dispatch(errorsActions2.addErrors({
+                dispatch(errorsActions.addErrors({
                     login: { common: [
                         { code: 'connection error', message: 'Ошибка соединения с сервером' }
                     ]}
                 }))
                 return
             case "incorrect data":
-                dispatch(errorsActions2.addErrors({
+                dispatch(errorsActions.addErrors({
                     login: { common: [
                         { code: 'incorrect data', message: 'Неправильный логин или пароль' }
                     ]}
                 }))
                 return
             default:
-                dispatch(errorsActions2.addErrors({
+                dispatch(errorsActions.addErrors({
                     login: { common: [
                         { code: 'error', message: 'Ошибка' }
                     ]}
@@ -139,23 +144,24 @@ const login = (login: string, password: string): AppThunk =>
             name: 'someusername'
         }
         dispatch(setUser(user))*/
+        return true
     }
 
 
-const logout = (): AppThunk =>
+const logout = (): AppThunk<Promise<void|boolean>> =>
     async (dispatch, getState) => {
 
 
         const state = getState()
-        if(state.loading2.logout) return
+        if(state.loading.logout) return
 
-        dispatch(errorsActions2.clearErrors('logout'))
+        dispatch(errorsActions.addErrors({ logout: undefined }))
 
         let { accessJwt } = state.user
 
 
         if (!accessJwt) {
-            dispatch(errorsActions2.addError({
+            dispatch(errorsActions.addErrors({
                 logout: { common:[
                     { code: 401, message: 'Вы не вошли в систему' }
                 ] }
@@ -163,30 +169,30 @@ const logout = (): AppThunk =>
             return
         }
 
-        dispatch(loadingActions2.setLoading('logout'))
+        dispatch(loadingActions.setLoading('logout'))
 
-        let { data, error } = await userService.logout(accessJwt)
-            .finally(()=>dispatch(loadingActions2.setLoading('logout',false)))
+        let { data, error } = await userService.logout()
+            .finally(()=>dispatch(loadingActions.setLoading('logout',false)))
 
         // error check
         if (error){
             switch (error.code){
                 case "connection error":
-                    dispatch(errorsActions2.addError({
+                    dispatch(errorsActions.addErrors({
                         logout: { common:[
                             { code: 'connection error', message: 'Ошибка соединения с сервером' }
                         ] }
                     }))
                     return
                 case 401:
-                    dispatch(errorsActions2.addError({
+                    dispatch(errorsActions.addErrors({
                         logout: { common:[
                             { code: 401, message: 'Вы не вошли в систему' }
                         ] }
                     }))
                     return
                 default:
-                    dispatch(errorsActions2.addError({
+                    dispatch(errorsActions.addErrors({
                         logout: { common:[
                             { code: 'error', message: 'Ошибка' }
                         ] }
@@ -198,7 +204,7 @@ const logout = (): AppThunk =>
         data = data!
 
         if (!data.isLogout){
-            dispatch(errorsActions2.addError({
+            dispatch(errorsActions.addErrors({
                 logout: { common:[
                     { code: 'error', message: 'Ошибка разлогинивания' }
                 ] }
@@ -208,172 +214,173 @@ const logout = (): AppThunk =>
 
         dispatch(setJwt({ accessJwt: null }))
         dispatch(setUser(null))
+
+        return true
     }
 
 
 
-const emailPattern = /^.+@.+$/
 const phonePattern = /^\+(\d\D*){9,15}$/
 const birthDatePattern = /^\D*(?<day>\d{1,2})\D+(?<month>\d{1,2})\D+(?<year>\d{4})\D*$/
 
-const signup = (userData: UserRegister): AppThunk =>
+const signup = (userData: UserRegister): AppThunk<Promise<void|boolean>> =>
     async (dispatch, getState) => {
 
         let state = getState()
-        if(state.loading2.signup) return
+        if(state.loading.signup) return
 
-        dispatch(errorsActions2.clearErrors('signup'))
+        dispatch(errorsActions.addErrors({ signup: undefined }))
+        {
+            let anyPrevalidationError = false
+            let error: ErrorType|undefined = undefined
+            // prevalidation
+            if (userData.email.length <= 0) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { email: [
+                                { code: 'required', message: 'email обязателен' }
+                            ]}}
+                }))
+            }
+            if (error = errors.checkEmail(userData.email)) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { email: [error] }}
+                }))
+            }
+            if (userData.password.length<=0){
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { password: [
+                                { code: 'required', message: 'Пароль обязателен' }
+                            ]}}
+                }))
+            }
+            if (userData.password.length < 6) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { password: [
+                                { code: 'incorrect', message: 'Пароль должен быть не короче 6 символов' }
+                            ]}}
+                }))
+            }
+            if (userData.name.length <= 0) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { name: [
+                                { code: 'required', message: 'Имя обязательно' }
+                            ]}}
+                }))
+            }
+            if (userData.surname.length <= 0) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { surname: [
+                                { code: 'required', message: 'Фамилия обязательна' }
+                            ]}}
+                }))
+            }
+            if (userData.patronymic.length <= 0) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { patronymic: [
+                                { code: 'required', message: 'Отчество обязательно' }
+                            ]}}
+                }))
+            }
+            if (userData.nickname.length <= 0) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { nickname: [
+                                { code: 'required', message: 'Никнейм обязателен' }
+                            ]}}
+                }))
+            }
+            if (userData.phone.length <= 0) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { phone: [
+                                { code: 'required', message: 'Телефон обязателен' }
+                            ]}}
+                }))
+            }
+            let phoneMatch = phonePattern.exec(userData.phone)
+            if (!phoneMatch) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { phone: [
+                                { code: 'incorrect', message: "Телефон должен начинаться с '+' и иметь 9-15 цифр, разделённых как угодно" }
+                            ]}}
+                }))
+            }
 
-        let anyPrevalidationError = false
-        // prevalidation
-        if (userData.email.length <= 0) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { email: [
-                    { code: 'required', message: 'email обязателен' }
-                ]}}
-            }))
-        }
-        if (!emailPattern.test(userData.email)) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { email: [
-                    { code: 'incorrect', message: 'Неправильный email' }
-                ]}}
-            }))
-        }
-        if (userData.password.length<=0){
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { password: [
-                    { code: 'required', message: 'Пароль обязателен' }
-                ]}}
-            }))
-        }
-        if (userData.password.length < 6) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { password: [
-                    { code: 'incorrect', message: 'Пароль должен быть не короче 6 символов' }
-                ]}}
-            }))
-        }
-        if (userData.name.length <= 0) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { name: [
-                    { code: 'required', message: 'Имя обязательно' }
-                ]}}
-            }))
-        }
-        if (userData.surname.length <= 0) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { surname: [
-                    { code: 'required', message: 'Фамилия обязательна' }
-                ]}}
-            }))
-        }
-        if (userData.patronymic.length <= 0) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { patronymic: [
-                    { code: 'required', message: 'Отчество обязательно' }
-                ]}}
-            }))
-        }
-        if (userData.nickname.length <= 0) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { nickname: [
-                    { code: 'required', message: 'Никнейм обязателен' }
-                ]}}
-            }))
-        }
-        if (userData.phone.length <= 0) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { phone: [
-                    { code: 'required', message: 'Телефон обязателен' }
-                ]}}
-            }))
-        }
-        let phoneMatch = phonePattern.exec(userData.phone)
-        if (!phoneMatch) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { phone: [
-                    { code: 'incorrect', message: "Телефон должен начинаться с '+' и иметь 9-15 цифр, разделённых как угодно" }
-                ]}}
-            }))
-        }
-
-        if (userData.birthDate.length <= 0) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { birthDate: [
-                    { code: 'required', message: 'Дата рождения обязательна' }
-                ]}}
-            }))
-        }
-        let birthDateMatch = birthDatePattern.exec(userData.birthDate)
-        if (!birthDateMatch) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { birthDate: [
-                    { code: 'incorrect', message: "Дата рождения должна быть в формате 31-12-2000 или 1-2-2000" }
-                ]}}
-            }))
-        }
-        const year0 = +birthDateMatch!.groups!.year
-        const month0 = +birthDateMatch!.groups!.month
-        const day0 = +birthDateMatch!.groups!.day
-        const birthDate = new Date(year0, month0-1, day0)
-        const year = birthDate.getFullYear()
-        const month = birthDate.getMonth()+1
-        const day = birthDate.getDate()
-        if (year!==year0 || month!==month0 || day!==day0) {
-            anyPrevalidationError = true
-            dispatch(errorsActions2.addError({
-                signup: { errors: { birthDate: [
-                            { code: 'incorrect', message: "Дата рождения некорректна" }
-                        ]}}
-            }))
-        }
+            if (userData.birthDate.length <= 0) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { birthDate: [
+                                { code: 'required', message: 'Дата рождения обязательна' }
+                            ]}}
+                }))
+            }
+            let birthDateMatch = birthDatePattern.exec(userData.birthDate)
+            if (!birthDateMatch) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { birthDate: [
+                                { code: 'incorrect', message: "Дата рождения должна быть в формате 31-12-2000 или 1-2-2000" }
+                            ]}}
+                }))
+            }
+            const year0 = +birthDateMatch!.groups!.year
+            const month0 = +birthDateMatch!.groups!.month
+            const day0 = +birthDateMatch!.groups!.day
+            const birthDate = new Date(year0, month0-1, day0)
+            const year = birthDate.getFullYear()
+            const month = birthDate.getMonth()+1
+            const day = birthDate.getDate()
+            if (year!==year0 || month!==month0 || day!==day0) {
+                anyPrevalidationError = true
+                dispatch(errorsActions.addErrors({
+                    signup: { errors: { birthDate: [
+                                { code: 'incorrect', message: "Дата рождения некорректна" }
+                            ]}}
+                }))
+            }
 
 
-        if (anyPrevalidationError) return
+            if (anyPrevalidationError) return
 
-        userData.phone = '+'+userData.phone.replaceAll(/\D/g,"")
-        userData.birthDate = `${(day+'').padStart(2,'0')}-${(month+'').padStart(2,'0')}-${(year+'').padStart(4,'0')}`
+            userData.phone = '+'+userData.phone.replaceAll(/\D/g,"")
+            userData.birthDate = `${(day+'').padStart(2,'0')}-${(month+'').padStart(2,'0')}-${(year+'').padStart(4,'0')}`
+        }
 
         console.log('userData', userData)
 
 
-        dispatch(loadingActions2.setLoading('signup'))
+        dispatch(loadingActions.setLoading('signup'))
 
         // request
         let {data, error} = await userService.signup(userData)
-            .finally(()=>dispatch(loadingActions2.setLoading('signup',false)))
+            .finally(()=>dispatch(loadingActions.setLoading('signup',false)))
 
         // error check
         if (error) switch (error.code) {
             case "connection error":
-                dispatch(errorsActions2.addError({
+                dispatch(errorsActions.addErrors({
                     signup: { common: [
                         { code: 'connection error', message: 'Ошибка соединения с сервером' }
                     ]}
                 }))
                 return
             case 500:
-                dispatch(errorsActions2.addError({
+                dispatch(errorsActions.addErrors({
                     signup: { common: [
                             { code: 'error', message: error.message }
                         ]}
                 }))
                 return
             default:
-                dispatch(errorsActions2.addError({
+                dispatch(errorsActions.addErrors({
                     signup: { common: [
                             { code: 'error', message: 'Ошибка' }
                         ]}
@@ -384,8 +391,6 @@ const signup = (userData: UserRegister): AppThunk =>
 
         // all is ok
         data = data!
-        dispatch(errorsActions2.clearErrors('signup'))
-
 
         dispatch(setJwt({
             accessJwt: data.accessToken
@@ -397,7 +402,12 @@ const signup = (userData: UserRegister): AppThunk =>
             name: 'someusername'
         }
         dispatch(setUser(user))*/
+
+        return true
     }
+
+
+
 
 // Action creators are generated for each case reducer function
 const { setJwt, setUser } = userSlice.actions

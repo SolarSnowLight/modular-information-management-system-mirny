@@ -1,7 +1,7 @@
 import {Reducer} from "redux";
 
 
-type LoadingState2 = typeof initialState
+type LoadingState = typeof initialState
 
 const initialState = {
     login: false,
@@ -11,7 +11,7 @@ const initialState = {
 
 
 
-export const loadingReducer2: Reducer<LoadingState2> = (state = initialState, action) => {
+export const loadingReducer: Reducer<LoadingState> = (state = initialState, action) => {
     switch (action.type) {
         case 'setLoading':
             const payload = action.payload as SetLoadingActionPayload
@@ -24,13 +24,13 @@ export const loadingReducer2: Reducer<LoadingState2> = (state = initialState, ac
 }
 
 
-type SetLoadingActionPayload = { part: keyof LoadingState2, isLoading: boolean }
-const setLoading = (part: keyof LoadingState2, isLoading = true) => ({
+type SetLoadingActionPayload = { part: keyof LoadingState, isLoading: boolean }
+const setLoading = (part: keyof LoadingState, isLoading = true) => ({
     type: 'setLoading', payload: { part, isLoading } as SetLoadingActionPayload
 })
 
 
-export const loadingActions2 = {
+export const loadingActions = {
     setLoading
 }
 

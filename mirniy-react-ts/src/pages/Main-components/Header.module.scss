@@ -1,0 +1,23 @@
+
+@use 'src/common-styles/common';
+
+$h: 91px;
+
+.frame {
+    width: 100%; height: $h;
+}
+
+.header {
+    position: fixed;
+    width: 100%; height: $h;
+    background: #424041; // Gray1 todo extract
+    @include common.row;
+    justify-content: flex-end;
+}
+
+.text {
+    flex-grow: 1;
+    overflow-wrap: anywhere;
+    color: #FCFCFC; // White todo extract
+    //white-space: break-spaces;
+}

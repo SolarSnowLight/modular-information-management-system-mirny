@@ -8,6 +8,6 @@ type TokenContent = {
     auth_types_id: string
 }
 
-export  function decodeJwt<C extends {} = TokenContent>(jwt: string): C {
+export function decodeJwt<C extends {} = TokenContent>(jwt: string): C {
     return jwtUtils.decode(jwt, { json: true }) as C
 }

@@ -1,5 +1,4 @@
-import Axios, {AxiosError} from "axios"
-import axios, {AxiosResponse} from "axios"
+import {AxiosResponse} from "axios"
 import ax from './ax'
 
 
@@ -39,7 +38,7 @@ export type LogoutResponse = {
     is_logout: boolean
 }
 const logout = async (
-    accessToken: string|null|undefined
+    accessToken?: string|null
 ): ResponseData<LogoutResponse> => {
     return ax.post('auth/logout', undefined, {
         headers: {

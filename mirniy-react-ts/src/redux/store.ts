@@ -13,8 +13,8 @@ import hardSet from "redux-persist/lib/stateReconciler/hardSet";
 import {PersistConfig} from "redux-persist/es/types";
 import createSagaMiddleware from 'redux-saga'
 import { userReducer } from "./userReducer";
-import {errorsReducer2} from "./errorsReducer2";
-import {loadingReducer2} from "./loadingReducer2";
+import {errorsReducer} from "./errorsReducer";
+import {loadingReducer} from "./loadingReducer";
 import {appReducer} from "./appReducer";
 
 
@@ -38,10 +38,8 @@ export const store = configureStore({
     reducer: {
         app: appReducer,
         user: userPersistedReducer,
-        //errors: errorsReducer,
-        errors2: errorsReducer2,
-        //loading: loadingReducer,
-        loading2: loadingReducer2,
+        errors: errorsReducer,
+        loading: loadingReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
@@ -52,7 +50,7 @@ export const store = configureStore({
     // todo plug in saga middleware
 })
 
-
+export type Store = typeof store
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>
 // Inferred type example: {posts: PostsState, comments: CommentsState, users: UsersState}

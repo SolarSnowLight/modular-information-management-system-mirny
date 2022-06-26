@@ -23,3 +23,20 @@ code {
     font-weight: 500;
     src: local('Roboto'), url('src/assets/fonts/Roboto/Roboto-Medium.ttf') format('truetype');
 }
+
+
+@font-face {
+    font-family: 'TT Commons';
+    font-weight: 400;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Regular.otf');
+}
+@font-face {
+    font-family: 'TT Commons';
+    font-weight: 500;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Medium.otf');
+}
+@font-face {
+    font-family: 'TT Commons';
+    font-weight: 600;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons DemiBold.otf');
+}

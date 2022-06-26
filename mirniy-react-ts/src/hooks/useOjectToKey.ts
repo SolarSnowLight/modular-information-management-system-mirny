@@ -21,10 +21,6 @@ export const useObjectToKey = () => {
         return weakMap.get(key)!
     }
 
-    const getKey = (value: number) => {
-
-    }
-
     return getId
 
 }

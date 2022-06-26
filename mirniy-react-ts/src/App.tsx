@@ -1,15 +1,12 @@
-import React, {useLayoutEffect, useState} from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import Main from "./pages/Main";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import ArticleOLD from "./pages/ArticleOLD";
+import Signup from "./pages/Main-pages/Signup";
 import {useAppDispatch} from "./redux/hooks";
 import {appActions} from "./redux/appReducer";
 import {useDebounce} from "./hooks/useDebounce";
-import ArticleNew from "./pages/ArticleNew";
-import ArticlePreview from "./pages/ArticlePreview";
-import Login2 from "./pages/Login2";
+import ArticleCreator from "./pages/Main-pages/ArticleCreator";
+import Login from "./pages/Main-pages/Login";
 
 function App() {
 
@@ -37,11 +34,13 @@ function App() {
 
     }
 
+
     const [dragging, setDragging] = useState({})
     useDebounce(()=>{
         d(appActions.setDragging(false))
         d(appActions.setDraggingFiles(false))
     }, 150, [dragging])
+
 
     const onDragOver = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.preventDefault()
@@ -88,8 +87,7 @@ function App() {
             <Routes>
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
-                <Route path='/login2' element={<Login2/>}/>
-                <Route path='/article' element={<ArticleNew/>}/>
+                <Route path='/article' element={<ArticleCreator/>}/>
 
                 <Route path='*' element={<Main/>}/>
             </Routes>

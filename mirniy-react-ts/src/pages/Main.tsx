@@ -1,37 +1,25 @@
-import {Link} from "react-router-dom";
-import {testApi} from "../api/testApi";
-import Axios, {AxiosError} from "axios";
+import {Link, useLocation} from "react-router-dom";
+import Header from "./Main-components/Header";
 
 
 function Main(){
 
-    /*const makeError = () => {
-        testApi.makeError().then(
-            response => console.log('response', response),
-            (error: AxiosError) => {
-                console.log('isAxiosError:', Axios.isAxiosError(error))
-                console.log('error', error)
-                console.log('error code: ', error.code)
-            }
-        )
-    }*/
+    const location = useLocation()
+    const currLocation = location.pathname+location.search+location.hash
 
-    return <>
+    return <div>
+        <Header/>
+
         <Link to={'/signup'}>
             <button>Регистрация</button>
         </Link>
-        <Link to={'/login'}>
-            <button>Вход & Выход</button>
-        </Link>
-        <Link to={'/login2'}>
+        <Link to={'/login?backpath='+currLocation}>
             <button>Вход</button>
         </Link>
         <Link to={'/article'}>
             <button>Статья</button>
         </Link>
-
-        {/*<button onClick={makeError}>Error</button>*/}
-    </>
+    </div>
 }
 
 export default Main

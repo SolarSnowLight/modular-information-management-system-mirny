@@ -1,11 +1,10 @@
 
-import css from './ArticleNew.module.scss'
+import css from './ArticleCreator.module.scss'
 
-import React, {useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
-import {useAppDispatch, useAppSelector} from "../redux/hooks";
-import {useObjectToKey} from "../hooks/useOjectToKey";
-import {useNavigate} from "react-router-dom";
-import {appActions} from "../redux/appReducer";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
+import {useAppDispatch, useAppSelector} from "../../redux/hooks";
+import {useObjectToKey} from "../../hooks/useOjectToKey";
+import {appActions} from "../../redux/appReducer";
 import ArticlePreview from "./ArticlePreview";
 
 
@@ -19,7 +18,7 @@ const imageTag =/<image[ \n]+id=(?<id>\d+)[ \n]*\/>/g
 const wordExtensions = /\.((doc)|(docx))$/i
 
 
-const ArticleNew = () => {
+const ArticleCreator = () => {
 
     const d = useAppDispatch()
 
@@ -236,7 +235,7 @@ Lorem    ipsum dolor sit amet, consectetur adipisicing elit. Accusantium atque c
 
     </div>
 }
-export default ArticleNew
+export default ArticleCreator
 
 
 
@@ -334,3 +333,18 @@ function walkFileTree(fsItem: FileSystemEntry|null, onFile: (file:File)=>void){
             console.log('RECTS:',range.getClientRects())
         }
     }*/
+
+/*<div
+                //contentEditable
+                className={css.content} ref={contentRef}
+                //onInput={}
+            >
+                some content
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                Accusantium atque culpa dicta dignissimos doloremque esse facilis illum,
+                {
+                    //<div className={css.floatDiv}><LoadingIc fill='#6663ff' size={20}/></div>
+                }
+                maxime minima nihil officia officiis pariatur quae quasi quod saepe sunt unde.
+                Debitis.
+            </div>*/

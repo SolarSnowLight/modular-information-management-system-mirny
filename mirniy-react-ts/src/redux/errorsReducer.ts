@@ -1,5 +1,6 @@
-import {ErrorType} from "../service/utils";
+
 import {Reducer} from "redux";
+import {ErrorType} from "./errors";
 
 
 /*type Errors2<T extends string|never> = {
@@ -32,7 +33,7 @@ type ErrorsState2Draft = {
 }*/
 
 
-type ErrorsDraft2 = {
+type ErrorsDraft = {
     login?: {
         common?: ErrorType[],
         errors?: {
@@ -59,7 +60,7 @@ type ErrorsDraft2 = {
     },
 }
 
-export type ErrorsState2 = typeof initialState
+export type ErrorsState = typeof initialState
 const initialState = {
     login: {
         hasError: false,
@@ -92,11 +93,11 @@ const initialState = {
 
 
 
-export const errorsReducer2: Reducer<ErrorsState2> = (state = initialState, action) => {
+export const errorsReducer: Reducer<ErrorsState> = (state = initialState, action) => {
     switch (action.type){
-        case 'addErrors': {
+        /*case 'addErrors': {
             const newState = {...state}
-            const parts = action.payload as ErrorsDraft2
+            const parts = action.payload as ErrorsDraft
             for (let k1 in parts){
                 if (k1 in newState && typeof parts[k1] === 'object'){
                     newState[k1] = {...newState[k1]}
@@ -120,12 +121,13 @@ export const errorsReducer2: Reducer<ErrorsState2> = (state = initialState, acti
                 }
             }
             return newState
-        }
+        }*/
+
 
         // if property exists and set to undefined - it will be reseted
-        case 'addErrors2': {
+        case 'addErrors': {
             const newState = {...state}
-            const parts = action.payload as ErrorsDraft2
+            const parts = action.payload as ErrorsDraft
             for (let k1 in parts) if (k1 in newState) {
                 if (typeof parts[k1] === 'object'){
                     newState[k1] = {...newState[k1]}
@@ -171,12 +173,12 @@ export const errorsReducer2: Reducer<ErrorsState2> = (state = initialState, acti
         }
 
 
-        case 'clearErrors':
-            const partName = action.payload as keyof ErrorsState2
+        /*case 'clearErrors':
+            const partName = action.payload as keyof ErrorsState
             return {
                 ...state,
                 [partName]: {...initialState[partName]}
-            }
+            }*/
 
         default: return state
     }
@@ -184,21 +186,21 @@ export const errorsReducer2: Reducer<ErrorsState2> = (state = initialState, acti
 
 
 
-const addError = (errors: ErrorsDraft2) => ({
+/*const addError = (errors: ErrorsDraft) => ({
+    type: 'addErrors', payload: errors
+})*/
+const addErrors = (errors: ErrorsDraft) => ({
     type: 'addErrors', payload: errors
 })
-const addErrors = (errors: ErrorsDraft2) => ({
-    type: 'addErrors2', payload: errors
-})
 
-const clearErrors = (part: keyof ErrorsState2) => ({
+/*const clearErrors = (part: keyof ErrorsState) => ({
     type: 'clearErrors', payload: part
-})
+})*/
 
 
-export const errorsActions2 = {
-    addError,
+export const errorsActions = {
+    //addError,
     addErrors,
-    clearErrors,
+    //clearErrors,
 }
 

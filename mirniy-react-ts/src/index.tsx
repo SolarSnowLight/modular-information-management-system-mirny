@@ -12,10 +12,10 @@ import {store} from "./redux/store";
 
 import {PersistGate} from "redux-persist/integration/react";
 import persistStore from "redux-persist/es/persistStore";
-import {setupAxiosInterceptors} from "./api/ax";
+import {setupAxios} from "./api/ax";
 
 
-setupAxiosInterceptors(store)
+setupAxios(store)
 
 const persistor = persistStore(store)
 
@@ -39,6 +39,8 @@ root.render(
 );
 
 //console.log(store.getState())
+
+
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
