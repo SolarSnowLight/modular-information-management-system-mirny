@@ -7,6 +7,7 @@ const initialState = {
     login: false,
     logout: false,
     signup: false,
+    articles: false,
 }
 
 

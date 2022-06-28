@@ -1,0 +1,15 @@
+{
+    "name": "Spring WebFlux Test Schema",
+    "schemaPath": "src/main/resources/graphql/graphql-schema.graphqls",
+    "extensions": {
+        "endpoints": {
+            "Spring WebFlux Test Endpoint": {
+                "url": "http://localhost:8080/graphql",
+                "headers": {
+                    "user-agent": "JS GraphQL"
+                },
+                "introspect": false
+            }
+        }
+    }
+}

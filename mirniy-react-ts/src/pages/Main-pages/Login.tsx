@@ -17,9 +17,11 @@ import {Link, useNavigate, useSearchParams} from "react-router-dom";
 
 function Login(){
 
+    //console.log('mir-rab', mirRab)
+    //console.log('mir-rab', typeof mirRab)
+
     const d = useAppDispatch()
 
-    //const { accessJwt, refreshJwt, user } = useAppSelector(s=>s.user)
     const { login: loginErrors } = useAppSelector(s=>s.errors)
     const { login: loginLoading } = useAppSelector(s=>s.loading)
 

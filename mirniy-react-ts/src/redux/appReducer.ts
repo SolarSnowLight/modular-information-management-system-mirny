@@ -3,9 +3,9 @@ import {Reducer} from "redux";
 
 
 type Article = undefined | {
-    text: string,
+    text: string
     images: {
-        index: number,
+        index: number
         file: File
     }[]
 }

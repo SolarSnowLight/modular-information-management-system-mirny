@@ -58,6 +58,11 @@ type ErrorsDraft = {
             birthDate?: ErrorType[],
         }
     },
+    articles?: {
+        common?: ErrorType[],
+        errors?: { }
+    },
+
 }
 
 export type ErrorsState = typeof initialState
@@ -89,6 +94,11 @@ const initialState = {
             birthDate: [] as ErrorType[],
         }
     },
+    articles: {
+        hasError: false,
+        common: [] as ErrorType[],
+        errors: { }
+    }
 }
 
 

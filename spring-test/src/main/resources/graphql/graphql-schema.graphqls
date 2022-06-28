@@ -1,0 +1,47 @@
+
+# File extesion MUST BE .graphqls
+
+
+# The Root Query for the application
+type Query {
+    helloGraphQL: String!
+
+
+    # ARTICLES
+    articles: [Article!]!
+}
+
+
+
+
+
+type Image {
+    id: ID!
+    path: String!
+    #absPath: String!
+}
+
+
+type Article {
+    id: ID!
+
+    title: String!
+    titleImage: ArticleImage!
+    theme: String!
+    shortDescription: String!
+
+    authors: String!
+    photographers: String!
+
+    publishDate: String!
+    viewsCnt: Int!
+    isFavorite: Boolean!
+
+    text: String!
+    images: [ArticleImage!]!
+}
+type ArticleImage {
+    id: ID!
+    index: Int
+    image: Image!
+}

@@ -1,0 +1,26 @@
+
+
+server.port: 8081
+
+
+
+
+#spring.graphql.websocket.path: /graphql
+spring.graphql:
+    path: /graphql
+
+    # enables schema viewing on path: HTTP GET /graphql/scheme
+    # by default scheme can be obtained: HTTP POST /graphql
+    #schema.printer.enabled: true
+
+
+
+
+logging.level:
+    org.springframework:
+        web: debug
+        http: debug
+        graphql: debug
+        security: debug
+        data.r2dbc: debug
+    #reactor.netty: debug

@@ -7,6 +7,8 @@ import {appActions} from "./redux/appReducer";
 import {useDebounce} from "./hooks/useDebounce";
 import ArticleCreator from "./pages/Main-pages/ArticleCreator";
 import Login from "./pages/Main-pages/Login";
+import ArticleList from "./pages/Main-pages/ArticleList";
+import Article from "./pages/Main-pages/Article";
 
 function App() {
 
@@ -87,7 +89,9 @@ function App() {
             <Routes>
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
-                <Route path='/article' element={<ArticleCreator/>}/>
+                <Route path='/user-articles' element={<ArticleList/>}/>
+                <Route path='/create-article' element={<ArticleCreator/>}/>
+                <Route path='/article/:articleId' element={<Article/>}/>
 
                 <Route path='*' element={<Main/>}/>
             </Routes>

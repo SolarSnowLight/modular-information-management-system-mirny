@@ -16,6 +16,7 @@ import { userReducer } from "./userReducer";
 import {errorsReducer} from "./errorsReducer";
 import {loadingReducer} from "./loadingReducer";
 import {appReducer} from "./appReducer";
+import {articleReducer} from "./articleReducer";
 
 
 
@@ -40,6 +41,7 @@ export const store = configureStore({
         user: userPersistedReducer,
         errors: errorsReducer,
         loading: loadingReducer,
+        articles: articleReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

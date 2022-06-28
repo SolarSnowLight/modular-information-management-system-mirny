@@ -174,7 +174,7 @@ const logout = (): AppThunk<Promise<void|boolean>> =>
         let { data, error } = await userService.logout()
             .finally(()=>dispatch(loadingActions.setLoading('logout',false)))
 
-        // error check
+
         if (error){
             switch (error.code){
                 case "connection error":

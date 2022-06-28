@@ -27,6 +27,16 @@ code {
 
 @font-face {
     font-family: 'TT Commons';
+    font-weight: 300;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Light.otf');
+}
+@font-face {
+    font-family: 'TT Commons';
+    font-weight: 400;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Regular.otf');
+}
+@font-face {
+    font-family: 'TT Commons';
     font-weight: 400;
     src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Regular.otf');
 }
@@ -39,4 +49,9 @@ code {
     font-family: 'TT Commons';
     font-weight: 600;
     src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons DemiBold.otf');
+}
+@font-face {
+    font-family: 'TT Commons';
+    font-weight: 700;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Bold.otf');
 }
