@@ -9,6 +9,7 @@ type Query {
 
     # ARTICLES
     articles: [Article!]!
+    article(id: ID!): Article
 }
 
 

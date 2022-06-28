@@ -4,6 +4,7 @@ import com.rrain.springtest.entities.Image
 import com.rrain.springtest.entities.article.Article
 import com.rrain.springtest.entities.article.ArticleImage
 import com.rrain.springtest.repos.ArticleRepo
+import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.BatchMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
@@ -16,6 +17,10 @@ class ArticleGraphqlController {
     @QueryMapping
     suspend fun articles(): List<Article> {
         return ArticleRepo.articles.values.toList()
+    }
+    @QueryMapping
+    suspend fun article(@Argument id: Int?): Article? {
+        return ArticleRepo.articles.values.singleOrNull { it.id===id }
     }
 
 

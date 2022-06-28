@@ -10,7 +10,7 @@ import {errors} from "./errors";
 
 type ArticleState = typeof initialState
 const initialState = {
-    articles: undefined as ArticleApi[]|undefined
+    articles: undefined as ArticleApi[]|undefined,
 }
 
 

@@ -61,8 +61,38 @@ const getArticles = async () => {
 
 
 
+export type ArticleResponse = { article: ArticleApi }
+const getArticleById = async (id: string) => {
+    return ax2.post<GraphQlData<ArticleResponse>>('graphql',{
+        query: `{
+            article(id: ${id}) {
+                id, title
+                titleImage {
+                    id, index,
+                    image {
+                        id, path
+                    }
+                }
+                theme, shortDescription
+                authors, photographers
+                publishDate, viewsCnt, isFavorite
+                text
+                images {
+                    id, index,
+                    image {
+                        id, path
+                    }
+                }
+            }
+        }`
+    })
+}
+
+
+
 
 
 export const articleApiMock = {
     getArticles,
+    getArticleById,
 }
