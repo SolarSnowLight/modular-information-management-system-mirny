@@ -9,6 +9,7 @@ export type ArticleApi = {
     title: string
     titleImage: ArticleImageApi
     theme: string
+    tags: string[]
     shortDescription: string
 
     authors: string
@@ -19,6 +20,7 @@ export type ArticleApi = {
     isFavorite: boolean
 
     text: string
+    content: string
     images: Array<ArticleImageApi>
 }
 export type ArticleImageApi = {
@@ -44,10 +46,10 @@ const getArticles = async () => {
                         id, path
                     }
                 }
-                theme, shortDescription
+                theme, tags, shortDescription
                 authors, photographers
                 publishDate, viewsCnt, isFavorite
-                text
+                text, content
                 images {
                     id, index,
                     image {
@@ -73,10 +75,10 @@ const getArticleById = async (id: string) => {
                         id, path
                     }
                 }
-                theme, shortDescription
+                theme, tags, shortDescription
                 authors, photographers
                 publishDate, viewsCnt, isFavorite
-                text
+                text, content
                 images {
                     id, index,
                     image {

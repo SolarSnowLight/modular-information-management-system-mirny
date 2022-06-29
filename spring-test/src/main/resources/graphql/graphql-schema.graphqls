@@ -29,6 +29,7 @@ type Article {
     title: String!
     titleImage: ArticleImage!
     theme: String!
+    tags: [String!]!
     shortDescription: String!
 
     authors: String!
@@ -39,6 +40,7 @@ type Article {
     isFavorite: Boolean!
 
     text: String!
+    content: String!
     images: [ArticleImage!]!
 }
 type ArticleImage {

@@ -12,6 +12,10 @@ import StarFilledIc from "../../components/icons/StartFilledIc";
 import StarIc from "../../components/icons/StartIc";
 
 
+
+// todo add regexp to check article content
+
+
 const Article = () => {
 
     const { articleId } = useParams()
@@ -56,9 +60,9 @@ const Article = () => {
                     <BottomText>{a.date.day}.{a.date.month}.{a.date.year} {a.date.hour}:{a.date.minute}</BottomText>
                     <Space w={39}/>
                     <div className={common.column}>
-                        <BottomText>Авторы: {article.authors}</BottomText>
+                        <BottomText>Авторы: <Blue>{article.authors}</Blue></BottomText>
                         <Space h={9}/>
-                        <BottomText>Фото: {article.photographers}</BottomText>
+                        <BottomText>Фото: <Blue>{article.photographers}</Blue></BottomText>
                     </div>
                     <Space flexGrow={1}/>
 
@@ -80,7 +84,35 @@ const Article = () => {
                 <Title>{article.title}</Title>
                 <Space h={29}/>
 
-                <ArticleText dangerouslySetInnerHTML={{ __html: article.text }}/>
+                {/* css class-marker article-container */}
+                <ArticleContainer className='article-container' dangerouslySetInnerHTML={{ __html: article.content }}/>
+
+                <Space h={32}/>
+                <div>
+                    { article.tags.map(it=><Tag key={it}>#{it}   </Tag>) }
+                </div>
+
+                <Space h={32} />
+{/*
+
+                <ImageBlock>
+                    <Image gridArea={"a1"} src={a.titleImgUrl+''}/>
+                    <Image gridArea={"a2"}  src={a.titleImgUrl+''}/>
+                    <Image gridArea={"a3"}  src={a.titleImgUrl+''}/>
+                    <Image gridArea={"a4"}  src={a.titleImgUrl+''}/>
+                    <Image gridArea={"a5"}  src={a.titleImgUrl+''}/>
+                </ImageBlock>
+
+                <Space h={32} />
+
+                <ImageBlock2>
+                    <Image2 gridArea={"1 / 1 / 3 / 3"} src={a.titleImgUrl+''}/>
+                    <Image2 gridArea={"1 / 3 / 2 / 4"}  src={a.titleImgUrl+''}/>
+                    <Image2 gridArea={"2 / 3 / 3 / 4"}  src={a.titleImgUrl+''}/>
+                    <Image2 gridArea={"3 / 1 / 4 / 2"}  src={a.titleImgUrl+''}/>
+                    <Image2 gridArea={"3 / 2 / 4 / 4"}  src={a.titleImgUrl+''}/>
+                </ImageBlock2>
+*/}
 
             </Frame>
         </ArticleFrame>
@@ -114,6 +146,9 @@ const BottomText = styled.div`
   font: 300 15px 'TT Commons';
   color: black; 
 `
+const Blue = styled.span`
+  color: #1F8DCD; // todo extract all colors
+`
 
 const EyeIcBox = styled.div`
   height: 20px;
@@ -133,17 +168,66 @@ const Title = styled.div`
   font: 500 43px 'TT Commons';
 `
 
-const ArticleText = styled.div`
+const ArticleContainer = styled.div`
+  & > :nth-child(n){
+    padding-bottom: 30px;
+  }
+  margin-bottom: -30px;
+  
   h3 {
     font: 500 29px 'TT Commons';
     color: black;
-    padding-bottom: 10px;
   }
   p {
-    font: 400 16px 'TT Commons';
+    font: 400 19px 'TT Commons';
     color: black;
-    padding-bottom: 10px;
-    white-space: pre-wrap;
+    white-space: break-spaces;
   }
+`
+
+const Tag = styled.span`
+  height: 20px;
+  font: 300 15px 'TT Commons';
+  color: black;
+  white-space: break-spaces;
+`
+
+
+
+
+
+
+
+const ImageBlock = styled.div`
+  display: grid;
+  width: fit-content; height: fit-content;
+  grid-auto-flow: row;
+  grid-template: 
+    "a1    a1    a2"   100px // row1-h
+    "a1    a1    a3"   100px // row2-h
+    "a4    a5    a5"   100px // row3-h
+  / 100px 200px 100px // / col1-w co2-w col3-w
+  ;
+  grid-gap: 15px 15px;
+`
+const Image = styled.img<{ gridArea: string }>`
+  grid-area: ${p=>p.gridArea};
+  width: 100%; height: 100%;
+  object-fit: cover;
+`
+
+
+
+const ImageBlock2 = styled.div`
+  display: grid;
+  width: fit-content; height: fit-content;
+  grid-auto-flow: row;
+  grid-template: 100px 100px 100px / 100px 200px 100px; // row1-h row2-h row3-h / col1-w col2-w col3-w
+  grid-gap: 15px 15px;
+`
+const Image2 = styled.img<{ gridArea: string }>`
+  grid-area: ${p=>p.gridArea};
+  width: 100%; height: 100%;
+  object-fit: cover;
 `
 

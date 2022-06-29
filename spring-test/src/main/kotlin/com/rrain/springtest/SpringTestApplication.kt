@@ -9,3 +9,4 @@ class SpringTestApplication
 fun main(args: Array<String>) {
 	runApplication<SpringTestApplication>(*args)
 }
+
