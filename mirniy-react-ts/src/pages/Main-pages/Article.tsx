@@ -1,6 +1,7 @@
 import {useParams} from "react-router-dom";
 import styled from "styled-components";
 import common from 'src/common-styles/common.module.scss'
+import './Article.scss';
 import {useEffect, useMemo, useState} from "react";
 import {ArticleApi} from "src/api/articleApiMock";
 import {articleService} from "src/service/articleService";
@@ -85,7 +86,8 @@ const Article = () => {
                 <Space h={29}/>
 
                 {/* css class-marker article-container */}
-                <ArticleContainer className='article-container' dangerouslySetInnerHTML={{ __html: article.content }}/>
+                {/*<ArticleContainer className='article-container' dangerouslySetInnerHTML={{ __html: article.content }}/>*/}
+                <div className='article-container' dangerouslySetInnerHTML={{ __html: article.content }}/>
 
                 <Space h={32}/>
                 <div>
@@ -133,6 +135,7 @@ const ArticleFrame = styled.div`
 `
 const Frame = styled.div`
   width: 1112px;
+  padding: 0 212px 0 212px;
 `
 const TitleImage = styled.div<{ imageUrl: URL }>`
   width: 100%; height: 395px;
@@ -164,11 +167,11 @@ const StarIcWrap = styled.div`
 `
 
 const Title = styled.div`
-  width: 60%;
+  width: 90%;
   font: 500 43px 'TT Commons';
 `
 
-const ArticleContainer = styled.div`
+/*const ArticleContainer = styled.div`
   & > :nth-child(n){
     padding-bottom: 30px;
   }
@@ -183,7 +186,7 @@ const ArticleContainer = styled.div`
     color: black;
     white-space: break-spaces;
   }
-`
+`*/
 
 const Tag = styled.span`
   height: 20px;

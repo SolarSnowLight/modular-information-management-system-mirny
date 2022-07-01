@@ -1,0 +1,52 @@
+
+
+// class marker to apply article style
+.article-container {
+
+    // basic offset between article parts
+    > :nth-child(n){
+        padding-top: 30px;
+    }
+    margin-top: -30px;
+
+    h3 { // subtitle
+        font: 500 29px 'TT Commons';
+        color: black;
+    }
+    p { // paragraph
+        font: 400 19px 'TT Commons';
+        color: black;
+        white-space: break-spaces;
+    }
+    i { // italic
+
+    }
+    b { // bold
+
+    }
+    mark { // highlighted
+        background-color: rgba(0, 238, 0, 0.11);
+        color: #0a0;
+        border-radius: .2em;
+        padding: 0 .4em 0 .4em;
+    }
+    .image-description {
+        padding-top: 10px;
+        color: #8B8B8B; /* Gray2 */
+        font: 400 19px 'TT Commons';
+    }
+
+}
+/*
+HTML Formatting Elements:
+    <b> - Bold text
+    <strong> - Important text
+    <i> - Italic text
+    <em> - Emphasized text
+    <mark> - Marked text
+    <small> - Smaller text
+    <del> - Deleted text
+    <ins> - Inserted text
+    <sub> - Subscript text
+    <sup> - Superscript text
+ */
