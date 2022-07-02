@@ -16,11 +16,20 @@ type Input1Props = {
     hideable?: boolean
     value?: string
     onInput?: FormEventHandler<HTMLInputElement>
+
+    titleFont?: string
+    titleColor?: string
+    placeholderFont?: string
+    placeholderColor?: string
+    textFont?: string
+    textColor?: string
+    borderColor?: string
 }
 
 const Input1 = ({
         w = '100%', h = '100%', title, placeholder, autofocused, hasError,
-        hideable, hide, value, onInput
+        hideable, hide, value, onInput,
+        titleFont, titleColor, placeholderFont, placeholderColor, textFont, textColor, borderColor
 }: Input1Props) => {
 
     const [inputFocused, setInputFocused] = useState(autofocused)
@@ -28,22 +37,32 @@ const Input1 = ({
 
     return <div className={css.mainFrame +' '+ (hasError?css.mainFrameError:'')}
                 style={{
-                    width: w, height: h,
+                    width: w, height: h, borderColor: borderColor
                 }}>
 
-        { title && <div className={css.title}>{title}</div> }
+        { title && <div className={css.title}
+                        style={{ fontFamily: titleFont, color: titleColor }}
+                    >
+                {title}
+            </div> }
 
 
             <div className={css.inputContainer}>
                 { placeholder && !inputFocused && !value &&
                     <div className={css.placeholderContainer}>
-                        <div className={css.placeholder}>{placeholder}</div>
+                        <div className={css.placeholder}
+                             style={{ fontFamily: placeholderFont, color: placeholderColor }}
+                        >
+                            {placeholder}
+                        </div>
                     </div>
                 }
                 <input autoFocus={autofocused}
                        type={ hideText ? 'password' : undefined}
                        onFocus={()=>setInputFocused(true)} onBlur={()=>setInputFocused(false)}
-                       value={value} onInput={onInput}/>
+                       value={value} onInput={onInput}
+                       style={{ fontFamily: textFont, color: textColor }}
+                />
             </div>
             <div className={css.eyeContainer} onClick={()=>setHideText(!hideText)}>
                 { hideable && (hideText

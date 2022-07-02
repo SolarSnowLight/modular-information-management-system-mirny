@@ -7,7 +7,7 @@
 .mainFrame {
     position: relative;
 
-    @include common.border(1px, solid, #8B8B8B, 4px); // Gray2 // todo extract into props
+    @include common.border(2px, solid, #8B8B8B, 4px); // Gray2 // todo extract into props
 
     &Error {
         border: 1px solid #EE1D23; // Red // todo extract into props
@@ -21,7 +21,7 @@
 
 .title {
     position: absolute;
-    top: -4px; left: 2px;
+    top: -0.4em; left: 2px;
     padding: 0 6px 0 12px;
     color: #424041; // Gray // todo extract into props
     background: #FCFCFC; // todo extract into props

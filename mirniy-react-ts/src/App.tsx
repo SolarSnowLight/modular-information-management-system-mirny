@@ -9,6 +9,7 @@ import ArticleCreator from "./pages/Main-pages/ArticleCreator";
 import Login from "./pages/Main-pages/Login";
 import ArticleList from "./pages/Main-pages/ArticleList";
 import Article from "./pages/Main-pages/Article";
+import ArticleCreator2 from './pages/Main-pages/ArticleCreator2';
 
 function App() {
 
@@ -91,6 +92,7 @@ function App() {
                 <Route path='/login' element={<Login/>}/>
                 <Route path='/user-articles' element={<ArticleList/>}/>
                 <Route path='/create-article' element={<ArticleCreator/>}/>
+                <Route path='/create-article-2' element={<ArticleCreator2/>}/>
                 <Route path='/article/:articleId' element={<Article/>}/>
 
                 <Route path='*' element={<Main/>}/>

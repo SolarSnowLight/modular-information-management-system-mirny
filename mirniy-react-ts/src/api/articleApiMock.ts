@@ -21,7 +21,7 @@ export type ArticleApi = {
 
     text: string
     content: string
-    images: Array<ArticleImageApi>
+    images: Array<ArticleImageApi> // TODO remove
 }
 export type ArticleImageApi = {
     id: string
