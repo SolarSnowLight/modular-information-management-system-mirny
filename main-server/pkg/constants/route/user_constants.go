@@ -10,4 +10,10 @@ const (
 
 	// Get article
 	USER_GET_ARTICLE_ROUTE = "/article/get"
+
+	// Get articles
+	USER_GET_ARTICLES_ROUTE = "/article/get/all"
+
+	// Delete article
+	USER_DELETE_ARTICLE_ROUTE = "/article/delete"
 )

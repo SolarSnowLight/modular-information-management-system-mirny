@@ -31,8 +31,10 @@ type AuthType interface {
 }
 
 type User interface {
-	CreateArticle(c *gin.Context, title, text string, files []articleModel.FileArticleModel) (bool, error)
-	GetArticle(c *gin.Context) (articleModel.ArticleResponse, error)
+	CreateArticle(c *gin.Context, title, text, tags string, files []articleModel.ArticlesFilesDBModel) (bool, error)
+	DeleteArticle(uuid articleModel.ArticleUuidModel, c *gin.Context) (articleModel.ArticleSuccessModel, error)
+	GetArticle(uuid articleModel.ArticleUuidModel, c *gin.Context) (articleModel.ArticleModel, error)
+	GetArticles(c *gin.Context) (articleModel.ArticlesModel, error)
 }
 
 type Service struct {

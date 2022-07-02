@@ -7,29 +7,34 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Структура репозитория
+/* Структура сервиса */
 type UserService struct {
 	repo repository.User
 }
 
-// Функция создания нового репозитория
+/* Функция создания нового сервиса */
 func NewUserService(repo repository.User) *UserService {
 	return &UserService{
 		repo: repo,
 	}
 }
 
-/*
-*	Create article
- */
-func (s *UserService) CreateArticle(c *gin.Context, title, text string, files []articleModel.FileArticleModel) (bool, error) {
-	return s.repo.CreateArticle(c, title, text, files)
+/* Создание новой статьи */
+func (s *UserService) CreateArticle(c *gin.Context, title, text, tags string, files []articleModel.ArticlesFilesDBModel) (bool, error) {
+	return s.repo.CreateArticle(c, title, text, tags, files)
 }
 
-/*
-*	Get article
- */
+/* Удаление статьи пользователя */
+func (s *UserService) DeleteArticle(uuid articleModel.ArticleUuidModel, c *gin.Context) (articleModel.ArticleSuccessModel, error) {
+	return s.repo.DeleteArticle(uuid, c)
+}
 
-func (s *UserService) GetArticle(c *gin.Context) (articleModel.ArticleResponse, error) {
-	return s.repo.GetArticle(c)
+/* Получение информации о конкретной статье */
+func (s *UserService) GetArticle(uuid articleModel.ArticleUuidModel, c *gin.Context) (articleModel.ArticleModel, error) {
+	return s.repo.GetArticle(uuid, c)
+}
+
+/* Получение информации о всех статьях пользователя */
+func (s *UserService) GetArticles(c *gin.Context) (articleModel.ArticlesModel, error) {
+	return s.repo.GetArticles(c)
 }

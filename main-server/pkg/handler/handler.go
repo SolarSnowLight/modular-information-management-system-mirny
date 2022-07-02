@@ -60,7 +60,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	user := router.Group(route.USER_MAIN_ROUTE, h.userIdentity)
 	{
 		user.POST(route.USER_CREATE_ARTICLE_ROUTE, h.createArticle)
+		user.POST(route.USER_DELETE_ARTICLE_ROUTE, h.deleteArticle)
 		user.POST(route.USER_GET_ARTICLE_ROUTE, h.getArticle)
+		user.POST(route.USER_GET_ARTICLES_ROUTE, h.getArticles)
 	}
 
 	/*api := router.Group("/api", h.userIdentity)

@@ -1,10 +1,6 @@
 package article
 
-type FileArticleModel struct {
-	Filename string
-	Filepath string
-	Index    int
-}
+import "time"
 
 type FileArticleExModel struct {
 	Filename string
@@ -13,13 +9,23 @@ type FileArticleExModel struct {
 	Id       int
 }
 
-type ArticleCreateResponse struct {
-	IsCreated bool `json:"is_created"`
+type ArticleSuccessModel struct {
+	Success bool `json:"success"`
 }
 
-type ArticleResponse struct {
-	Id    int                `json:"id" binding:"required"`
-	Title string             `json:"title" binding:"required"`
-	Text  string             `json:"text" binding:"required"`
-	Files []FileArticleModel `json:"files" binding:"required"`
+type ArticleModel struct {
+	Uuid        string                 `json:"uuid" binding:"required"`
+	Title       string                 `json:"title" binding:"required"`
+	Text        string                 `json:"text" binding:"required"`
+	Tags        string                 `json:"tags" binding:"required"`
+	DateCreated time.Time              `json:"date_created" binding:"required"`
+	Files       []ArticlesFilesDBModel `json:"files" binding:"required"`
+}
+
+type ArticlesModel struct {
+	Articles []ArticleModel `json:"articles" binding:"required"`
+}
+
+type ArticleUuidModel struct {
+	Uuid string `json:"uuid" binding:"required"`
 }
