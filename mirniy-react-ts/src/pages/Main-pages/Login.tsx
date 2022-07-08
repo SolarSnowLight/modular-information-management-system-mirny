@@ -3,7 +3,7 @@ import mirRab from 'src/assets/images/mir-rab.png'
 import css from './Login.module.scss'
 import Input1 from "../../components/Input1";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
-import {useState} from "react";
+import React, {useState} from "react";
 import {errorsActions} from "../../redux/errorsReducer";
 import {userActions} from "../../redux/userReducer";
 import Space from "../../components/Space";
@@ -116,5 +116,5 @@ function Login(){
 
     </div>
 }
-export default Login
+export default React.memo(Login)
 

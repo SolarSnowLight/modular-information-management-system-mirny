@@ -21,4 +21,4 @@ const SpinnerIc = (
                        style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
     />
 }
-export default SpinnerIc
+export default React.memo(SpinnerIc)

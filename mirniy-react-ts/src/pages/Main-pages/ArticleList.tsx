@@ -1,5 +1,5 @@
 import common from 'src/common-styles/common.module.scss'
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {ArticleApi} from "../../api/articleApiMock";
 import {articleService} from "../../service/articleService";
 import ArticleCard from "./ArticleCard";
@@ -31,12 +31,12 @@ function ArticleList(){
         { articles.map(it=><ArticleCard key={it.id} article={it} onFavorite={onFavorite}/>) }
     </MainFrame>
 }
-export default ArticleList
+export default React.memo(ArticleList)
 
-const MainFrame = styled.div`
+const MainFrame = React.memo(styled.div`
   padding: 20px;
   gap: 20px;
-`
+`)
 
 
 

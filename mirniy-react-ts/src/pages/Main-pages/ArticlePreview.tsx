@@ -4,7 +4,7 @@ import css from './ArticlePreview.module.scss'
 
 
 import {useAppSelector} from "../../redux/hooks";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 
 const ArticlePreview = () => {
 
@@ -38,11 +38,11 @@ const ArticlePreview = () => {
 
     </div>
 }
-export default ArticlePreview
+export default React.memo(ArticlePreview)
 
 
 
-const Image = ({ file }: { file: File }) => {
+const Image = React.memo(({ file }: { file: File }) => {
 
     const [fileUrl, setFileUrl] = useState(undefined as undefined|string)
 
@@ -63,4 +63,4 @@ const Image = ({ file }: { file: File }) => {
                 style={{ backgroundImage: `url(${fileUrl})`}}
     />
 
-}
+})

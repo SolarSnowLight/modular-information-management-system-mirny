@@ -7,8 +7,25 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 
+/*
+todo:
+    Image {
+        articleId
+        localId
+        imageId
+    }
+
+    <img src="localId=123" />
+
+    front:
+    Image {
+        localId
+        file
+        url
+    }
+ */
+
 object ArticleRepo {
-    const val imgPathPrefix = "http://localhost:8081/image?path="
 
     val images = Collections.synchronizedMap(mutableMapOf(
         1 to Image(1, "FlatOut 2.jpg"),
@@ -18,16 +35,14 @@ object ArticleRepo {
     ))
     val nextImageId = AtomicInteger((images.keys.maxOrNull() ?: 0) + 1)
 
+    // articleId to ArticleImage
     val articleImages = Collections.synchronizedMap(mutableMapOf(
-        1 to ArticleImage(1, null, 1),
-        2 to ArticleImage(2, null, 2),
-        3 to ArticleImage(3, null, 3),
-        4 to ArticleImage(4, null, 4),
-
-        5 to ArticleImage(5, 100, 1),
-        6 to ArticleImage(6, 100, 2),
+        1 to listOf(ArticleImage(1, 1, 1)),
+        2 to listOf(ArticleImage(2, 1, 2), ArticleImage(2, 2, 1)),
+        3 to listOf(ArticleImage(3, 1, 3)),
+        4 to listOf(ArticleImage(4, 1, 4)),
     ))
-    val nextArticleImageId = AtomicInteger((articleImages.keys.maxOrNull() ?: 0) + 1)
+    //val nextArticleImageId = AtomicInteger((articleImages.keys.maxOrNull() ?: 0) + 1)
 
     val articles = Collections.synchronizedMap(mutableMapOf(
         1 to Article(
@@ -49,7 +64,7 @@ object ArticleRepo {
         ),
         2 to Article(
             2,
-            "Статья 2 - Вертолёт победил гидру ультраракетой", 2,
+            "Статья 2 - Вертолёт победил гидру ультраракетой", 1,
             "LoremTheme", mutableListOf("нереальное","супероружие","гидра"),"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce consectetur porta augue",
             "Автор 1", "Фотограф 1",
             "2022-01-10T00:00", 50, false,
@@ -59,7 +74,7 @@ object ArticleRepo {
                 |<p>Curabitur dapibus euismod mollis. Nullam eu mauris id quam rutrum bibendum. Proin blandit venenatis risus vitae cursus. Morbi ultrices felis finibus risus ullamcorper, ut interdum purus finibus. Pellentesque non massa at ex euismod laoreet. Nunc et aliquam nisl, sit amet faucibus velit. Aliquam ultrices nec arcu at vestibulum. Mauris ut est tincidunt, posuere purus quis, pretium tortor. Cras ut lectus libero. Integer eget pellentesque diam. Phasellus mauris tortor, euismod eu luctus id, viverra id ipsum. Vestibulum efficitur augue non condimentum congue. Proin vulputate lorem eget vehicula feugiat. Nullam tempus congue finibus. Integer faucibus, mauris at consequat scelerisque, quam eros tristique sem, at vehicula ipsum felis quis enim. Curabitur dictum facilisis ligula, a vehicula quam.</p>
                 |<h3>Ipsum</h3>
                 |<p>Картинки</p><script>alert("AAAAAAA")</script>
-                |<img src="path=NEXT UP.jpg" style="display: block; width: 100%; height: 300px; object-fit: cover;"/>
+                |<img src="localId=2" style="display: block; width: 100%; height: 300px; object-fit: cover;"/>
                 |<p class="image-description">Описание картинки. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce consectetur porta augue, vitae volutpat enim molestie ut. Suspendisse ut mollis lorem, at efficitur sapien.</p>
                 |<p>Vivamus ornare finibus ligula, id posuere quam blandit sit amet. Nam sodales ipsum ut est viverra, id viverra magna dictum. Pellentesque mollis sollicitudin lacus nec fermentum. Nullam iaculis et odio id condimentum. Phasellus aliquam ut neque a feugiat. Vivamus arcu mauris, auctor vel aliquet id, consequat eget lectus. Fusce convallis sodales ante in elementum.</p>
                 |<p>Nulla ultricies tortor eget ex sagittis, ut semper mi aliquam. In porta massa enim, et rutrum mauris suscipit accumsan. Ut feugiat leo metus, at tempus odio suscipit eu. Nunc et diam interdum, dictum dui id, maximus risus. Morbi sagittis, dolor nec pulvinar tempor, lectus mi vestibulum nunc, vel euismod tortor turpis vitae odio. Praesent id turpis in purus fermentum ornare. Cras non turpis malesuada, auctor turpis vitae, pretium magna. Donec lobortis, massa vel ultrices gravida, ligula turpis ullamcorper magna, eu imperdiet arcu leo ut turpis. Nam pharetra nunc luctus enim faucibus sodales et eget ante. Pellentesque vitae pellentesque sapien. Nulla facilisi. Curabitur congue pretium tristique. Ut lacus orci, ultricies vel orci quis, aliquet dapibus ante. Duis lacinia quis nisi ut porta. Nullam lacinia dolor non justo tempor rutrum. Duis auctor euismod orci ac sagittis.</p>
@@ -70,7 +85,7 @@ object ArticleRepo {
         ),
         3 to Article(
             3,
-            "Статья 3", 3,
+            "Статья 3", 1,
             "LoremTheme", mutableListOf("музей","отдых","история","наука"),"Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "Автор 1", "Фотограф 1",
             "2022-01-22T00:00", 1, false,
@@ -87,7 +102,7 @@ object ArticleRepo {
         ),
         4 to Article(
             4,
-            "Статья 4", 4,
+            "Статья 4", 1,
             "LoremTheme", mutableListOf("музей","отдых","история","наука"),"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce consectetur porta augue",
             "Автор 1", "Фотограф 1",
             "2022-01-30T00:00", 99, true,

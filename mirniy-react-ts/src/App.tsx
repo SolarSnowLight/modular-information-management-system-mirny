@@ -9,7 +9,7 @@ import ArticleCreator from "./pages/Main-pages/ArticleCreator";
 import Login from "./pages/Main-pages/Login";
 import ArticleList from "./pages/Main-pages/ArticleList";
 import Article from "./pages/Main-pages/Article";
-import ArticleCreator2 from './pages/Main-pages/ArticleCreator2';
+import ArticleCreator2 from './pages/ArticleCreator2/ArticleCreator2';
 
 function App() {
 

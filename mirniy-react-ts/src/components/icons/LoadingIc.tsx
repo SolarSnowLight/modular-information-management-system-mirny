@@ -1,6 +1,7 @@
 
 import {ReactComponent as LoadingSvg} from "src/assets/icons/loading.svg"
 import css from "./LoadingIc.module.scss"
+import React from "react";
 
 
 
@@ -12,7 +13,7 @@ const LoadingIc = (
         style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
         fill={fill} stroke={fill}/>
 }
-export default LoadingIc
+export default React.memo(LoadingIc)
 
 
 

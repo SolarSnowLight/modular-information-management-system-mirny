@@ -1,5 +1,6 @@
 
 import {ReactComponent as EyeSvg} from "src/assets/icons/eye.svg"
+import React from "react";
 
 
 const EyeIc = (
@@ -8,6 +9,6 @@ const EyeIc = (
     return <EyeSvg style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
                    fill={fill} stroke={fill}/>
 }
-export default EyeIc
+export default React.memo(EyeIc)
 
 

@@ -1,5 +1,5 @@
 import {userActions} from "../../redux/userReducer";
-import {useState} from "react";
+import React, {useState} from "react";
 import {useAppDispatch, useAppSelector} from "../../redux/hooks";
 import LoadingIc from "../../components/icons/LoadingIc";
 import {errorsActions} from "../../redux/errorsReducer";
@@ -234,4 +234,4 @@ function Signup(){
     </div>
 }
 
-export default Signup
+export default React.memo(Signup)

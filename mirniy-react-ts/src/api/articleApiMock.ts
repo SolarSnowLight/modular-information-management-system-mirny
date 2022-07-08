@@ -30,7 +30,7 @@ export type ArticleImageApi = {
 }
 export type ImageApi = {
     id: string
-    path: string
+    url: string
 }
 
 
@@ -41,21 +41,22 @@ const getArticles = async () => {
             articles {
                 id, title
                 titleImage {
-                    id, index,
+                    articleId, localId,
                     image {
-                        id, path
+                        id, url
                     }
                 }
-                theme, tags, shortDescription
+                theme, shortDescription
                 authors, photographers
                 publishDate, viewsCnt, isFavorite
                 text, content
                 images {
-                    id, index,
+                    articleId, localId,
                     image {
-                        id, path
+                        id, url
                     }
                 }
+                tags
             }
         }`
     })
@@ -70,21 +71,22 @@ const getArticleById = async (id: string) => {
             article(id: ${id}) {
                 id, title
                 titleImage {
-                    id, index,
+                    articleId, localId,
                     image {
-                        id, path
+                        id, url
                     }
                 }
-                theme, tags, shortDescription
+                theme, shortDescription
                 authors, photographers
                 publishDate, viewsCnt, isFavorite
                 text, content
                 images {
-                    id, index,
+                    articleId, localId,
                     image {
-                        id, path
+                        id, url
                     }
                 }
+                tags
             }
         }`
     })

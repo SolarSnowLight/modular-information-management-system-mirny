@@ -1,5 +1,6 @@
 
 import {ReactComponent as EyeCrossedOutSvg} from "src/assets/icons/eye-crossed-out.svg"
+import React from "react";
 
 
 const EyeCrossedOutIc = (
@@ -8,6 +9,6 @@ const EyeCrossedOutIc = (
     return <EyeCrossedOutSvg style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
                              fill={fill} stroke={fill}/>
 }
-export default EyeCrossedOutIc
+export default React.memo(EyeCrossedOutIc)
 
 

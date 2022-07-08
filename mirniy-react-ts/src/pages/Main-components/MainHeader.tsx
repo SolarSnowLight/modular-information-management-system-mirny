@@ -3,6 +3,7 @@ import {useAppDispatch, useAppSelector} from "src/redux/hooks";
 import {userActions} from "src/redux/userReducer";
 import Space from "src/components/Space";
 import Header from "../../components/Header";
+import React from "react";
 
 
 
@@ -25,4 +26,4 @@ function MainHeader(){
         </div>
     </Header>
 }
-export default MainHeader
+export default React.memo(MainHeader)

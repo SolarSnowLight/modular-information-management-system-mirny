@@ -1,5 +1,6 @@
 package com.rrain.springtest.entities.article
 
+import com.rrain.springtest.entities.Image
 import com.rrain.springtest.repos.ArticleRepo
 import org.jsoup.Jsoup
 import java.lang.Integer.max
@@ -10,7 +11,7 @@ class Article(
     var id: Int? = null,
 
     var title: String? = null,
-    var titleImageId: Int? = null,
+    var titleImageLocalId: Int? = null,
     var theme: String? = null,
     var tags: MutableList<String> = mutableListOf(),
     var shortDescription: String? = null,
@@ -41,8 +42,16 @@ class Article(
                 val eqIdx = it.indexOf('=')
                 it.substring(0, max(0,eqIdx)) to it.substring(eqIdx+1)
             }
-            if (type=="path"){
-                it.attr("src", ArticleRepo.imgPathPrefix+value)
+            when(type){
+                "path" -> it.attr("src", Image.imgPathPrefix+value)
+                "localId" -> it.attr("src",
+                    Image.imgPathPrefix +
+                    ArticleRepo.articleImages[id]!!
+                        .find { it.localId==value.toIntOrNull() }!!
+                        .imageId!!
+                        .let { ArticleRepo.images[it]!! }
+                        .path
+                )
             }
         }
 

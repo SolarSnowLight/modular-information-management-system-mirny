@@ -20,6 +20,7 @@ type Image {
     id: ID!
     path: String!
     #absPath: String!
+    url: String!
 }
 
 
@@ -43,8 +44,13 @@ type Article {
     content: String!
     images: [ArticleImage!]!
 }
+#type ArticleImage {
+#    id: ID!
+#    index: Int
+#    image: Image!
+#}
 type ArticleImage {
-    id: ID!
-    index: Int
+    articleId: ID!
+    localId: Int
     image: Image!
 }
