@@ -1,8 +1,8 @@
 import common from 'src/common-styles/common.module.scss'
 import React, {useEffect, useState} from "react";
-import {ArticleApi} from "../../api/articleApiMock";
+import {ArticleApi} from "../../api/articleApiTest";
 import {articleService} from "../../service/articleService";
-import ArticleCard from "./ArticleCard";
+import ArticleCard from "./sub-components/ArticleCard";
 import styled from "styled-components";
 
 

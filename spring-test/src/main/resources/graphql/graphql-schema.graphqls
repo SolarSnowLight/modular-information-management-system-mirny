@@ -41,7 +41,8 @@ type Article {
     isFavorite: Boolean!
 
     text: String!
-    content: String!
+    htmlContent: String!
+
     images: [ArticleImage!]!
 }
 #type ArticleImage {

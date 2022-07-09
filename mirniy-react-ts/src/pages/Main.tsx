@@ -1,5 +1,6 @@
 import {Link, useLocation} from "react-router-dom";
-import MainHeader from "./Main-components/MainHeader";
+import MainHeader from "./sub-components/MainHeader";
+import React from "react";
 
 
 function Main(){
@@ -22,11 +23,8 @@ function Main(){
         <Link to={'/create-article'}>
             <button>Создать статью</button>
         </Link>
-        <Link to={'/create-article-2'}>
-            <button>Создать статью 2</button>
-        </Link>
     </div>
 }
 
-export default Main
+export default React.memo(Main)
 

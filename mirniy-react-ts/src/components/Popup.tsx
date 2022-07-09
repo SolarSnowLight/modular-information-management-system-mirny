@@ -3,9 +3,13 @@ import CrossIc from "./icons/CrossIc";
 
 
 const Popup = ({ children, onClose }: { children: React.ReactNode, onClose: ()=>void }) => {
-    return <PopupFrame>
+    const stopEvent = (ev: React.MouseEvent) => {
+        ev.stopPropagation()
+        ev.preventDefault()
+    }
+    return <PopupFrame onClick={onClose}>
         <CloseFrame onClick={onClose}><CrossIc color='black'/></CloseFrame>
-        <PreviewContent>
+        <PreviewContent onClick={stopEvent}>
             { children }
         </PreviewContent>
     </PopupFrame>
@@ -15,11 +19,12 @@ export default Popup
 
 const PopupFrame = styled.div`
   position: fixed;
-  top: 0; right: 0; min-height: 100vh; left: 0;
-  overflow-y: scroll;
+  top: 0; right: 0; bottom: 0; left: 0;
+  overflow: auto;
   background: #00000050;
   padding: 50px;
   z-index: 1000;
+  cursor: pointer;
 `
 const CloseFrame = styled.div`
   position: absolute;
@@ -30,4 +35,5 @@ const CloseFrame = styled.div`
 const PreviewContent = styled.div`
   width: fit-content; height: fit-content;
   margin: 0 auto;
+  cursor: auto;
 `

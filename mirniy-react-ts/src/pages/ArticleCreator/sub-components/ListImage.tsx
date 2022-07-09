@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import CrossIc from "src/components/icons/CrossIc";
 import Button1 from "src/components/Button1";
 import styled from "styled-components";
-import {ImageSrc} from "src/entities/ImageSrc";
+import {ImageSrc} from "src/models/ImageSrc";
 
 
 
@@ -43,20 +43,13 @@ const ListImage = React.memo((
         <Image imageUrl={fileUrl}/>
 
         <ButtonBox>
-            <Button1 title='Добавить' onClick={()=>onPaste(imageSource)}
+            <Button1 onClick={()=>onPaste(imageSource)}
                      style={{
                          background: '#1F8DCD',
-                         font: "300 19px 'TT Commons'", color: '#FCFCFC',
+                         font: "500 16px 'TT Commons'", color: '#FCFCFC',
                      }}
-            />
+            >Добавить</Button1>
         </ButtonBox>
-
-
-        {/*<div style={{ display: "flex", flexFlow: 'column nowrap' }}>
-            <div>id: {id}</div>
-            <button onClick={()=>onPaste(id)}>Paste</button>
-        </div>*/}
-
 
     </ImageItemFrame>
 
@@ -68,9 +61,11 @@ const ImageItemFrame = React.memo(styled.div`
   grid-template: auto auto / 1fr auto;
 `)
 const ImageItemText = React.memo(styled.div`
-  font: 400 19px 'TT Commons';
+  font: 500 16px 'TT Commons';
   color: #424041; // Gray1
   grid-area: 1 / 1;
+  //padding-top: 4px;
+  align-self: center;
 `)
 const CrossContainer = React.memo(styled.div`
   width: 16px; height: 16px; align-self: end;
@@ -79,7 +74,7 @@ const CrossContainer = React.memo(styled.div`
   cursor: pointer;
 `)
 const Image = React.memo(styled.div<{ imageUrl?: string }>`
-  width: 100%; height: 274px;
+  width: 100%; aspect-ratio: 1.17 / 1;
   background-image: url("${p=>p.imageUrl}");
   background-size: cover;
   background-position: center;
@@ -87,7 +82,7 @@ const Image = React.memo(styled.div<{ imageUrl?: string }>`
   grid-area: 2 / 1 / span 1 / span 2;
 `)
 const ButtonBox = React.memo(styled.div`
-  width: 108px; height: 32px;
+  width: 91px; height: 32px;
   margin: 0 10px 10px 0;
   align-self: end; justify-self: end;
   grid-area: 2 / 1 / span 1 / span 2;

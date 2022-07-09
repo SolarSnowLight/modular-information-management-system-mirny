@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Main from "./pages/Main";
-import Signup from "./pages/Main-pages/Signup";
-import {useAppDispatch} from "./redux/hooks";
+import Signup from "./pages/Signup/Signup";
+import {useAppDispatch} from "./redux/reduxHooks";
 import {appActions} from "./redux/appReducer";
 import {useDebounce} from "./hooks/useDebounce";
-import ArticleCreator from "./pages/Main-pages/ArticleCreator";
-import Login from "./pages/Main-pages/Login";
-import ArticleList from "./pages/Main-pages/ArticleList";
-import Article from "./pages/Main-pages/Article";
-import ArticleCreator2 from './pages/ArticleCreator2/ArticleCreator2';
+import Login from "./pages/Login/Login";
+import ArticleList from "./pages/ArticleList/ArticleList";
+import Article from "./pages/Article/Article";
+import ArticleCreator2 from './pages/ArticleCreator/ArticleCreator';
 
 function App() {
 
@@ -91,8 +90,7 @@ function App() {
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
                 <Route path='/user-articles' element={<ArticleList/>}/>
-                <Route path='/create-article' element={<ArticleCreator/>}/>
-                <Route path='/create-article-2' element={<ArticleCreator2/>}/>
+                <Route path='/create-article' element={<ArticleCreator2/>}/>
                 <Route path='/article/:articleId' element={<Article/>}/>
 
                 <Route path='*' element={<Main/>}/>

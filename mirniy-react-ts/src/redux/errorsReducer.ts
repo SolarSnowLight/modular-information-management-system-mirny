@@ -1,6 +1,6 @@
 
 import {Reducer} from "redux";
-import {ErrorType} from "./errors";
+import {ErrorType} from "../models/errors";
 
 
 /*type Errors2<T extends string|never> = {

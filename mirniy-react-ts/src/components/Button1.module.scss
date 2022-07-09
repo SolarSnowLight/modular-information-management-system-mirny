@@ -4,8 +4,7 @@
 
 
 .btn {
-    all: unset;
-    box-sizing: border-box;
+    @include common.allDefault;
 
     background: #1F8DCD; // Blue todo extract color
     border-radius: 4px;

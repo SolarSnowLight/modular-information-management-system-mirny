@@ -5,27 +5,16 @@ import StarIc from "src/components/icons/StartIc";
 import styled from "styled-components";
 import common from 'src/common-styles/common.module.scss'
 import './ArticleView.scss';
-import React, {useEffect, useMemo, useState} from "react";
-import {ArticleApi} from "src/api/articleApiMock";
-import {API_URL_2} from "src/api/ax2";
+import React, { useMemo } from "react";
+import {ArticleApi} from "src/api/articleApiTest";
 import {dateUtils} from "src/utils/dateUtils";
 
 
 const ArticleView = ({ article }: { article: ArticleApi }) => {
 
     const a = useMemo(()=>{
-        /*const path = article.titleImage.image.path
-        let titleImgUrl: URL
-        if (path.startsWith('data:')){
-            titleImgUrl = new URL(path)
-        } else {
-            titleImgUrl = new URL(API_URL_2+'image')
-            titleImgUrl.searchParams.append('path', article.titleImage.image.path)
-        }*/
-        const titleImgUrl = new URL(article.titleImage.image.url)
-
+        const titleImgUrl = article.titleImage.image.url
         const date = dateUtils.from_yyyy_MM_dd_hh_mm(article.publishDate)
-
         return {
             titleImgUrl,
             date,
@@ -67,8 +56,8 @@ const ArticleView = ({ article }: { article: ArticleApi }) => {
             <Title>{article.title}</Title>
             <Space h={29}/>
 
-            {/* css class-marker article-container */}
-            <div className='article-container' dangerouslySetInnerHTML={{ __html: article.content }}/>
+            {/* article-container is css class-marker*/}
+            <div className='article-container' dangerouslySetInnerHTML={{ __html: article.htmlContent }}/>
 
             <Space h={32}/>
             <div>
@@ -88,9 +77,9 @@ export default React.memo(ArticleView)
 const Frame = React.memo(styled.div`
   width: 736px;
 `)
-const TitleImage = React.memo(styled.div<{ imageUrl: URL }>`
+const TitleImage = React.memo(styled.div<{ imageUrl: string }>`
   width: 100%; height: 395px;
-  background-image: url("${p=>p.imageUrl+''}");
+  background-image: url("${p=>p.imageUrl}");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;

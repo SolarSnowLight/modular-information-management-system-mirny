@@ -1,5 +1,5 @@
 import css from './Header.module.scss'
-import {useAppDispatch, useAppSelector} from "src/redux/hooks";
+import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
 import {userActions} from "src/redux/userReducer";
 import Space from "src/components/Space";
 import Header from "../../components/Header";

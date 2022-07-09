@@ -1,13 +1,13 @@
-import {articleApiMock, ArticleResponse, ArticlesResponse} from "../api/articleApiMock";
+import {articleApiTest, ArticleResponse, ArticlesResponse} from "../api/articleApiTest";
 import {GraphQlData} from "../api/utils";
-import {errors} from "../redux/errors";
+import {errors} from "../models/errors";
 import {ServiceData} from "./utils";
 import Axios, {AxiosError} from "axios";
 
 
 
 const getArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
-    return articleApiMock.getArticles().then(
+    return articleApiTest.getArticles().then(
         response => {
             let { status, data } = response
             if (status===200) {
@@ -33,7 +33,7 @@ const getArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
 
 
 const getArticleById = async (id: string): Promise<ServiceData<ArticleResponse>> => {
-    return articleApiMock.getArticleById(id).then(
+    return articleApiTest.getArticleById(id).then(
         response => {
             let { status, data } = response
             if (status===200) {

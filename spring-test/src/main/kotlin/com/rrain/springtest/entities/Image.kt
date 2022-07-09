@@ -12,13 +12,13 @@ class Image(
 ) {
     fun getAbsPath() = path?.let{ PathProvider.absPath.resolve("src/main/resources/images").resolve(it) }
 
-    fun getUrl() = path?.let { imgPathPrefix +it }
+    fun getUrl() = path?.let { imgUrlPrefix+it }
 
     override fun toString(): String {
         return "Image(id=$id, path=$path)"
     }
 
     companion object {
-        const val imgPathPrefix = "http://localhost:8081/image?path="
+        const val imgUrlPrefix = "http://localhost:8081/image?path="
     }
 }

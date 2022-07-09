@@ -1,11 +1,10 @@
 import {useNavigate, useParams} from "react-router-dom";
 import styled from "styled-components";
 import common from 'src/common-styles/common.module.scss'
-import './ArticleView.scss';
+import '../ArticleView/ArticleView.scss';
 import React, {useEffect, useMemo, useState} from "react";
-import {ArticleApi} from "src/api/articleApiMock";
+import {ArticleApi} from "src/api/articleApiTest";
 import {articleService} from "src/service/articleService";
-import {API_URL_2} from "../../api/ax2";
 import {dateUtils} from "src/utils/dateUtils";
 import Space from "src/components/Space";
 import EyeIc from "src/components/icons/EyeIc";
@@ -96,7 +95,7 @@ const Article = () => {
                     <Space h={29}/>
 
                     {/* css class-marker article-container */}
-                    <div className='article-container' dangerouslySetInnerHTML={{ __html: article.content }}/>
+                    <div className='article-container' dangerouslySetInnerHTML={{ __html: article.htmlContent }}/>
 
                     <Space h={32}/>
                     <div>

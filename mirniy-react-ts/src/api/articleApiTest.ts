@@ -1,10 +1,10 @@
-import ax2 from "./ax2";
+import axTest from "./axTest";
 import {GraphQlData} from "./utils";
 
 
 
 export type ArticleApi = {
-    id: string
+    id: string|number
 
     title: string
     titleImage: ArticleImageApi
@@ -20,23 +20,24 @@ export type ArticleApi = {
     isFavorite: boolean
 
     text: string
-    content: string
+    htmlContent: string
+
     images: Array<ArticleImageApi> // TODO remove
 }
 export type ArticleImageApi = {
-    id: string
-    index: number
+    articleId: string|number
+    localId: number
     image: ImageApi
 }
 export type ImageApi = {
-    id: string
+    id: string|number
     url: string
 }
 
 
 export type ArticlesResponse = { articles: ArticleApi[] }
 const getArticles = async () => {
-    return ax2.post<GraphQlData<ArticlesResponse>>('graphql',{
+    return axTest.post<GraphQlData<ArticlesResponse>>('graphql',{
         query: `{
             articles {
                 id, title
@@ -49,7 +50,7 @@ const getArticles = async () => {
                 theme, shortDescription
                 authors, photographers
                 publishDate, viewsCnt, isFavorite
-                text, content
+                text, htmlContent
                 images {
                     articleId, localId,
                     image {
@@ -66,7 +67,7 @@ const getArticles = async () => {
 
 export type ArticleResponse = { article: ArticleApi }
 const getArticleById = async (id: string) => {
-    return ax2.post<GraphQlData<ArticleResponse>>('graphql',{
+    return axTest.post<GraphQlData<ArticleResponse>>('graphql',{
         query: `{
             article(id: ${id}) {
                 id, title
@@ -79,7 +80,7 @@ const getArticleById = async (id: string) => {
                 theme, shortDescription
                 authors, photographers
                 publishDate, viewsCnt, isFavorite
-                text, content
+                text, htmlContent
                 images {
                     articleId, localId,
                     image {
@@ -96,7 +97,7 @@ const getArticleById = async (id: string) => {
 
 
 
-export const articleApiMock = {
+export const articleApiTest = {
     getArticles,
     getArticleById,
 }

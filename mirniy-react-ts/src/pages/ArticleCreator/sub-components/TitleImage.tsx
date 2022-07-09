@@ -1,15 +1,7 @@
 import styled from "styled-components";
 import React, {useEffect, useState} from "react";
 import {absolute, absoluteOff} from "src/common-styles/commonStyled";
-import {ImageSrc} from "src/entities/ImageSrc";
-
-
-// INFO:
-
-// div props: React.HTMLAttributes<HTMLDivElement>
-// div props with ref: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
-
-// styled components && - ссылка на текущий экземпляр компоненты
+import {ImageSrc} from "src/models/ImageSrc";
 
 
 

@@ -4,7 +4,7 @@ import {userService} from "src/service/userService";
 import {loadingActions} from "./loadingReducer";
 import {UserRegister} from "src/api/userApi";
 import {errorsActions} from "./errorsReducer";
-import {errors, ErrorType} from './errors';
+import {errors, ErrorType} from '../models/errors';
 
 
 type User = {

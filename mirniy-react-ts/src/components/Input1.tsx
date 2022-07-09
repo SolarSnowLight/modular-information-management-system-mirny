@@ -5,6 +5,8 @@ import {FormEventHandler, useState} from "react";
 import EyeCrossedOutIc from "./icons/EyeCrossedOutIc";
 
 
+// todo refactor it
+
 type Input1Props = {
     w?: string|number
     h?: string|number

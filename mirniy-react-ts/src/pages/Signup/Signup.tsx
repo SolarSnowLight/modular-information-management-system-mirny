@@ -1,6 +1,6 @@
 import {userActions} from "../../redux/userReducer";
 import React, {useState} from "react";
-import {useAppDispatch, useAppSelector} from "../../redux/hooks";
+import {useAppDispatch, useAppSelector} from "../../redux/reduxHooks";
 import LoadingIc from "../../components/icons/LoadingIc";
 import {errorsActions} from "../../redux/errorsReducer";
 

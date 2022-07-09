@@ -21,6 +21,13 @@
     justify-content: center;
 }
 
+@mixin allDefault {
+    all: unset;
+    box-sizing: border-box;
+    margin: 0;
+    background: none;
+}
+
 
 
 

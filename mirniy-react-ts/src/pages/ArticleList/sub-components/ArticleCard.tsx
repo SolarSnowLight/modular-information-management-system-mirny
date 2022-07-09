@@ -1,13 +1,12 @@
 import common from 'src/common-styles/common.module.scss'
-import {ArticleApi} from "src/api/articleApiMock";
-import {API_URL_2} from "src/api/ax2";
+import {ArticleApi} from "src/api/articleApiTest";
 import {Link} from "react-router-dom";
 import Space from "src/components/Space";
 import EyeIc from "src/components/icons/EyeIc";
 import StarFilledIc from "src/components/icons/StartFilledIc";
 import StarIc from "src/components/icons/StartIc";
 import styled from "styled-components";
-import {dateUtils} from "../../utils/dateUtils";
+import {dateUtils} from "../../../utils/dateUtils";
 import React from "react";
 
 
@@ -21,9 +20,7 @@ const ArticleCard = (
             onFavorite: (article: ArticleApi, isFavorite?: boolean)=>void
         }
 ) => {
-    /*const titleImgUrl = new URL(API_URL_2+'image')
-    titleImgUrl.searchParams.append('path', article.titleImage.image.path)*/
-    const titleImgUrl = new URL(article.titleImage.image.url)
+    const titleImgUrl = article.titleImage.image.url
     const date = dateUtils.from_yyyy_MM_dd_hh_mm(article.publishDate)
 
     return <Card className={common.row}>
@@ -100,9 +97,9 @@ const StarIcWrap = React.memo(styled.div`
   display: contents;
   cursor: pointer;
 `)
-const Photo = React.memo(styled.div<{ imageUrl: URL }>`
+const Photo = React.memo(styled.div<{ imageUrl: string }>`
   aspect-ratio: 1; height: 100%;
-  background-image: url("${p=>p.imageUrl+''}");
+  background-image: url("${p=>p.imageUrl}");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;

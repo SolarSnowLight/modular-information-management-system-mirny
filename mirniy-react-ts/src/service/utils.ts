@@ -1,4 +1,4 @@
-import {ErrorType} from "../redux/errors";
+import {ErrorType} from "../models/errors";
 
 
 export type ServiceData<D> = {

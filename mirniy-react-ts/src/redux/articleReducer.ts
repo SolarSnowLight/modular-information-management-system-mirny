@@ -1,11 +1,11 @@
-import {ArticleApi} from "../api/articleApiMock";
+import {ArticleApi} from "../api/articleApiTest";
 import {Action, Reducer} from "redux";
 import {AppThunk} from "./store";
 import {errorsActions} from "./errorsReducer";
 import {loadingActions} from "./loadingReducer";
 import {userService} from "../service/userService";
 import {articleService} from "../service/articleService";
-import {errors} from "./errors";
+import {errors} from "../models/errors";
 
 
 type ArticleState = typeof initialState
