@@ -1,19 +1,21 @@
-import {articleApiTest, ArticleResponse, ArticlesResponse} from "../api/articleApiTest";
-import {GraphQlData} from "../api/utils";
-import {errors} from "../models/errors";
+import {Article, ArticleApi, articleApiTest, ArticleApiResponse, ArticlesApiResponse} from "../api/articleApiTest";
+import {GraphQlData} from "src/api/utils";
+import {errors} from "src/models/errors";
 import {ServiceData} from "./utils";
 import Axios, {AxiosError} from "axios";
+import {ImageSrc} from "src/models/ImageSrc";
 
 
+export type ArticlesResponse = { articles: Article[] }
 
 const getArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
     return articleApiTest.getArticles().then(
         response => {
             let { status, data } = response
             if (status===200) {
-                data = data as GraphQlData<ArticlesResponse>
+                data = data as GraphQlData<ArticlesApiResponse>
                 return { data: {
-                        articles: data.data!.articles
+                        articles: data.data!.articles.map(articleApiToArticle)
                     }}
             }
 
@@ -31,15 +33,16 @@ const getArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
 }
 
 
+export type ArticleResponse = { article: Article }
 
 const getArticleById = async (id: string): Promise<ServiceData<ArticleResponse>> => {
     return articleApiTest.getArticleById(id).then(
         response => {
             let { status, data } = response
             if (status===200) {
-                data = data as GraphQlData<ArticleResponse>
+                data = data as GraphQlData<ArticleApiResponse>
                 return { data: {
-                        article: data.data!.article
+                        article: articleApiToArticle(data.data!.article)
                     }}
             }
 
@@ -57,6 +60,21 @@ const getArticleById = async (id: string): Promise<ServiceData<ArticleResponse>>
 }
 
 
+
+function articleApiToArticle(articleApi: ArticleApi): Article {
+    let titleImageSrc
+    let imagesSrc = articleApi.images.map(it=>{
+        let newIm = ImageSrc.fromUrl(it.localId, it.image.url)
+        if (newIm.id === articleApi.titleImageLocalId) titleImageSrc=newIm
+        return newIm
+    })
+    const article = {
+        ...articleApi,
+        titleImageSrc,
+        imagesSrc
+    }
+    return article
+}
 
 
 

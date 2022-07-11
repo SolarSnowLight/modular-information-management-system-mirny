@@ -41,7 +41,7 @@ const ImageWrap = React.memo(({ imageSource }: { imageSource?: ImageSrc }) => {
         let cancel = false
         ;(async () => {
             if (imageSource){
-                const url = await imageSource.getUrl()
+                const url = await imageSource.fetchUrl()
                 if (!cancel) setFileUrl(url)
             }
         })()

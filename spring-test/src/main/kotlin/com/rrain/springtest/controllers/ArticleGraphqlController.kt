@@ -28,6 +28,8 @@ class ArticleGraphqlController {
     suspend fun articleImageOfArticle(articles: List<Article>): Map<Article, ArticleImage> {
         return articles.associateWith { ArticleRepo.articleImages[it.titleImageLocalId]!! }
     }*/
+
+    // todo remove
     @BatchMapping("titleImage")
     fun articleImageOfArticle(articles: List<Article>): List<ArticleImage> {
         return articles.map { a -> ArticleRepo.articleImages[a.id]!!.find { it.localId==a.titleImageLocalId }!! }

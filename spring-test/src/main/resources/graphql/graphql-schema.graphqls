@@ -12,6 +12,10 @@ type Query {
     article(id: ID!): Article
 }
 
+type Mutation {
+    saveArticle(): 
+}
+
 
 
 
@@ -28,22 +32,22 @@ type Article {
     id: ID!
 
     title: String!
-    titleImage: ArticleImage!
+    titleImageLocalId: Int!
     theme: String!
-    tags: [String!]!
     shortDescription: String!
+    publishDate: String!
+    tags: [String!]!
 
     authors: String!
     photographers: String!
 
-    publishDate: String!
-    viewsCnt: Int!
-    isFavorite: Boolean!
-
     text: String!
-    htmlContent: String!
+    #htmlContent: String!
 
     images: [ArticleImage!]!
+
+    viewsCnt: Int!
+    isFavorite: Boolean!
 }
 #type ArticleImage {
 #    id: ID!

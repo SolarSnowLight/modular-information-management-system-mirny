@@ -1,12 +1,12 @@
 import common from 'src/common-styles/common.module.scss'
-import {ArticleApi} from "src/api/articleApiTest";
+import {Article, ArticleApi} from "src/api/articleApiTest";
 import {Link} from "react-router-dom";
 import Space from "src/components/Space";
 import EyeIc from "src/components/icons/EyeIc";
-import StarFilledIc from "src/components/icons/StartFilledIc";
+import StarFilledIc from "src/components/icons/StarFilledIc";
 import StarIc from "src/components/icons/StartIc";
 import styled from "styled-components";
-import {dateUtils} from "../../../utils/dateUtils";
+import {dateUtils} from "src/utils/dateUtils";
 import React from "react";
 
 
@@ -14,14 +14,13 @@ import React from "react";
 
 
 const ArticleCard = (
-    { article, onFavorite }:
-        {
-            article: ArticleApi,
-            onFavorite: (article: ArticleApi, isFavorite?: boolean)=>void
-        }
+    { article }: { article: Article }
 ) => {
-    const titleImgUrl = article.titleImage.image.url
     const date = dateUtils.from_yyyy_MM_dd_hh_mm(article.publishDate)
+
+    const onFavorite = (article: ArticleApi, isFavorite = true) => {
+        console.log('setFavorite', isFavorite)
+    }
 
     return <Card className={common.row}>
         <Content className={common.column}>
@@ -31,7 +30,7 @@ const ArticleCard = (
             <div className={common.row}>
                 <BottomText>{article.theme}</BottomText>
                 <Space w={10}/>
-                <BottomText>{date.day}.{date.month}</BottomText>
+                { date && <BottomText>{date.day}.{date.month}</BottomText> }
                 <Space flexGrow={1} />
                 <EyeIcBox className={common.center}><EyeIc fill='#8B8B8B' size={22}/></EyeIcBox>
                 <Space w={10}/>
@@ -47,7 +46,7 @@ const ArticleCard = (
                 }
             </div>
         </Content>
-        <Photo imageUrl={titleImgUrl} />
+        <Photo imageUrl={article.titleImageSrc?.getUrl()} />
     </Card>
 }
 export default React.memo(ArticleCard)
@@ -91,7 +90,7 @@ const EyeIcBox = React.memo(styled.div`
 const ViewsCnt = React.memo(styled.div`
   min-width: 20px; height: 20px;
   font: 300 16px 'TT Commons';
-  color: #8B8B8B; // Gray 2
+  color: #8B8B8B; // Gray 2 // todo extract color
 `)
 const StarIcWrap = React.memo(styled.div`
   display: contents;

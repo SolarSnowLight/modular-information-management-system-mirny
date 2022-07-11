@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {AppThunk} from "./store";
-import {userService} from "src/service/userService";
+import {userService} from "src/api-service/userService";
 import {loadingActions} from "./loadingReducer";
 import {UserRegister} from "src/api/userApi";
 import {errorsActions} from "./errorsReducer";

@@ -18,7 +18,7 @@ const ListImage = React.memo((
         let cancel = false
         ;(async () => {
             if (imageSource){
-                const url = await imageSource.getUrl()
+                const url = await imageSource.fetchUrl()
                 if (!cancel) setFileUrl(url)
             }
         })()

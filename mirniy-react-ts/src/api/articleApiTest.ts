@@ -1,63 +1,66 @@
 import axTest from "./axTest";
 import {GraphQlData} from "./utils";
+import {ImageSrc} from "../models/ImageSrc";
 
 
 
 export type ArticleApi = {
-    id: string|number
+    id?: string|number
 
-    title: string
-    titleImage: ArticleImageApi
-    theme: string
-    tags: string[]
-    shortDescription: string
+    title?: string
+    titleImageLocalId?: number
+    theme?: string
+    shortDescription?: string
+    publishDate?: string // yyyy-MM-ddThh:mm // 2022-01-01T01:01
+    tags: string[] // ['tag1', 'tag2', 'tag3'] // #tag1 #tag2 #tag3
 
-    authors: string
-    photographers: string
+    authors?: string // формат данных пока не определён
+    photographers?: string // формат данных пока не определён
 
-    publishDate: string
-    viewsCnt: number
-    isFavorite: boolean
 
-    text: string
-    htmlContent: string
+    text?: string // текст с общими тегами (<p> <i> <b> <mark> <article-image>)
 
-    images: Array<ArticleImageApi> // TODO remove
+    images: ArticleImageApi[]
+
+    viewsCnt?: number
+    isFavorite?: boolean
 }
 export type ArticleImageApi = {
-    articleId: string|number
+    articleId?: string|number
     localId: number
     image: ImageApi
 }
 export type ImageApi = {
-    id: string|number
+    id?: string|number
     url: string
 }
 
+export type Article = ArticleApi & {
+    titleImageSrc?: ImageSrc
+    imagesSrc: ImageSrc[]
+    //htmlContent: string
+}
 
-export type ArticlesResponse = { articles: ArticleApi[] }
+
+export type ArticlesApiResponse = { articles: ArticleApi[] }
+
 const getArticles = async () => {
-    return axTest.post<GraphQlData<ArticlesResponse>>('graphql',{
+    return axTest.post<GraphQlData<ArticlesApiResponse>>('graphql',{
         query: `{
             articles {
-                id, title
-                titleImage {
-                    articleId, localId,
-                    image {
-                        id, url
-                    }
-                }
+                id, 
+                title, titleImageLocalId
                 theme, shortDescription
+                publishDate, tags
                 authors, photographers
-                publishDate, viewsCnt, isFavorite
-                text, htmlContent
+                text
                 images {
                     articleId, localId,
                     image {
                         id, url
                     }
                 }
-                tags
+                viewsCnt, isFavorite
             }
         }`
     })
@@ -65,29 +68,25 @@ const getArticles = async () => {
 
 
 
-export type ArticleResponse = { article: ArticleApi }
+export type ArticleApiResponse = { article: ArticleApi }
+
 const getArticleById = async (id: string) => {
-    return axTest.post<GraphQlData<ArticleResponse>>('graphql',{
+    return axTest.post<GraphQlData<ArticleApiResponse>>('graphql',{
         query: `{
             article(id: ${id}) {
-                id, title
-                titleImage {
-                    articleId, localId,
-                    image {
-                        id, url
-                    }
-                }
+                id, 
+                title, titleImageLocalId
                 theme, shortDescription
+                publishDate, tags
                 authors, photographers
-                publishDate, viewsCnt, isFavorite
-                text, htmlContent
+                text
                 images {
                     articleId, localId,
                     image {
                         id, url
                     }
                 }
-                tags
+                viewsCnt, isFavorite
             }
         }`
     })

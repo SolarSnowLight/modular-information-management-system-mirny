@@ -1,7 +1,9 @@
 
 
 // from "2022-01-01T00:00"
-const from_yyyy_MM_dd_hh_mm = (date: string) => {
+// yyyy-MM-ddThh:mm
+const from_yyyy_MM_dd_hh_mm = (date?: string) => {
+    if (!date) return undefined
     return {
         year: date.substring(0,4),
         month: date.substring(5,7),

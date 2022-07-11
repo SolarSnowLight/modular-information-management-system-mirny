@@ -7,8 +7,8 @@ import {appActions} from "./redux/appReducer";
 import {useDebounce} from "./hooks/useDebounce";
 import Login from "./pages/Login/Login";
 import ArticleList from "./pages/ArticleList/ArticleList";
-import Article from "./pages/Article/Article";
-import ArticleCreator2 from './pages/ArticleCreator/ArticleCreator';
+import Article from "./pages/Article/ArticlePage";
+import ArticleCreator2 from './pages/ArticleEditor/ArticleEditor';
 
 function App() {
 

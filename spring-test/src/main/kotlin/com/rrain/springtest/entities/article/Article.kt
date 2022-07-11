@@ -1,10 +1,8 @@
 package com.rrain.springtest.entities.article
 
-import com.rrain.springtest.entities.Image
 import com.rrain.springtest.repos.ArticleRepo
 import org.jsoup.Jsoup
 import org.jsoup.parser.Parser
-import java.lang.Integer.max
 
 
 
@@ -14,19 +12,28 @@ class Article(
     var title: String? = null,
     var titleImageLocalId: Int? = null,
     var theme: String? = null,
-    var tags: MutableList<String> = mutableListOf(),
     var shortDescription: String? = null,
+    var publishDate: String? = null,
+    var tags: MutableList<String> = mutableListOf(),
 
     var authors: String? = null,
     var photographers: String? = null,
 
-    var publishDate: String? = null,
+    var text: String? = null,
+
+    var imageIds: MutableList<Int> = mutableListOf(),
+
     var viewsCnt: Int? = null,
     var isFavorite: Boolean? = null,
-
-    text: String? = null,
-    var imageIds: MutableList<Int> = mutableListOf(),
 ) {
+
+
+
+}
+
+
+// todo extract to my test tutorials
+/*
 
     var text = text
         set(value){
@@ -63,10 +70,7 @@ class Article(
             }
             return field
         }
-
-
-
-}
+*/
 
 
 // OLD

@@ -3,40 +3,37 @@
 import common from 'src/common-styles/common.module.scss'
 import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
-import {useObjectToKey} from "../../hooks/useOjectToKey";
 import styled from "styled-components";
 import Space from "src/components/Space";
 import Input1 from "src/components/Input1";
 import Button1 from "src/components/Button1";
-import CrossIc from "src/components/icons/CrossIc";
 import {lastFocused} from "src/utils/documentUtils";
-import {ArticleApi} from "src/api/articleApiTest";
+import {Article, ArticleApi, ArticleImageApi} from "src/api/articleApiTest";
 import {DateTime} from "src/utils/DateTime";
 import Popup from "src/components/Popup";
-import ArticleView from "../ArticleView/ArticleView";
+import ArticleView from "src/pages/ArticleView/ArticleView";
 import TitleImage from "./sub-components/TitleImage";
 import {ImageSrc} from "src/models/ImageSrc";
-import {walkFileTree} from "../../utils/utils";
-import {IdGenerator} from "../../models/IdGenerator";
+import {walkFileTree} from "src/utils/utils";
+import {IdGenerator} from "src/models/IdGenerator";
 import ListImage from './sub-components/ListImage';
+import {articleUtils} from "src/models/articleUtils";
 
 
 
 
 const imageExtensions = /\.((jpg)|(jpeg)|(png)|(webp)|(bmp)|(jfif))$/i
-const imageTag =/<image[ \n]+id=(?<id>\d+)[ \n]*\/>/g
-
 const wordExtensions = /\.((doc)|(docx))$/i
 
 
 
 
-const ArticleCreator = () => {
+const ArticleEditor = () => {
 
     const d = useAppDispatch()
     const { isDraggingFiles } = useAppSelector(s=>s.app)
 
-    const [idGen] = useState(new IdGenerator())
+    const [idGen] = useState(()=>new IdGenerator())
 
     const [title, setTitle] = useState('')
     const onTitleInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,9 +46,9 @@ const ArticleCreator = () => {
     }
 
     const textareaRef = useRef<HTMLTextAreaElement>(null)
-    const [text, setText] = useState('')
+    const [rawText, setRawText] = useState('')
     const onTextInput = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setText(ev.currentTarget.value)
+        setRawText(ev.currentTarget.value)
     }
     const [newSelection, setNewSelection] = useState(undefined as undefined|{ s:number, e:number })
     useLayoutEffect(()=>{
@@ -65,7 +62,7 @@ const ArticleCreator = () => {
 
     const titleImageFrameRef = useRef<HTMLDivElement>(null)
 
-// todo
+
     const [titleImage, setTitleImage] = useState(undefined as ImageSrc|undefined)
     const [images, setImages] = useState([] as ImageSrc[])
     //const [word, setWord] = useState(undefined as undefined|File)
@@ -74,9 +71,11 @@ const ArticleCreator = () => {
         if (isDraggingFiles) {
             //console.log('IMAGES DROP:',ev)
 
-            const addFile = (file: File) => {
-                if (imageExtensions.test(file.name))
-                    setImages(images=>[...images, new ImageSrc(idGen.getId(),file)])
+            const addFile = async (file: File) => {
+                if (imageExtensions.test(file.name)){
+                    const newIm = await ImageSrc.fromFile(idGen.getId(),file)
+                    setImages(images=>[...images, newIm])
+                }
                 else if (wordExtensions.test(file.name)){
                     //setWord(file)
                 }
@@ -100,9 +99,9 @@ const ArticleCreator = () => {
         const area = textareaRef.current
         if (area && lastFocused === area){
             const s = area.selectionStart
-            const oldLen = text.length
-            const newText = text.substring(0,s)+`${"\n"}<article-image localId="${imageSrc.id}"/>${"\n"}`+text.substring(s)
-            setText(newText)
+            const oldLen = rawText.length
+            const newText = rawText.substring(0,s)+`${"\n"}<article-image localId="${imageSrc.id}"/>${"\n"}`+rawText.substring(s)
+            setRawText(newText)
             const newSel = s+(newText.length-oldLen)
             setNewSelection({s: newSel, e: newSel})
             area.focus()
@@ -116,85 +115,89 @@ const ArticleCreator = () => {
         }
     }
 
-    const [preparingArticle, setPreparingArticle] = useState(false)
-    const [article, setArticle] = useState(undefined as ArticleApi|undefined)
+    const [article, setArticle] = useState(undefined as Article|undefined)
 
     const onPreview = () => {
-        if (preparingArticle) return
-        setPreparingArticle(true)
-        ;(async function(){
-            const article = await prepareArticle()
-            setArticle(article)
-        })().finally(()=>setPreparingArticle(false))
+        const article = prepareArticleForPreview()
+        setArticle(article)
     }
 
-    const prepareArticle = async (): Promise<ArticleApi|undefined> => {
+    const prepareArticleForPreview = (): Article|undefined => {
+        let text = articleUtils.wrapWithP(rawText)
 
-        const parser = new DOMParser()
-        let wrappedText = `<root>${text}</root>` // need to wrap in some root tag
-        let xmlDoc = parser.parseFromString(wrappedText, 'text/xml')
+        const article: Article = {
+            id: undefined,
 
-        const root = xmlDoc.childNodes[0]
-        let currentP = undefined as undefined|ChildNode
-        for (let i = 0; i<root.childNodes.length; ){
-            const ch = root.childNodes[i]
-            if (['#text','i','b','mark'].includes(ch.nodeName)){
-                if (!currentP){
-                    currentP = xmlDoc.createElement('p')
-                    root.appendChild(currentP)
-                    root.insertBefore(currentP, ch)
-                    i++
-                }
-                currentP.appendChild(ch)
-            } else {
-                if ('article-image'===ch.nodeName){
-                    const el = ch as Element
-                    const src = await images.find(it=>it.id==el.attributes["localId"].value)!.getUrl()
-                    const img = parser.parseFromString(
-                        `<img src="${src}" style="display: block; width: 100%; height: 300px; object-fit: cover;"/>`,
-                        'text/xml'
-                    ).childNodes[0]
-                    root.replaceChild(img, ch)
-                }
-                currentP = undefined
-                i++
-            }
-        }
-
-        const xmlSerializer = new XMLSerializer()
-        let htmlContent = xmlSerializer.serializeToString(xmlDoc) // <root><p>some <i>italic</i> plain</p><img src="localId=2" style="display: block; width: 100%; height: 300px; object-fit: cover;"/><p>text more text</p></root>
-
-
-        let titleImageUrl = await titleImage?.getUrl()
-        titleImageUrl = titleImageUrl ?? ''
-
-        const article: ArticleApi = {
-            id: 'undefined',
             title: title,
-            titleImage: {
-                articleId: 'undefined',
-                localId: titleImage?.id ?? -1,
-                image: {
-                    id: 'undefined',
-                    url: titleImageUrl,
-                }
-            },
-            theme: 'not specified',
-            tags: tags.trim().split(/\s*#/).slice(1),
-            shortDescription: 'not specified',
-
-            authors: 'not specified',
-            photographers: 'not specified',
+            titleImageLocalId: undefined,
+            theme: undefined,
+            shortDescription: undefined,
             publishDate: DateTime.fromDate(new Date()).to_yyyy_MM_dd_HH_mm(),
+            tags: tags.trim().split(/\s*#/).slice(1),
+
+            authors: undefined,
+            photographers: undefined,
+
+            text: text,
+
+            images: [],
+
             viewsCnt: 0,
             isFavorite: false,
 
-            text: '',
-            htmlContent: htmlContent,
-            images: [],
+            titleImageSrc: titleImage,
+            imagesSrc: images,
         }
         return article
     }
+
+
+    const onSave = async () => {
+        /*const formData: FormData = new FormData();
+        formData.append("rawText", rawText);
+        images.forEach(it=>formData.append("files", it.file!, it.id+''))
+        axTest.post('save-article', formData)*/
+
+
+    }
+    const prepareArticleForSave = (): Article|undefined => {
+        let text = articleUtils.wrapWithP(rawText)
+        let usedImIds = articleUtils.getUsedImageLocalIds(text)
+        usedImIds.push(titleImage?.id)
+
+        const article: Article = {
+            id: undefined,
+
+            title: title,
+            titleImageLocalId: titleImage?.id,
+            theme: undefined,
+            shortDescription: undefined,
+            publishDate: DateTime.fromDate(new Date()).to_yyyy_MM_dd_HH_mm(),
+            tags: tags.trim().split(/\s*#/).slice(1),
+
+            authors: undefined,
+            photographers: undefined,
+
+            text: text,
+
+            images: images.filter(it=>usedImIds.includes(it+'')).map(it=>({
+                articleId: undefined,
+                localId: it.id,
+                image: {
+                    id: undefined,
+                    url: it.getUrl()!
+                }
+            })),
+
+            viewsCnt: 0,
+            isFavorite: false,
+
+            titleImageSrc: undefined,
+            imagesSrc: [],
+        }
+        return article
+    }
+
 
 
     return <Page>
@@ -203,7 +206,7 @@ const ArticleCreator = () => {
             <ArticlePreviewCard>
                 <ArticleView article={article}/>
                 <Space h={35}/>
-                <Button1 w={170} h={54} onClick={onPreview}>Предпросмотр</Button1>
+                <Button1 w={138} h={42} style={{ font: '600 18px "TT Commons"' }} onClick={onSave}>Сохранить</Button1>
             </ArticlePreviewCard>
         </Popup> }
 
@@ -242,7 +245,7 @@ const ArticleCreator = () => {
 
             <Space h={35}/>
 
-            <TextArea ref={textareaRef} value={text} onInput={onTextInput} />
+            <TextArea ref={textareaRef} value={rawText} onInput={onTextInput} />
 
             <Space h={35}/>
 
@@ -263,7 +266,7 @@ const ArticleCreator = () => {
     </Page>
 
 }
-export default React.memo(ArticleCreator)
+export default React.memo(ArticleEditor)
 
 
 const Page = React.memo(styled.div`
@@ -315,8 +318,8 @@ const TextArea = React.memo(styled.textarea`
   height: 400px;
   border: 2px solid #8B8B8B;
   border-radius: 4px;
-  padding: 17px;
-  font: 400 19px 'TT Commons';
+  padding: 14px;
+  font: 400 18px 'TT Commons';
   color: black;
   resize: vertical;
 `)
