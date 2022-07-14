@@ -12,9 +12,9 @@ type Query {
     article(id: ID!): Article
 }
 
-type Mutation {
-    saveArticle(): 
-}
+#type Mutation {
+#    saveArticle():
+#}
 
 
 
