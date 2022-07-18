@@ -11,8 +11,8 @@ export type ArticleApi = {
     title: string
     text: string
     tags: string // "#tag1 #tag2 #tag3"
-    date_created?: string // yyyy-MM-dd'T'hh:mm? // "2022-07-11T00:00Z" // todo Z at the end
-    files: ArticleImageApi[]
+    date_created?: string // yyyy-MM-dd'T'HH:mm:ss? // "2022-07-11T00:00:00Z" // todo what is Z at the end
+    files: ArticleImageApi[] | null
 }
 export type ArticleImageApi = {
     files_id: null // todo null or ...
@@ -39,16 +39,19 @@ const getArticleById = async (id: string /!* todo *!/ ) => {
 
 export type ArticlesApiResponse = { articles: ArticleApi[] | null }
 
-const getUserArticles = async () => {
-    return ax.post<ResponseData<ArticlesApiResponse>>('user/article/get/all')
+const getUserArticles = async (): ResponseData<ArticlesApiResponse> => {
+    return ax.post('user/article/get/all', undefined, {
+        headers: { Authorization: `Bearer ${store.getState().user.accessJwt}`}
+    })
 }
 
 
 
-// todo надо бы id только что созданной статьи получить
+
+
 export type ArticleCreationResponse = { success: boolean }
 
-const createArticle = async (article: Article) => {
+const createArticle = async (article: Article): ResponseData<ArticleCreationResponse> => {
     const fd = new FormData()
 
     fd.append('title', article.title ?? '')
@@ -61,7 +64,7 @@ const createArticle = async (article: Article) => {
 
     article.textImages.forEach(it=>fd.append('files',it.image.file!,it.localId+''))
 
-    return ax.post<ResponseData<ArticleCreationResponse>>('user/article/create', fd, {
+    return ax.post('user/article/create', fd, {
         headers: { Authorization: `Bearer ${store.getState().user.accessJwt}`}
     })
 }

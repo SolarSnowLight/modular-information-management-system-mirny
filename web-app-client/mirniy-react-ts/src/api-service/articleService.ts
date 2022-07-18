@@ -2,8 +2,11 @@
 import {errors} from "src/models/errors";
 import {ServiceData} from "./utils";
 import Axios, {AxiosError} from "axios";
-import {articleApi, ArticlesApiResponse} from "src/api/articleApi";
-import {readAsUrl, trimSlash, trimTails} from "src/utils/utils";
+import {ArticleApi, articleApi, ArticlesApiResponse} from "src/api/articleApi";
+import {readAsUrl, splitTags, trimSlash} from "src/utils/utils";
+import {DateTime} from "src/utils/DateTime";
+import {IdGenerator} from "src/models/IdGenerator";
+import {API_URL} from "src/api/ax";
 
 
 
@@ -13,7 +16,9 @@ export class Article {
 
         public title?: string,
         public titleImageLocalId?: number,
-        public publishDate?: string, // yyyy-MM-ddThh:mm // 2022-01-01T01:01
+        public theme?: string,
+        public shortDescription?: string,
+        public publishDate?: string, // yyyy-MM-dd'T'HH:mm // 2022-01-01T01:01
         public tags?: string[], // ['tag1', 'tag2', 'tag3'] // #tag1 #tag2 #tag3
 
         public authors?: string, // формат данных пока не определён
@@ -89,16 +94,16 @@ export class Image {
 
 
 
-/*export type ArticlesResponse = { articles: Article[] }
+export type ArticlesResponse = { articles: Article[] }
 
-const getArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
+const getUserArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
     return articleApi.getUserArticles().then(
         response => {
             let { status, data } = response
             if (status===200) {
                 data = data as ArticlesApiResponse
                 return { data: {
-                    articles: data.articles.
+                    articles: data.articles?.map(articleApiToArticle) ?? []
                 } }
             }
 
@@ -113,7 +118,7 @@ const getArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
             return { error: { code: 'error' } }
         }
     )
-}*/
+}
 
 
 
@@ -156,7 +161,7 @@ const createArticle = async (article: Article): Promise<ServiceData<ArticleCreat
             console.log('RESPONSE:', response)
             let { status, data } = response
             if (status===200) {
-                //data = data as ArticleCreationResponse
+                data = data as ArticleCreationResponse
                 return { data: { } }
             }
 
@@ -175,27 +180,45 @@ const createArticle = async (article: Article): Promise<ServiceData<ArticleCreat
 
 
 
-/*
 function articleApiToArticle(articleApi: ArticleApi): Article {
-    let titleImageSrc
-    let imagesSrc = articleApi.images.map(it=>{
-        let newIm = ImageSrc.fromUrl(it.localId, it.image.url)
-        if (newIm.id === articleApi.titleImageLocalId) titleImageSrc=newIm
-        return newIm
-    })
-    const article = {
-        ...articleApi,
-        titleImageSrc,
-        imagesSrc
-    }
+    const aa = articleApi
+
+    const textImagesLocalIds = (aa.files??[]).map(it=>it.index)
+
+    const idGen = new IdGenerator()
+    idGen.addExistingIds(textImagesLocalIds)
+    const titleImId = idGen.getId()
+
+    let images = (aa.files??[]).map(it=>new ArticleImage(
+        it.index, Image.fromRemotePath(undefined, it.filepath, API_URL)
+    ))
+    images.push(new ArticleImage(
+        titleImId, Image.fromRemotePath(undefined, aa.filepath, API_URL)
+    ))
+
+    const article = new Article(
+        aa.uuid,
+        aa.title,
+        titleImId,
+        undefined,
+        undefined,
+        DateTime.fromDate(new Date(aa.date_created!)).to_yyyy_MM_dd_HH_mm(),
+        splitTags(aa.tags),
+        undefined,
+        undefined,
+        aa.text,
+        images,
+        textImagesLocalIds,
+        undefined,
+        undefined,
+    )
     return article
 }
-*/
 
 
 
 export const articleService = {
-    //getArticles,
+    getUserArticles,
     //getArticleById,
     createArticle,
 }

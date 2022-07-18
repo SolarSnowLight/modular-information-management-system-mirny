@@ -1,5 +1,4 @@
 import common from 'src/common-styles/common.module.scss'
-import {ArticleApiFull, ArticleApi} from "src/api/test/articleApiTest";
 import {Link} from "react-router-dom";
 import Space from "src/components/Space";
 import EyeIc from "src/components/icons/EyeIc";
@@ -8,45 +7,47 @@ import StarIc from "src/components/icons/StartIc";
 import styled from "styled-components";
 import {dateUtils} from "src/utils/dateUtils";
 import React from "react";
+import {Article} from "src/api-service/articleService";
 
 
 
 
 
 const ArticleCard = (
-    { article }: { article: ArticleApiFull }
+    { article }: { article: Article }
 ) => {
-    const date = dateUtils.from_yyyy_MM_dd_hh_mm(article.publishDate)
+    const a = article
+    const date = dateUtils.from_yyyy_MM_dd_hh_mm(a.publishDate)
 
-    const onFavorite = (article: ArticleApi, isFavorite = true) => {
-        console.log('setFavorite', isFavorite)
+    const onFavorite = (article: Article, isFavorite = true) => {
+        console.log('setFavorite: ', isFavorite)
     }
 
     return <Card className={common.row}>
         <Content className={common.column}>
-            <Link to={`/article/${article.id}`}><Title>{article.title}</Title></Link>
-            <Description>{article.shortDescription}</Description>
+            <Link to={`/article/${a.id}`}><Title>{a.title}</Title></Link>
+            <Description>{a.shortDescription}</Description>
             <Divider/>
             <div className={common.row}>
-                <BottomText>{article.theme}</BottomText>
+                <BottomText>{a.theme}</BottomText>
                 <Space w={10}/>
                 { date && <BottomText>{date.day}.{date.month}</BottomText> }
                 <Space flexGrow={1} />
                 <EyeIcBox className={common.center}><EyeIc fill='#8B8B8B' size={22}/></EyeIcBox>
                 <Space w={10}/>
-                <ViewsCnt>{article.viewsCnt}</ViewsCnt>
+                <ViewsCnt>{a.viewsCnt}</ViewsCnt>
                 <Space w={20}/>
-                { article.isFavorite
-                    ? <StarIcWrap onClick={()=>onFavorite(article,false)}>
+                { a.isFavorite
+                    ? <StarIcWrap onClick={()=>onFavorite(a,false)}>
                         <StarFilledIc color='#FCFCFC' size={20} />
                     </StarIcWrap>
-                    : <StarIcWrap onClick={()=>onFavorite(article)}>
+                    : <StarIcWrap onClick={()=>onFavorite(a)}>
                         <StarIc color='#FCFCFC' size={20} />
                     </StarIcWrap>
                 }
             </div>
         </Content>
-        <Photo imageUrl={article.titleImageSrc?.getUrl()} />
+        <Photo imageUrl={a.titleImage?.image.getUrl()} />
     </Card>
 }
 export default React.memo(ArticleCard)

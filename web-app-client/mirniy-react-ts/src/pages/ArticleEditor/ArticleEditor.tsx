@@ -178,6 +178,8 @@ const ArticleEditor = () => {
             title,
             titleImId,
             undefined,
+            undefined,
+            undefined,
             splitTags(tags),
             undefined,
             undefined,

@@ -89,7 +89,7 @@ function App() {
             <Routes>
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
-                <Route path='/user-articles' element={<ArticleList/>}/>
+                <Route path='/articles/user' element={<ArticleList/>}/>
                 <Route path='/create-article' element={<ArticleCreator2/>}/>
                 <Route path='/article/:articleId' element={<Article/>}/>
 

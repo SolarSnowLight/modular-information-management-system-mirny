@@ -17,7 +17,7 @@ function Main(){
         <Link to={'/login?backpath='+currLocation}>
             <button>Вход</button>
         </Link>
-        <Link to={'/user-articles'}>
+        <Link to={'/articles/user'}>
             <button>Статьи пользователя</button>
         </Link>
         <Link to={'/create-article'}>

@@ -7,8 +7,8 @@ import {trimSlash} from "../utils/utils";
 const ip = 'localhost'
 const port = '5000'
 const basePath = ""
-const API_URL = trimSlash(`http://${ip}:${port}/${basePath}`)
-console.log(API_URL)
+export const API_URL = trimSlash(`http://${ip}:${port}/${basePath}`)
+
 
 const ax = Axios.create({
     baseURL: API_URL,
@@ -66,7 +66,7 @@ export function setupAxios(reduxStore: Store){
 
                         setAuthData({ accessJwt })
 
-                        originalRequest.headers = originalRequest.headers ?? {}
+                        originalRequest.headers ??= {}
                         originalRequest.headers.Authorization = `Bearer ${accessJwt}`
                         await ax.request(originalRequest);
                     } else {
