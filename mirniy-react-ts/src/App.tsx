@@ -32,7 +32,7 @@ function App() {
 
 */
         // use kind: 'file'
-        console.log('ENTER:', ev)
+        //console.log('ENTER:', ev)
 
     }
 
@@ -65,7 +65,7 @@ function App() {
         ev.stopPropagation()
         //d(appActions.setDragging(false))
         //d(appActions.setDraggingFiles(false))
-        console.log('LEAVE:', ev)
+        //console.log('LEAVE:', ev)
     }
     const onDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.preventDefault()

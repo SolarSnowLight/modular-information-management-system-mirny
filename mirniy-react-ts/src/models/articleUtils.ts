@@ -1,5 +1,5 @@
 import {ImageSrc} from "./ImageSrc";
-import {Article} from "../api/articleApiTest";
+import {ArticleApiFull} from "../api/test/articleApiTest";
 
 
 function wrapWithP(articleText: string){
@@ -31,7 +31,7 @@ function wrapWithP(articleText: string){
 }
 
 
-function inlineImages(article: Article){
+function inlineImages(article: ArticleApiFull){
     const parser = new DOMParser()
     let wrappedText = `<root>${article.text}</root>` // need to wrap in some root tag
     let xmlDoc = parser.parseFromString(wrappedText, 'text/xml')
@@ -58,7 +58,7 @@ function inlineImages(article: Article){
 
 
 function getUsedImageLocalIds(articleText: string){
-    const ids = [] as (string|number|undefined)[]
+    const ids = [] as number[]
 
     const parser = new DOMParser()
     let wrappedText = `<root>${articleText}</root>` // need to wrap in some root tag
@@ -69,7 +69,9 @@ function getUsedImageLocalIds(articleText: string){
         const ch = root.childNodes[i]
         if ('article-image'===ch.nodeName){
             const el = ch as Element
-            const localId = el.attributes["localId"].value as string|undefined
+            let localId = el.attributes["localId"].value
+            localId = Number(localId)
+            if (!Number.isFinite(localId)) throw new Error('localId is not a finite number')
             if (localId) ids.push(localId)
         }
     }

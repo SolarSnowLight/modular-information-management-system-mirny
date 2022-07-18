@@ -1,4 +1,4 @@
-import {ErrorType} from "../models/errors";
+import {ErrorType} from "src/models/errors";
 
 
 export type ServiceData<D> = {

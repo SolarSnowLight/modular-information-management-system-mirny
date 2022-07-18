@@ -1,12 +1,14 @@
 import Axios, {AxiosError} from "axios";
 import {AuthResponse} from "./userApi";
-import {Store} from "../redux/store";
-import {userActions, UserState} from "../redux/userReducer";
+import {Store} from "src/redux/store";
+import {userActions, UserState} from "src/redux/userReducer";
+import {trimSlash} from "../utils/utils";
 
 const ip = 'localhost'
 const port = '5000'
 const basePath = ""
-const API_URL = `http://${ip}:${port}/${basePath}`
+const API_URL = trimSlash(`http://${ip}:${port}/${basePath}`)
+console.log(API_URL)
 
 const ax = Axios.create({
     baseURL: API_URL,
@@ -21,8 +23,13 @@ const refreshPath = 'auth/refresh'
 export function setupAxios(reduxStore: Store){
 
     const removeAuthData = () => {
+        //localStorage.removeItem('token')
         reduxStore.dispatch(userActions.setJwt({ accessJwt: null }))
         reduxStore.dispatch(userActions.setUser(null))
+    }
+    const setAuthData = (authData: { accessJwt: string }) => {
+        //localStorage.setItem('token', authData.accessJwt)
+        reduxStore.dispatch(userActions.setJwt(authData))
     }
 
     ax.interceptors.response.use(
@@ -38,7 +45,9 @@ export function setupAxios(reduxStore: Store){
                 const originalUrl = new URL(Axios.getUri(originalRequest))
                 //console.log('path',originalUrl.pathname)
 
-                if (originalUrl.pathname === '/'+refreshPath) {
+                if (originalUrl.pathname.endsWith(refreshPath)) {
+                    //console.log(error.response.status)
+                    //console.log(error)
                     if (error.response.status === 401){
                         removeAuthData()
                     } else {
@@ -49,16 +58,16 @@ export function setupAxios(reduxStore: Store){
                         // Обновление токена
                         originalRequest._isRetried = true;
 
-                        const secondResponse = await ax.post<AuthResponse>(refreshPath, {
+                        const secondResponse = await ax.post<AuthResponse>(refreshPath, undefined, {
                             headers: { Authorization: 'Bearer undefined'}
                         })
 
                         const accessJwt = secondResponse.data.access_token
 
-                        //localStorage.setItem('token', secondResponse.data.access_token);
-                        reduxStore.dispatch(userActions.setJwt({ accessJwt }))
+                        setAuthData({ accessJwt })
 
-                        ;(originalRequest.headers??{}).Authorization = `Bearer ${accessJwt}`
+                        originalRequest.headers = originalRequest.headers ?? {}
+                        originalRequest.headers.Authorization = `Bearer ${accessJwt}`
                         await ax.request(originalRequest);
                     } else {
                         removeAuthData()

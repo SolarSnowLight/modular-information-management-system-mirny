@@ -1,23 +1,26 @@
 
 
 import common from 'src/common-styles/common.module.scss'
-import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
+import React, {useLayoutEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
 import styled from "styled-components";
 import Space from "src/components/Space";
 import Input1 from "src/components/Input1";
 import Button1 from "src/components/Button1";
 import {lastFocused} from "src/utils/documentUtils";
-import {Article, ArticleApi, ArticleImageApi} from "src/api/articleApiTest";
+import {ArticleApiFull} from "src/api/test/articleApiTest";
 import {DateTime} from "src/utils/DateTime";
 import Popup from "src/components/Popup";
 import ArticleView from "src/pages/ArticleView/ArticleView";
 import TitleImage from "./sub-components/TitleImage";
 import {ImageSrc} from "src/models/ImageSrc";
-import {walkFileTree} from "src/utils/utils";
+import {splitTags, walkFileTree} from "src/utils/utils";
 import {IdGenerator} from "src/models/IdGenerator";
 import ListImage from './sub-components/ListImage';
 import {articleUtils} from "src/models/articleUtils";
+import {Article, ArticleImage, articleService, Image} from "src/api-service/articleService";
+import {useNavigate} from "react-router-dom";
+
 
 
 
@@ -29,6 +32,8 @@ const wordExtensions = /\.((doc)|(docx))$/i
 
 
 const ArticleEditor = () => {
+
+    const nav = useNavigate()
 
     const d = useAppDispatch()
     const { isDraggingFiles } = useAppSelector(s=>s.app)
@@ -115,17 +120,17 @@ const ArticleEditor = () => {
         }
     }
 
-    const [article, setArticle] = useState(undefined as Article|undefined)
+    const [article, setArticle] = useState(undefined as ArticleApiFull|undefined)
 
     const onPreview = () => {
         const article = prepareArticleForPreview()
         setArticle(article)
     }
 
-    const prepareArticleForPreview = (): Article|undefined => {
+    const prepareArticleForPreview = (): ArticleApiFull|undefined => {
         let text = articleUtils.wrapWithP(rawText)
 
-        const article: Article = {
+        const article: ArticleApiFull = {
             id: undefined,
 
             title: title,
@@ -153,48 +158,37 @@ const ArticleEditor = () => {
 
 
     const onSave = async () => {
-        /*const formData: FormData = new FormData();
-        formData.append("rawText", rawText);
-        images.forEach(it=>formData.append("files", it.file!, it.id+''))
-        axTest.post('save-article', formData)*/
-
-
+        const a = prepareArticleForSave()
+        //console.log(a)
+        if (a){
+            await articleService.createArticle(a)
+            nav('/articles/user')
+        }
     }
     const prepareArticleForSave = (): Article|undefined => {
-        let text = articleUtils.wrapWithP(rawText)
-        let usedImIds = articleUtils.getUsedImageLocalIds(text)
-        usedImIds.push(titleImage?.id)
+        const text = articleUtils.wrapWithP(rawText)
+        const textImIds = articleUtils.getUsedImageLocalIds(text)
+        const titleImId = titleImage?.id
+        const ids = new Set([...textImIds, titleImId])
+        ids.delete(undefined)
+        const allImIds = [...ids.values()] as number[]
 
-        const article: Article = {
-            id: undefined,
-
-            title: title,
-            titleImageLocalId: titleImage?.id,
-            theme: undefined,
-            shortDescription: undefined,
-            publishDate: DateTime.fromDate(new Date()).to_yyyy_MM_dd_HH_mm(),
-            tags: tags.trim().split(/\s*#/).slice(1),
-
-            authors: undefined,
-            photographers: undefined,
-
-            text: text,
-
-            images: images.filter(it=>usedImIds.includes(it+'')).map(it=>({
-                articleId: undefined,
-                localId: it.id,
-                image: {
-                    id: undefined,
-                    url: it.getUrl()!
-                }
-            })),
-
-            viewsCnt: 0,
-            isFavorite: false,
-
-            titleImageSrc: undefined,
-            imagesSrc: [],
-        }
+        const article = new Article(
+            undefined,
+            title,
+            titleImId,
+            undefined,
+            splitTags(tags),
+            undefined,
+            undefined,
+            text,
+            images.filter(it=>allImIds.includes(it.id)).map(it=>
+                new ArticleImage(it.id, Image.fromFileAndDataUrl(undefined, it.file!, it.dataUrl!))
+            ),
+            textImIds,
+            0,
+            false,
+        )
         return article
     }
 

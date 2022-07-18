@@ -6,6 +6,13 @@ export const wait = async <T>(delay:number, value?:T) => new Promise<T>(
 )
 
 
+export const trimTails = (str: string, tail: string) =>
+    str.replaceAll(RegExp(`^(${tail})|(${tail})$`,'g'),'')
+
+export const trimSlash = (str: string) => trimTails(str,'/')
+
+
+export const splitTags = (tagsStr: string) => tagsStr.trim().split(/\s*#/).slice(1)
 
 
 // read file as DataURL (base64 url)
@@ -39,40 +46,14 @@ export function walkFileTree(fsItem: FileSystemEntry|null, onFile: (file:File)=>
 
 
 
-
 /*
-export function dataURItoBlob(dataURI) {
-    // convert base64 to raw binary data held in a string
-    // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
-    var byteString = atob(dataURI.split(',')[1]);
+DataURL example:
+var url = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
 
-    // separate out the mime component
-    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
-
-    // write the bytes of the string to an ArrayBuffer
-    var ab = new ArrayBuffer(byteString.length);
-
-    // create a view into the buffer
-    var ia = new Uint8Array(ab);
-
-
-    // set the bytes of the buffer to the correct values
-    for (var i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-    }
-
-    const ab2 = Uint8Array.from(byteString, str => str.charCodeAt(0)).buffer
-
-    // write the ArrayBuffer to a blob, and you're done
-    var blob = new Blob([ab], {type: mimeString});
-    return blob;
-
-}
-
-
-
-export const dataUriToBlob = (dataUri: string): Blob|undefined => {
-
-}
-
+https://stackoverflow.com/questions/12168909/blob-from-dataurl
  */
+
+export const dataUriToBlob = async (dataUri: string): Promise<Blob> =>
+    await (await fetch(dataUri)).blob()
+
+

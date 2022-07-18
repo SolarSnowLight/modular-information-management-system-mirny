@@ -1,6 +1,6 @@
 import axTest from "./axTest";
 import {GraphQlData} from "./utils";
-import {ImageSrc} from "../models/ImageSrc";
+import {ImageSrc} from "src/models/ImageSrc";
 
 
 
@@ -35,7 +35,7 @@ export type ImageApi = {
     url: string
 }
 
-export type Article = ArticleApi & {
+export type ArticleApiFull = ArticleApi & {
     titleImageSrc?: ImageSrc
     imagesSrc: ImageSrc[]
     //htmlContent: string

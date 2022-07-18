@@ -1,8 +1,8 @@
 import {useNavigate, useParams} from "react-router-dom";
 import styled from "styled-components";
 import React, {useEffect, useState} from "react";
-import { Article } from "src/api/articleApiTest";
-import {articleService} from "src/api-service/articleService";
+import { ArticleApiFull } from "src/api/test/articleApiTest";
+import {articleServiceTest} from "src/api-service/test/articleServiceTest";
 import Header from "src/components/Header";
 import ArticleView from "src/pages/ArticleView/ArticleView";
 
@@ -14,10 +14,10 @@ const ArticlePage = () => {
     const { articleId } = useParams()
     const nav = useNavigate()
 
-    const [article, setArticle] = useState(undefined as Article|undefined)
+    const [article, setArticle] = useState(undefined as ArticleApiFull|undefined)
     useEffect(()=>{(async()=>{
         if (articleId){
-            let { data, error } = await articleService.getArticleById(articleId)
+            let { data, error } = await articleServiceTest.getArticleById(articleId)
             if (error) {
                 return
             }

@@ -6,12 +6,12 @@ import styled from "styled-components";
 import common from 'src/common-styles/common.module.scss'
 import './ArticleView.scss';
 import React, {useEffect, useState} from "react";
-import { Article } from "src/api/articleApiTest";
+import { ArticleApiFull } from "src/api/test/articleApiTest";
 import {dateUtils} from "src/utils/dateUtils";
 import {articleUtils} from "src/models/articleUtils";
 
 
-const ArticleView = ({ article }: { article: Article }) => {
+const ArticleView = ({ article }: { article: ArticleApiFull }) => {
 
     const [htmlContent, setHtmlContent] = useState(undefined as string|undefined)
     useEffect(()=>{
@@ -20,7 +20,7 @@ const ArticleView = ({ article }: { article: Article }) => {
 
     const date = dateUtils.from_yyyy_MM_dd_hh_mm(article.publishDate)
 
-    const onFavorite = (article: Article, isFavorite = true) => {
+    const onFavorite = (article: ArticleApiFull, isFavorite = true) => {
         console.log('setFavorite', isFavorite)
     }
 

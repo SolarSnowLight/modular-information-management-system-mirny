@@ -1,8 +1,8 @@
-import {AuthResponse, LogoutResponse, userApi, UserRegister} from "../api/userApi";
+import {AuthResponse, LogoutResponse, userApi, UserRegister} from "src/api/userApi";
 import Axios, {AxiosError} from "axios";
 import {ServiceData} from "./utils";
-import {getAccessJwt} from "../api/ax";
-import {BadRequest} from "../api/utils";
+import {getAccessJwt} from "src/api/ax";
+import {BadRequest} from "src/api/utils";
 
 
 type AuthService = {

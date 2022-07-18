@@ -1,5 +1,5 @@
 import common from 'src/common-styles/common.module.scss'
-import {Article, ArticleApi} from "src/api/articleApiTest";
+import {ArticleApiFull, ArticleApi} from "src/api/test/articleApiTest";
 import {Link} from "react-router-dom";
 import Space from "src/components/Space";
 import EyeIc from "src/components/icons/EyeIc";
@@ -14,7 +14,7 @@ import React from "react";
 
 
 const ArticleCard = (
-    { article }: { article: Article }
+    { article }: { article: ArticleApiFull }
 ) => {
     const date = dateUtils.from_yyyy_MM_dd_hh_mm(article.publishDate)
 

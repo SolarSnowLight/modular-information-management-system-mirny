@@ -1,4 +1,4 @@
-import {readAsUrl} from "../utils/utils";
+import {readAsUrl} from "src/utils/utils";
 
 export class ImageSrc {
     private constructor(
