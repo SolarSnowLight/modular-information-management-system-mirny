@@ -6,55 +6,59 @@ import styled from "styled-components";
 import common from 'src/common-styles/common.module.scss'
 import './ArticleView.scss';
 import React, {useEffect, useState} from "react";
-import { ArticleApiFull } from "src/api/test/articleApiTest";
 import {dateUtils} from "src/utils/dateUtils";
 import {articleUtils} from "src/models/articleUtils";
+import { Article } from "src/api-service/articleService";
 
 
-const ArticleView = ({ article }: { article: ArticleApiFull }) => {
+const ArticleView = ({ article }: { article: Article }) => {
+
+    const a = article
+
+    //console.log(a)
 
     const [htmlContent, setHtmlContent] = useState(undefined as string|undefined)
     useEffect(()=>{
-        setHtmlContent(articleUtils.inlineImages(article))
-    },[article])
+        setHtmlContent(articleUtils.inlineImages(a))
+    },[a])
 
-    const date = dateUtils.from_yyyy_MM_dd_hh_mm(article.publishDate)
+    const date = dateUtils.from_yyyy_MM_dd_hh_mm(a.publishDate)
 
-    const onFavorite = (article: ArticleApiFull, isFavorite = true) => {
+    const onFavorite = (article: Article, isFavorite = true) => {
         console.log('setFavorite', isFavorite)
     }
 
-    if (!article) return <></>
+    if (!a) return <></>
 
     return <Frame className={common.column}>
-            <TitleImage imageUrl={article.titleImageSrc?.getUrl()}/>
+            <TitleImage imageUrl={a.titleImage?.image.getUrl()}/>
             <Space h={29}/>
             <div className={common.row}>
                 { date && <BottomText>{date.day}.{date.month}.{date.year} {date.hour}:{date.minute}</BottomText> }
                 <Space w={39}/>
                 <div className={common.column}>
-                    <BottomText>Авторы: <Blue>{article.authors}</Blue></BottomText>
+                    <BottomText>Авторы: <Blue>{a.authors}</Blue></BottomText>
                     <Space h={9}/>
-                    <BottomText>Фото: <Blue>{article.photographers}</Blue></BottomText>
+                    <BottomText>Фото: <Blue>{a.photographers}</Blue></BottomText>
                 </div>
                 <Space flexGrow={1}/>
 
                 <EyeIcBox className={common.center}><EyeIc fill='#8B8B8B' size={22}/></EyeIcBox>
                 <Space w={10}/>
-                <ViewsCnt>{article.viewsCnt}</ViewsCnt>
+                <ViewsCnt>{a.viewsCnt}</ViewsCnt>
                 <Space w={16}/>
-                { article.isFavorite
-                    ? <StarIcWrap onClick={()=>onFavorite(article,false)}>
+                { a.isFavorite
+                    ? <StarIcWrap onClick={()=>onFavorite(a,false)}>
                         <StarFilledIc color='#424041' size={20} />
                     </StarIcWrap>
-                    : <StarIcWrap onClick={()=>onFavorite(article)}>
+                    : <StarIcWrap onClick={()=>onFavorite(a)}>
                         <StarIc color='#424041' size={20} />
                     </StarIcWrap>
                 }
 
             </div>
             <Space h={29}/>
-            <Title>{article.title}</Title>
+            <Title>{a.title}</Title>
             <Space h={29}/>
 
             {/* article-container is css class-marker*/}
@@ -62,7 +66,7 @@ const ArticleView = ({ article }: { article: ArticleApiFull }) => {
 
             <Space h={32}/>
             <div>
-                { article.tags.map(it=><Tag key={it}>#{it}   </Tag>) }
+                { a.tags?.map(it=><Tag key={it}>#{it}   </Tag>) }
             </div>
 
             <Space h={32} />

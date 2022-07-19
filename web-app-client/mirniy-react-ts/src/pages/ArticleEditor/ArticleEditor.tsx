@@ -8,7 +8,6 @@ import Space from "src/components/Space";
 import Input1 from "src/components/Input1";
 import Button1 from "src/components/Button1";
 import {lastFocused} from "src/utils/documentUtils";
-import {ArticleApiFull} from "src/api/test/articleApiTest";
 import {DateTime} from "src/utils/DateTime";
 import Popup from "src/components/Popup";
 import ArticleView from "src/pages/ArticleView/ArticleView";
@@ -50,8 +49,8 @@ const ArticleEditor = () => {
         setTags(ev.currentTarget.value)
     }
 
-    const textareaRef = useRef<HTMLTextAreaElement>(null)
     const [rawText, setRawText] = useState('')
+    const textareaRef = useRef<HTMLTextAreaElement>(null)
     const onTextInput = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
         setRawText(ev.currentTarget.value)
     }
@@ -68,18 +67,17 @@ const ArticleEditor = () => {
     const titleImageFrameRef = useRef<HTMLDivElement>(null)
 
 
-    const [titleImage, setTitleImage] = useState(undefined as ImageSrc|undefined)
-    const [images, setImages] = useState([] as ImageSrc[])
+    const [titleImage, setTitleImage] = useState(undefined as ArticleImage|undefined)
+    const [images, setImages] = useState([] as ArticleImage[])
     //const [word, setWord] = useState(undefined as undefined|File)
 
     const onFilesDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         if (isDraggingFiles) {
-            //console.log('IMAGES DROP:',ev)
-
             const addFile = async (file: File) => {
                 if (imageExtensions.test(file.name)){
-                    const newIm = await ImageSrc.fromFile(idGen.getId(),file)
-                    setImages(images=>[...images, newIm])
+                    const newIm = await Image.fromFile(undefined, file)
+                    const newAIm = new ArticleImage(idGen.getId(), newIm)
+                    setImages(images=>[...images, newAIm])
                 }
                 else if (wordExtensions.test(file.name)){
                     //setWord(file)
@@ -93,19 +91,19 @@ const ArticleEditor = () => {
         }
     }
 
-    const onRemove = (imageSrc: ImageSrc) => {
-        setImages(images.filter(it=>it!==imageSrc))
+    const onRemove = (articleImage: ArticleImage) => {
+        setImages(images.filter(it=>it!==articleImage))
     }
 
 
 
 
-    const onImagePaste = (imageSrc: ImageSrc) => {
+    const onImagePaste = (articleImage: ArticleImage) => {
         const area = textareaRef.current
         if (area && lastFocused === area){
             const s = area.selectionStart
             const oldLen = rawText.length
-            const newText = rawText.substring(0,s)+`${"\n"}<article-image localId="${imageSrc.id}"/>${"\n"}`+rawText.substring(s)
+            const newText = rawText.substring(0,s)+`${"\n"}<article-image localId="${articleImage.localId}"/>${"\n"}`+rawText.substring(s)
             setRawText(newText)
             const newSel = s+(newText.length-oldLen)
             setNewSelection({s: newSel, e: newSel})
@@ -114,45 +112,38 @@ const ArticleEditor = () => {
         }
         const titleImageFrame = titleImageFrameRef.current
         if (titleImageFrame && lastFocused === titleImageFrame){
-            setTitleImage(imageSrc)
+            setTitleImage(articleImage)
             titleImageFrame.focus()
             return
         }
     }
 
-    const [article, setArticle] = useState(undefined as ArticleApiFull|undefined)
+    const [article, setArticle] = useState(undefined as Article|undefined)
 
     const onPreview = () => {
         const article = prepareArticleForPreview()
         setArticle(article)
     }
 
-    const prepareArticleForPreview = (): ArticleApiFull|undefined => {
+    const prepareArticleForPreview = (): Article|undefined => {
         let text = articleUtils.wrapWithP(rawText)
 
-        const article: ArticleApiFull = {
-            id: undefined,
-
-            title: title,
-            titleImageLocalId: undefined,
-            theme: undefined,
-            shortDescription: undefined,
-            publishDate: DateTime.fromDate(new Date()).to_yyyy_MM_dd_HH_mm(),
-            tags: tags.trim().split(/\s*#/).slice(1),
-
-            authors: undefined,
-            photographers: undefined,
-
-            text: text,
-
-            images: [],
-
-            viewsCnt: 0,
-            isFavorite: false,
-
-            titleImageSrc: titleImage,
-            imagesSrc: images,
-        }
+        const article = new Article(
+            undefined,
+            title,
+            titleImage?.localId,
+            undefined,
+            undefined,
+            DateTime.fromDate(new Date()).to_yyyy_MM_dd_HH_mm(),
+            splitTags(tags),
+            undefined,
+            undefined,
+            text,
+            images,
+            undefined,
+            99,
+            false,
+        )
         return article
     }
 
@@ -168,7 +159,7 @@ const ArticleEditor = () => {
     const prepareArticleForSave = (): Article|undefined => {
         const text = articleUtils.wrapWithP(rawText)
         const textImIds = articleUtils.getUsedImageLocalIds(text)
-        const titleImId = titleImage?.id
+        const titleImId = titleImage?.localId
         const ids = new Set([...textImIds, titleImId])
         ids.delete(undefined)
         const allImIds = [...ids.values()] as number[]
@@ -184,9 +175,7 @@ const ArticleEditor = () => {
             undefined,
             undefined,
             text,
-            images.filter(it=>allImIds.includes(it.id)).map(it=>
-                new ArticleImage(it.id, Image.fromFileAndDataUrl(undefined, it.file!, it.dataUrl!))
-            ),
+            images.filter(it=>allImIds.includes(it.localId)),
             textImIds,
             0,
             false,
@@ -210,7 +199,7 @@ const ArticleEditor = () => {
 
             { images.length > 0 && <ImagesList className={common.column}>
                 <TitleForImages>Изображения</TitleForImages>
-                { images.map(it=><ListImage imageSource={it} key={it.id}
+                { images.map(it=><ListImage articleImage={it} key={it.localId}
                                             onRemove={onRemove} onPaste={onImagePaste} />) }
             </ImagesList> }
 
@@ -233,7 +222,7 @@ const ArticleEditor = () => {
 
             <Space h={35}/>
 
-            <TitleImage ref={titleImageFrameRef} tabIndex={0} imageSource={titleImage} />
+            <TitleImage ref={titleImageFrameRef} tabIndex={0} articleImage={titleImage} />
 
             <Space h={35}/>
 

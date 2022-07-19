@@ -2,7 +2,13 @@
 import {errors} from "src/models/errors";
 import {ServiceData} from "./utils";
 import Axios, {AxiosError} from "axios";
-import {ArticleApi, articleApi, ArticlesApiResponse} from "src/api/articleApi";
+import {
+    ArticleApi,
+    articleApi,
+    ArticleApiResponse,
+    ArticleCreationApiResponse, ArticleDeletionApiResponse,
+    ArticlesApiResponse
+} from "src/api/articleApi";
 import {readAsUrl, splitTags, trimSlash} from "src/utils/utils";
 import {DateTime} from "src/utils/DateTime";
 import {IdGenerator} from "src/models/IdGenerator";
@@ -94,45 +100,17 @@ export class Image {
 
 
 
-export type ArticlesResponse = { articles: Article[] }
-
-const getUserArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
-    return articleApi.getUserArticles().then(
-        response => {
-            let { status, data } = response
-            if (status===200) {
-                data = data as ArticlesApiResponse
-                return { data: {
-                    articles: data.articles?.map(articleApiToArticle) ?? []
-                } }
-            }
-
-            return { error: errors.of('error') }
-        },
-        (error: Error|AxiosError) => {
-            if (Axios.isAxiosError(error)){
-                if (error.code==='ERR_NETWORK')
-                    // error.code: "ERR_NETWORK" when server not found
-                    return { error: { code: 'connection error' } }
-            }
-            return { error: { code: 'error' } }
-        }
-    )
-}
-
-
-
-/*
 export type ArticleResponse = { article: Article }
 
 const getArticleById = async (id: string): Promise<ServiceData<ArticleResponse>> => {
-    return articleApiTest.getArticleById(id).then(
+    return articleApi.getArticleById(id).then(
         response => {
             let { status, data } = response
             if (status===200) {
-                data = data as GraphQlData<ArticleApiResponse>
+                data = data as ArticleApiResponse
+                //console.log('a',data)
                 return { data: {
-                        article: articleApiToArticle(data.data!.article)
+                        article: articleApiToArticle(data)
                     }}
             }
 
@@ -148,7 +126,34 @@ const getArticleById = async (id: string): Promise<ServiceData<ArticleResponse>>
         }
     )
 }
-*/
+
+
+
+export type ArticlesResponse = { articles: Article[] }
+
+const getUserArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
+    return articleApi.getUserArticles().then(
+        response => {
+            let { status, data } = response
+            if (status===200) {
+                data = data as ArticlesApiResponse
+                return { data: {
+                        articles: data.articles?.map(articleApiToArticle) ?? []
+                    } }
+            }
+
+            return { error: errors.of('error') }
+        },
+        (error: Error|AxiosError) => {
+            if (Axios.isAxiosError(error)){
+                if (error.code==='ERR_NETWORK')
+                    // error.code: "ERR_NETWORK" when server not found
+                    return { error: { code: 'connection error' } }
+            }
+            return { error: { code: 'error' } }
+        }
+    )
+}
 
 
 
@@ -158,10 +163,10 @@ export type ArticleCreationResponse = { }
 const createArticle = async (article: Article): Promise<ServiceData<ArticleCreationResponse>> => {
     return articleApi.createArticle(article).then(
         response => {
-            console.log('RESPONSE:', response)
             let { status, data } = response
             if (status===200) {
-                data = data as ArticleCreationResponse
+                data = data as ArticleCreationApiResponse
+                if (!data.success) return { error: errors.of('error') }
                 return { data: { } }
             }
 
@@ -180,13 +185,41 @@ const createArticle = async (article: Article): Promise<ServiceData<ArticleCreat
 
 
 
+
+export type ArticleDeletionResponse = { }
+
+const deleteArticle = async (id: string): Promise<ServiceData<ArticleDeletionResponse>> => {
+    return articleApi.deleteArticle(id).then(
+        response => {
+            let { status, data } = response
+            if (status===200) {
+                data = data as ArticleDeletionApiResponse
+                if (!data.success) return { error: errors.of('error') }
+                return { data: { } }
+            }
+
+            return { error: errors.of('error') }
+        },
+        (error: Error|AxiosError) => {
+            if (Axios.isAxiosError(error)){
+                if (error.code==='ERR_NETWORK')
+                    // error.code: "ERR_NETWORK" when server not found
+                    return { error: { code: 'connection error' } }
+            }
+            return { error: { code: 'error' } }
+        }
+    )
+}
+
+
+
+
 function articleApiToArticle(articleApi: ArticleApi): Article {
     const aa = articleApi
 
     const textImagesLocalIds = (aa.files??[]).map(it=>it.index)
 
-    const idGen = new IdGenerator()
-    idGen.addExistingIds(textImagesLocalIds)
+    const idGen = new IdGenerator(textImagesLocalIds)
     const titleImId = idGen.getId()
 
     let images = (aa.files??[]).map(it=>new ArticleImage(
@@ -196,7 +229,7 @@ function articleApiToArticle(articleApi: ArticleApi): Article {
         titleImId, Image.fromRemotePath(undefined, aa.filepath, API_URL)
     ))
 
-    const article = new Article(
+    return  new Article(
         aa.uuid,
         aa.title,
         titleImId,
@@ -212,13 +245,13 @@ function articleApiToArticle(articleApi: ArticleApi): Article {
         undefined,
         undefined,
     )
-    return article
 }
 
 
 
 export const articleService = {
+    getArticleById,
     getUserArticles,
-    //getArticleById,
     createArticle,
+    deleteArticle,
 }

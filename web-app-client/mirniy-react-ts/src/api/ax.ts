@@ -2,7 +2,7 @@ import Axios, {AxiosError} from "axios";
 import {AuthResponse} from "./userApi";
 import {Store} from "src/redux/store";
 import {userActions, UserState} from "src/redux/userReducer";
-import {trimSlash} from "../utils/utils";
+import {trimSlash} from "src/utils/utils";
 
 const ip = 'localhost'
 const port = '5000'
@@ -59,15 +59,16 @@ export function setupAxios(reduxStore: Store){
                         originalRequest._isRetried = true;
 
                         const secondResponse = await ax.post<AuthResponse>(refreshPath, undefined, {
-                            headers: { Authorization: 'Bearer undefined'}
+                            //headers: { Authorization: `Bearer ${getAccessJwt()}`}
+                            headers: { Authorization: originalRequest.headers?.Authorization ?? 'Bearer undefined'}
                         })
 
-                        const accessJwt = secondResponse.data.access_token
+                        const newAccessJwt = secondResponse.data.access_token
 
-                        setAuthData({ accessJwt })
+                        setAuthData({ accessJwt: newAccessJwt })
 
                         originalRequest.headers ??= {}
-                        originalRequest.headers.Authorization = `Bearer ${accessJwt}`
+                        originalRequest.headers.Authorization = `Bearer ${newAccessJwt}`
                         await ax.request(originalRequest);
                     } else {
                         removeAuthData()

@@ -1,4 +1,4 @@
-import ax from './ax'
+import ax, {getAccessJwt} from './ax'
 import {ResponseData} from "./utils";
 
 
@@ -23,13 +23,9 @@ const login = async (
 export type LogoutResponse = {
     is_logout: boolean
 }
-const logout = async (
-    accessToken?: string|null
-): ResponseData<LogoutResponse> => {
+const logout = async (): ResponseData<LogoutResponse> => {
     return ax.post('auth/logout', undefined, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`
-        }
+        headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
 

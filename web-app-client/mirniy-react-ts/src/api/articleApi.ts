@@ -1,8 +1,8 @@
 
 import {ResponseData} from "./utils";
-import ax from "./ax";
+import ax, {getAccessJwt} from "./ax";
 import {Article} from "src/api-service/articleService";
-import {store} from "src/redux/store";
+import {joinTags} from "src/utils/utils";
 
 
 export type ArticleApi = {
@@ -24,16 +24,16 @@ export type ArticleImageApi = {
 
 
 
-/*
 
 export type ArticleApiResponse = ArticleApi
 
-const getArticleById = async (id: string /!* todo *!/ ) => {
-    return axTest.post<ResponseData<ArticleApiResponse>>('article/get',{
-        // todo
+const getArticleById = async (id: string): ResponseData<ArticleApiResponse> => {
+    return ax.post('user/article/get',{
+        uuid: id
+    }, {
+        headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
-*/
 
 
 
@@ -41,7 +41,7 @@ export type ArticlesApiResponse = { articles: ArticleApi[] | null }
 
 const getUserArticles = async (): ResponseData<ArticlesApiResponse> => {
     return ax.post('user/article/get/all', undefined, {
-        headers: { Authorization: `Bearer ${store.getState().user.accessJwt}`}
+        headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
 
@@ -49,14 +49,16 @@ const getUserArticles = async (): ResponseData<ArticlesApiResponse> => {
 
 
 
-export type ArticleCreationResponse = { success: boolean }
+export type ArticleCreationApiResponse = { success: boolean }
 
-const createArticle = async (article: Article): ResponseData<ArticleCreationResponse> => {
+const createArticle = async (article: Article): ResponseData<ArticleCreationApiResponse> => {
+    //console.log("article before form data", article)
+
     const fd = new FormData()
 
     fd.append('title', article.title ?? '')
     fd.append('text', article.text ?? '')
-    fd.append('tags', (article.tags??[]).join(' #'))
+    fd.append('tags', joinTags(article.tags))
 
     const tam = article.titleImage
     if (!tam) throw new Error('Title image is required')
@@ -65,29 +67,29 @@ const createArticle = async (article: Article): ResponseData<ArticleCreationResp
     article.textImages.forEach(it=>fd.append('files',it.image.file!,it.localId+''))
 
     return ax.post('user/article/create', fd, {
-        headers: { Authorization: `Bearer ${store.getState().user.accessJwt}`}
+        headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
 
 
 
-/*
-export type ArticleDeletionResponse = { /!* todo *!/ }
+export type ArticleDeletionApiResponse = { success: boolean }
 
-const deleteArticle = async ( /!* todo *!/ ) => {
-    return axTest.post<ResponseData<>>('article/delete',{
-        // todo
+const deleteArticle = async (id: string): ResponseData<ArticleDeletionApiResponse> => {
+    return ax.post('user/article/delete',{
+        uuid: id
+    }, {
+        headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
-*/
 
 
 
 
 
 export const articleApi = {
-    //getArticleById,
+    getArticleById,
     getUserArticles,
     createArticle,
-    //deleteArticle,
+    deleteArticle,
 }

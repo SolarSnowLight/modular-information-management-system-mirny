@@ -1,29 +1,17 @@
-import React, {useEffect, useState} from "react";
 import CrossIc from "src/components/icons/CrossIc";
 import Button1 from "src/components/Button1";
 import styled from "styled-components";
-import {ImageSrc} from "src/models/ImageSrc";
+import {ArticleImage} from "src/api-service/articleService";
+import React from "react";
 
 
 
 
 
 const ListImage = React.memo((
-    { imageSource, onRemove, onPaste }
-        : { imageSource: ImageSrc, onRemove: (imageSource: ImageSrc)=>void, onPaste: (imageSource: ImageSrc)=>void }
+    { articleImage, onRemove, onPaste }
+        : { articleImage: ArticleImage, onRemove: (imageSource: ArticleImage)=>void, onPaste: (imageSource: ArticleImage)=>void }
 ) => {
-
-    const [fileUrl, setFileUrl] = useState(undefined as undefined|string)
-    useEffect(()=>{
-        let cancel = false
-        ;(async () => {
-            if (imageSource){
-                const url = await imageSource.fetchUrl()
-                if (!cancel) setFileUrl(url)
-            }
-        })()
-        return ()=>{ cancel=true }
-    }, [imageSource])
 
     /*const onDragStart = (ev: React.DragEvent<HTMLDivElement>) => {
         ev.dataTransfer.setData('application/json', JSON.stringify({
@@ -33,17 +21,16 @@ const ListImage = React.memo((
     }*/
 
 
-
     return <ImageItemFrame
         /*draggable onDragStart={onDragStart}*/>
 
-        <ImageItemText>id: {imageSource.id}</ImageItemText>
-        <CrossContainer onClick={()=>onRemove(imageSource)}><CrossIc color='black'/></CrossContainer>
+        <ImageItemText>id: {articleImage.localId}</ImageItemText>
+        <CrossContainer onClick={()=>onRemove(articleImage)}><CrossIc color='black'/></CrossContainer>
 
-        <Image imageUrl={fileUrl}/>
+        <Image imageUrl={articleImage.image.getUrl()}/>
 
         <ButtonBox>
-            <Button1 onClick={()=>onPaste(imageSource)}
+            <Button1 onClick={()=>onPaste(articleImage)}
                      style={{
                          background: '#1F8DCD',
                          font: "500 16px 'TT Commons'", color: '#FCFCFC',

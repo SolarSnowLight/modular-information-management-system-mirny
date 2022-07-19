@@ -1,9 +1,9 @@
-import css from './Header.module.scss'
 import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
 import {userActions} from "src/redux/userReducer";
 import Space from "src/components/Space";
-import Header from "../../components/Header";
+import Header from "src/components/Header";
 import React from "react";
+import styled from "styled-components";
 
 
 
@@ -19,7 +19,7 @@ function MainHeader(){
     }
 
     return <Header>
-        <div className={css.text}>accessJwt: {accessJwt+''}</div>
+        <AccessJwtView>accessJwt: {accessJwt+''}</AccessJwtView>
         <Space w={20}/>
         <div>
             <button onClick={makeLogout}>Logout</button>
@@ -27,3 +27,13 @@ function MainHeader(){
     </Header>
 }
 export default React.memo(MainHeader)
+
+
+const AccessJwtView = styled.div`
+  font-size: 12px;
+  flex-grow: 1;
+  overflow-wrap: anywhere;
+  overflow-y: auto;
+  color: #FCFCFC; // White todo extract
+  //white-space: break-spaces;
+`

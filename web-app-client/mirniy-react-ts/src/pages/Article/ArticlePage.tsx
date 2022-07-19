@@ -1,10 +1,9 @@
 import {useNavigate, useParams} from "react-router-dom";
 import styled from "styled-components";
 import React, {useEffect, useState} from "react";
-import { ArticleApiFull } from "src/api/test/articleApiTest";
-import {articleServiceTest} from "src/api-service/test/articleServiceTest";
 import Header from "src/components/Header";
 import ArticleView from "src/pages/ArticleView/ArticleView";
+import {Article, articleService} from "src/api-service/articleService";
 
 
 
@@ -14,10 +13,10 @@ const ArticlePage = () => {
     const { articleId } = useParams()
     const nav = useNavigate()
 
-    const [article, setArticle] = useState(undefined as ArticleApiFull|undefined)
+    const [article, setArticle] = useState(undefined as Article|undefined)
     useEffect(()=>{(async()=>{
         if (articleId){
-            let { data, error } = await articleServiceTest.getArticleById(articleId)
+            let { data, error } = await articleService.getArticleById(articleId)
             if (error) {
                 return
             }
@@ -28,11 +27,19 @@ const ArticlePage = () => {
     const onEdit = () => {
         nav(`/article/${articleId}/edit`)
     }
+    const onDelete = async () => {
+        if (articleId){
+            let {data, error} = await articleService.deleteArticle(articleId)
+            if (error) return
+            nav(`/articles/user`)
+        }
+    }
 
 
     return <div>
         <Header>
             <div>
+                <button onClick={onDelete}>Удалить</button>
                 <button onClick={onEdit}>Редактировать</button>
             </div>
         </Header>

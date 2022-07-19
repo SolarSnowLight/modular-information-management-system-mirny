@@ -1,5 +1,6 @@
 import {ImageSrc} from "./ImageSrc";
 import {ArticleApiFull} from "../api/test/articleApiTest";
+import {Article} from "../api-service/articleService";
 
 
 function wrapWithP(articleText: string){
@@ -31,7 +32,7 @@ function wrapWithP(articleText: string){
 }
 
 
-function inlineImages(article: ArticleApiFull){
+function inlineImages(article: Article){
     const parser = new DOMParser()
     let wrappedText = `<root>${article.text}</root>` // need to wrap in some root tag
     let xmlDoc = parser.parseFromString(wrappedText, 'text/xml')
@@ -42,7 +43,7 @@ function inlineImages(article: ArticleApiFull){
         if ('article-image'===ch.nodeName){
             const el = ch as Element
             const localId = el.attributes["localId"].value
-            const srcUrl = article.imagesSrc.find(it=>it.id==localId)?.getUrl()
+            const srcUrl = article.images.find(it=>it.localId==localId)?.image.getUrl()
             const img = parser.parseFromString(
                 `<img src="${srcUrl}" style="display: block; width: 100%; height: 300px; object-fit: cover;"/>`,
                 'text/xml'

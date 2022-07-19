@@ -99,7 +99,7 @@ function Login(){
 
             <div className={css.inputBox}>
                 <div className={css.btnBox}>
-                    <Button1 h={54} onClick={makeLogin} title={loginLoading?'':'Далее'}/>
+                    <Button1 h={54} onClick={makeLogin}>{loginLoading?'':'Далее'}</Button1>
                     { loginLoading && <div className={css.spinnerBox}>
                         <SpinnerIc circleColor='#ffffff33' indicatorColor='white' size={24}/>
                     </div> }

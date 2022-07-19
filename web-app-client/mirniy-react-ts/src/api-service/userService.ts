@@ -1,7 +1,6 @@
 import {AuthResponse, LogoutResponse, userApi, UserRegister} from "src/api/userApi";
 import Axios, {AxiosError} from "axios";
 import {ServiceData} from "./utils";
-import {getAccessJwt} from "src/api/ax";
 import {BadRequest} from "src/api/utils";
 
 
@@ -52,7 +51,7 @@ type LogoutService = {
     isLogout: boolean
 }
 const logout = async (): Promise<ServiceData<LogoutService>> => {
-    return userApi.logout(getAccessJwt()).then(
+    return userApi.logout().then(
         response => {
             let { status, data } = response
             if (status===200) {

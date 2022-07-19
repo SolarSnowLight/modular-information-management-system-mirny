@@ -1,20 +1,20 @@
 import styled from "styled-components";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {absolute, absoluteOff} from "src/common-styles/commonStyled";
-import {ImageSrc} from "src/models/ImageSrc";
+import {ArticleImage} from "src/api-service/articleService";
 
 
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
-    imageSource?: ImageSrc
+    articleImage?: ArticleImage
 }
 
 const TitleImage = React.memo(React.forwardRef<HTMLDivElement, Props>(
     (props, ref) => {
-        const { imageSource, ...restProps } = props
+        const { articleImage, ...restProps } = props
         return <Frame ref={ref} {...restProps}>
             <Border/>
-            <ImageWrap imageSource={imageSource}/>
+            <ImageWrap articleImage={articleImage}/>
         </Frame>
 }))
 export default TitleImage
@@ -34,21 +34,8 @@ const Border = React.memo(styled.div`
     border: 4px solid #1F8DCD;
   }
 `)
-const ImageWrap = React.memo(({ imageSource }: { imageSource?: ImageSrc }) => {
-
-    const [fileUrl, setFileUrl] = useState(undefined as undefined|string)
-    useEffect(()=>{
-        let cancel = false
-        ;(async () => {
-            if (imageSource){
-                const url = await imageSource.fetchUrl()
-                if (!cancel) setFileUrl(url)
-            }
-        })()
-        return ()=>{ cancel=true }
-    }, [imageSource])
-
-    return <Image imageUrl={fileUrl}/>
+const ImageWrap = React.memo(({ articleImage }: { articleImage?: ArticleImage }) => {
+    return <Image imageUrl={articleImage?.image.getUrl()}/>
 })
 const Image = React.memo(styled.div<{ imageUrl?: string }>`
   ${absoluteOff('14px 21px')};

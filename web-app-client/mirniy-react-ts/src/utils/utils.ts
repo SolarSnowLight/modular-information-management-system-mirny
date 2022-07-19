@@ -13,6 +13,7 @@ export const trimSlash = (str: string) => trimTails(str,'/')
 
 
 export const splitTags = (tagsStr: string) => tagsStr.trim().split(/\s*#/).slice(1)
+export const joinTags = (tags?: string[]) => !tags || !tags.length ? '' : '#'+tags.join(' #')
 
 
 // read file as DataURL (base64 url)
