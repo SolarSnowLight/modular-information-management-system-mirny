@@ -34,35 +34,34 @@ type ErrorsState2Draft = {
 
 
 type ErrorsDraft = {
-    login?: {
-        common?: ErrorType[],
-        errors?: {
-            login?: ErrorType[],
-            password?: ErrorType[],
+    login?: undefined | {
+        common?: ErrorType[] | undefined,
+        errors?: undefined | {
+            login?: ErrorType[] | undefined,
+            password?: ErrorType[] | undefined,
         }
     },
-    logout?: {
-        common?: ErrorType[],
-        errors?: { }
+    logout?: undefined | {
+        common?: ErrorType[] | undefined,
+        errors?: undefined | { }
     },
-    signup?: {
-        common?: ErrorType[],
-        errors?: {
-            email?: ErrorType[],
-            password?: ErrorType[],
-            name?: ErrorType[],
-            surname?: ErrorType[],
-            patronymic?: ErrorType[],
-            nickname?: ErrorType[],
-            phone?: ErrorType[],
-            birthDate?: ErrorType[],
+    signup?: undefined | {
+        common?: ErrorType[] | undefined,
+        errors?: undefined | {
+            email?: ErrorType[] | undefined,
+            password?: ErrorType[] | undefined,
+            name?: ErrorType[] | undefined,
+            surname?: ErrorType[] | undefined,
+            patronymic?: ErrorType[] | undefined,
+            nickname?: ErrorType[] | undefined,
+            phone?: ErrorType[] | undefined,
+            birthDate?: ErrorType[] | undefined,
         }
     },
-    articles?: {
-        common?: ErrorType[],
-        errors?: { }
+    articles?: undefined | {
+        common?: ErrorType[] | undefined,
+        errors?: undefined | { }
     },
-
 }
 
 export type ErrorsState = typeof initialState

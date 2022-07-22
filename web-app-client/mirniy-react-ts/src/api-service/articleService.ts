@@ -5,26 +5,29 @@ import Axios, {AxiosError} from "axios";
 import {
     ArticleApi,
     articleApi,
-    ArticleApiResponse,
+    ArticleApiResponse, ArticleCreationApi,
     ArticleCreationApiResponse, ArticleDeletionApiResponse,
-    ArticlesApiResponse
+    ArticlesApiResponse, ArticleUpdateApi, ArticleUpdateApiResponse
 } from "src/api/articleApi";
-import {readAsUrl, splitTags, trimSlash} from "src/utils/utils";
+import {joinTags, readAsUrl, splitTags, trimSlash, uriToBlob} from "src/utils/utils";
 import {DateTime} from "src/utils/DateTime";
 import {IdGenerator} from "src/models/IdGenerator";
 import {API_URL} from "src/api/ax";
+import {Optional} from "@rrainpath/ts-utils";
+import {blob} from "stream/consumers";
 
 
 
 export class Article {
     constructor(
-        public id?: string|number,
+        public id?: string,
 
         public title?: string,
-        public titleImageLocalId?: number,
+        //public titleImageLocalId?: number,
         public theme?: string,
         public shortDescription?: string,
-        public publishDate?: string, // yyyy-MM-dd'T'HH:mm // 2022-01-01T01:01
+        public createdAt?: string, // yyyy-MM-dd'T'HH:mm // 2022-01-01T01:01
+        public updatedAt?: string, // yyyy-MM-dd'T'HH:mm // 2022-01-01T01:01
         public tags?: string[], // ['tag1', 'tag2', 'tag3'] // #tag1 #tag2 #tag3
 
         public authors?: string, // формат данных пока не определён
@@ -33,68 +36,115 @@ export class Article {
         public text?: string, // текст с общими тегами (<p> <i> <b> <mark> <article-image>)
 
         public images: ArticleImage[] = [],
-        public textImagesLocalIds: number[] = [],
+        //public textImagesLocalIds: number[] = [],
 
         public viewsCnt?: number,
         public isFavorite?: boolean,
     ) { }
     get titleImage(){
-        return this.images.find(it=>it.localId===this.titleImageLocalId)
+        return this.images.find(it=>it.props.isTitle)
     }
     get textImages(){
-        return this.images.filter(it=>this.textImagesLocalIds.includes(it.localId))
+        return this.images.filter(it=>it.props.isText)
     }
 }
+type ArticleImageProps = {
+    isTitle: boolean, // пришло по апи и используется в заголовке
+    isText: boolean, // пришло по апи и используется в тексте
+    isTitleNew: boolean, // используется в заголовке после редактирования (даже если не изменилось)
+    isTextNew: boolean, // используется в тексте после редактирования (даже если не изменилось)
+    isNew: boolean // новый файл, у которого на сервере не было localId
+}
 export class ArticleImage {
+    props: ArticleImageProps = { isTitle: false, isText: false, isTitleNew: false, isTextNew: false, isNew: false }
     constructor(
         public localId: number,
         public image: Image,
-    ) { }
+        props?: Optional<ArticleImageProps>,
+    ) {
+        if (props) this.updateProps(props)
+    }
+
+    updateProps(props: Optional<ArticleImageProps>){
+        this.props = { ...this.props, ...props }
+    }
+    clone(){
+        return new ArticleImage(this.localId, this.image, {...this.props})
+    }
 }
 export class Image {
-    private constructor(
-        public id: string|number|undefined,
-        public file?: File,
-        public remoteUrl?: string,
-        public dataUrl?: string,
-    ) { }
+    id: string|undefined
+    name: string|undefined
+    blob: Blob|undefined
+    remoteUrl: string|undefined
+    dataUrl: string|undefined
 
-    // как только создаём изображение из файла, то сразу загружаем его
-    // потом берём url с помощью getUrl()
-    static async fromFile(id:string|number|undefined, file: File){
-        const im = new Image(id, file)
+    private constructor(props: {
+        id?: string|undefined
+        name?: string|undefined
+        blob?: Blob|undefined
+        remoteUrl?: string|undefined
+        dataUrl?:string|undefined
+    }) {
+        this.id = props.id
+        this.name = props.name
+        this.blob = props.blob
+        this.remoteUrl = props.remoteUrl
+        this.dataUrl = props.dataUrl
+    }
+
+    // Как только создаём изображение из файла, то сразу загружаем его контент в dataUrl.
+    // Потом берём dataUrl с помощью getUrl().
+    static async fromFile(file: File, id?: string){
+        const im = new Image({ id: id, blob: file, name: file.name})
         await im.fetchUrl()
         return im
     }
 
-    static fromFileAndDataUrl(id:string|number|undefined, file: File, dataUrl: string){
-        return new Image(id, file, undefined, dataUrl)
+    static fromFileAndDataUrl(file: File, dataUrl: string, id?: string){
+        return new Image({ id: id, blob: file, name: file.name, dataUrl: dataUrl })
     }
 
-    static fromRemoteUrl(id:string|number|undefined, url: string){
-        return new Image(id, undefined, url)
+    static async fromRemoteUrl(url: string, name: string|undefined, id?: string){
+        const im = new Image({ id: id, name: name, remoteUrl: url })
+        await im.fetchBlob()
+        return im
     }
 
-    static fromRemotePath(id:string|number|undefined, path: string, baseUrl: string){
-        return new Image(id, undefined, trimSlash(baseUrl)+'/'+trimSlash(path))
+    static async fromRemotePath(path: string, baseUrl: string, name: string|undefined, id?: string){
+        const im = new Image({ id: id, name: name, remoteUrl: trimSlash(baseUrl)+'/'+trimSlash(path) })
+        await im.fetchBlob()
+        return im
     }
 
-    static fromDataUrl(id:string|number|undefined, dataUrl:string){
-        return new Image(id, undefined, undefined, dataUrl)
+    static async fromDataUrl(dataUrl:string, name: string|undefined, id?: string){
+        const im = new Image({ id: id, name: name, dataUrl: dataUrl })
+        await im.fetchBlob()
+        return im
     }
 
     async fetchUrl(){
         if (this.dataUrl) return this.dataUrl
         if (this.remoteUrl) return this.remoteUrl
-        if (this.file) {
-            const dataUrl = await readAsUrl(this.file)
+        if (this.blob) {
+            const dataUrl = await readAsUrl(this.blob)
             return this.dataUrl = dataUrl
         }
+    }
+
+    async fetchBlob(){
+        if (this.blob) return this.blob
+        if (this.dataUrl) return uriToBlob(this.dataUrl)
+        if (this.remoteUrl) return uriToBlob(this.remoteUrl)
     }
 
     getUrl(){
         if (this.dataUrl) return this.dataUrl
         if (this.remoteUrl) return this.remoteUrl
+    }
+
+    getBlob(){
+        if (this.blob) return this.blob
     }
 }
 
@@ -104,13 +154,13 @@ export type ArticleResponse = { article: Article }
 
 const getArticleById = async (id: string): Promise<ServiceData<ArticleResponse>> => {
     return articleApi.getArticleById(id).then(
-        response => {
+        async response => {
             let { status, data } = response
             if (status===200) {
                 data = data as ArticleApiResponse
                 //console.log('a',data)
                 return { data: {
-                        article: articleApiToArticle(data)
+                        article: await articleApiToArticle(data)
                     }}
             }
 
@@ -133,12 +183,12 @@ export type ArticlesResponse = { articles: Article[] }
 
 const getUserArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
     return articleApi.getUserArticles().then(
-        response => {
+        async response => {
             let { status, data } = response
             if (status===200) {
                 data = data as ArticlesApiResponse
                 return { data: {
-                        articles: data.articles?.map(articleApiToArticle) ?? []
+                        articles: data.articles?.map(articleApiToArticle)) ?? []
                     } }
             }
 
@@ -158,10 +208,23 @@ const getUserArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
 
 
 
+/*
 export type ArticleCreationResponse = { }
 
 const createArticle = async (article: Article): Promise<ServiceData<ArticleCreationResponse>> => {
-    return articleApi.createArticle(article).then(
+
+    const tam = article.titleImage
+    if (!tam) throw new Error('Title image is required')
+
+    const aApi: ArticleCreationApi = {
+        title: article.title ?? '',
+        title_file: tam.image.file!,
+        text: article.text ?? '',
+        tags: joinTags(article.tags),
+        files: article.textImages.map(it=>({ index: it.localId, file: it.image.file! }))
+    }
+
+    return articleApi.createArticle(aApi).then(
         response => {
             let { status, data } = response
             if (status===200) {
@@ -181,6 +244,98 @@ const createArticle = async (article: Article): Promise<ServiceData<ArticleCreat
             return { error: { code: 'error' } }
         }
     )
+}
+*/
+
+
+
+
+
+export type ArticleSaveResponse = { result: 'updated' | 'saved' }
+
+const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveResponse>> => {
+    const a = article
+    //console.log(a)
+    const titleIm = a.images.find(it=>it.props.isTitleNew)
+    if (!titleIm) return { error: errors.of('required', 'Title image is required') }
+    if (!a.title) return { error: errors.of('required', 'Title is required') }
+    if (!a.text) return { error: errors.of('required', 'Title image is required') }
+
+    // todo instead of file make fetch blob
+
+    if (!a.id){ // create article
+        const aApi: ArticleCreationApi = {
+            title: a.title,
+            title_file: a.images.find(it=>it.props.isTitleNew && !it.props.isTitle)?.image.blob!,
+            text: a.text,
+            tags: joinTags(article.tags),
+            files: a.images
+                .filter(it=>!it.props.isTextNew && it.props.isText && !it.props.isNew)
+                .map(it=>({ index: it.localId, file: it.image.blob! }))
+        }
+
+        return articleApi.createArticle(aApi).then(
+            response => {
+                let { status, data } = response
+                if (status===200) {
+                    data = data as ArticleCreationApiResponse
+                    if (!data.success) return { error: errors.of('error') }
+                    return { data: { result: 'saved' } }
+                }
+
+                return { error: errors.of('error') }
+            },
+            (error: Error|AxiosError) => {
+                if (Axios.isAxiosError(error)){
+                    if (error.code==='ERR_NETWORK')
+                        // error.code: "ERR_NETWORK" when server not found
+                        return { error: { code: 'connection error' } }
+                }
+                return { error: { code: 'error' } }
+            }
+        )
+    } else { // update article
+        const aUApi: ArticleUpdateApi = {
+            uuid: a.id,
+            title: a.title,
+            title_file: a.images.find(it=>it.props.isTitleNew && !it.props.isTitle)?.image.file,
+            text: a.text,
+            tags: joinTags(article.tags),
+            files: a.images
+                // картинка используется в тексте после редактирования
+                // && картинка не была использована в тексте до редактирования
+                // && картинка - новый файл
+                .filter(it=>it.props.isTextNew && !it.props.isText && it.props.isNew)
+                .map(it=>({ index: it.localId, file: it.image.blob! })),
+            files_deleted: a.images
+                // картинка не используется в тексте после редактирования
+                // && картинка была использована в тексте до редактирования
+                // && картинка - старый файл
+                .filter(it=>!it.props.isTextNew /*&& it.props.isText*/ && !it.props.isNew)
+                .map(it=>it.localId)
+        }
+
+        return articleApi.updateArticle(aUApi).then(
+            response => {
+                let { status, data } = response
+                if (status===200) {
+                    data = data as ArticleUpdateApiResponse
+                    if (!data.success) return { error: errors.of('error') }
+                    return { data: { result: 'updated' } }
+                }
+
+                return { error: errors.of('error') }
+            },
+            (error: Error|AxiosError) => {
+                if (Axios.isAxiosError(error)){
+                    if (error.code==='ERR_NETWORK')
+                        // error.code: "ERR_NETWORK" when server not found
+                        return { error: { code: 'connection error' } }
+                }
+                return { error: { code: 'error' } }
+            }
+        )
+    }
 }
 
 
@@ -214,34 +369,51 @@ const deleteArticle = async (id: string): Promise<ServiceData<ArticleDeletionRes
 
 
 
-function articleApiToArticle(articleApi: ArticleApi): Article {
+async function articleApiToArticle(articleApi: ArticleApi): Promise<Article> {
     const aa = articleApi
 
+    // todo maybe there is need to check if images is really in text
     const textImagesLocalIds = (aa.files??[]).map(it=>it.index)
-
     const idGen = new IdGenerator(textImagesLocalIds)
     const titleImId = idGen.getId()
 
-    let images = (aa.files??[]).map(it=>new ArticleImage(
-        it.index, Image.fromRemotePath(undefined, it.filepath, API_URL)
+
+    const imagePromises = Promise.allSettled((aa.files??[]).map(async it => new ArticleImage(
+        it.index, await Image.fromRemotePath(it.filepath, API_URL, it.filename),
+        {isText: true}
+    )))
+    const titleImPromise = new ArticleImage(
+        titleImId, await Image.fromRemotePath(aa.filepath, API_URL, aa.filename),
+        { isTitle: true }
+    )
+
+    /*let images = (aa.files??[]).map(it=>new ArticleImage(
+        it.index, Image.fromRemotePath(it.filepath, API_URL, it.filename),
+        { isText: true }
     ))
     images.push(new ArticleImage(
-        titleImId, Image.fromRemotePath(undefined, aa.filepath, API_URL)
-    ))
+        titleImId, Image.fromRemotePath(aa.filepath, API_URL, it.filename),
+        { isTitle: true }
+    ))*/
+    const images = [...await imagePromises, await titleImPromise]
+
+    const createdAt = DateTime.fromDate(new Date(aa.created_at!)).to_yyyy_MM_dd_HH_mm()
+    const updatedAt = DateTime.fromDate(new Date(aa.updated_at!)).to_yyyy_MM_dd_HH_mm()
 
     return  new Article(
         aa.uuid,
         aa.title,
-        titleImId,
+        //titleImId,
         undefined,
         undefined,
-        DateTime.fromDate(new Date(aa.date_created!)).to_yyyy_MM_dd_HH_mm(),
+        createdAt,
+        updatedAt,
         splitTags(aa.tags),
         undefined,
         undefined,
         aa.text,
         images,
-        textImagesLocalIds,
+        //textImagesLocalIds,
         undefined,
         undefined,
     )
@@ -252,6 +424,7 @@ function articleApiToArticle(articleApi: ArticleApi): Article {
 export const articleService = {
     getArticleById,
     getUserArticles,
-    createArticle,
+    //createArticle,
+    saveArticle,
     deleteArticle,
 }

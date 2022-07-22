@@ -1,4 +1,4 @@
-
+import {stringify} from "querystring";
 
 
 export const wait = async <T>(delay:number, value?:T) => new Promise<T>(
@@ -47,6 +47,7 @@ export function walkFileTree(fsItem: FileSystemEntry|null, onFile: (file:File)=>
 
 
 
+
 /*
 DataURL example:
 var url = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
@@ -54,7 +55,7 @@ var url = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAA
 https://stackoverflow.com/questions/12168909/blob-from-dataurl
  */
 
-export const dataUriToBlob = async (dataUri: string): Promise<Blob> =>
+export const uriToBlob = async (dataUri: string): Promise<Blob> =>
     await (await fetch(dataUri)).blob()
 
 

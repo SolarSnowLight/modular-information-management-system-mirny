@@ -1,8 +1,10 @@
 
 import {ResponseData} from "./utils";
 import ax, {getAccessJwt} from "./ax";
-import {Article} from "src/api-service/articleService";
-import {joinTags} from "src/utils/utils";
+
+
+
+
 
 
 export type ArticleApi = {
@@ -11,7 +13,8 @@ export type ArticleApi = {
     title: string
     text: string
     tags: string // "#tag1 #tag2 #tag3"
-    date_created?: string // yyyy-MM-dd'T'HH:mm:ss? // "2022-07-11T00:00:00Z" // todo what is Z at the end
+    created_at?: string // yyyy-MM-dd'T'HH:mm:ss.SSSSSS? // "2022-07-21T10:06:47.260527Z" // todo what is Z at the end
+    updated_at?: string // yyyy-MM-dd'T'HH:mm:ss.SSSSSS? // "2022-07-21T10:06:47.260527Z" // todo what is Z at the end
     files: ArticleImageApi[] | null
 }
 export type ArticleImageApi = {
@@ -20,7 +23,6 @@ export type ArticleImageApi = {
     filename: string
     filepath: string // url path to title image
 }
-
 
 
 
@@ -37,6 +39,7 @@ const getArticleById = async (id: string): ResponseData<ArticleApiResponse> => {
 
 
 
+
 export type ArticlesApiResponse = { articles: ArticleApi[] | null }
 
 const getUserArticles = async (): ResponseData<ArticlesApiResponse> => {
@@ -48,28 +51,63 @@ const getUserArticles = async (): ResponseData<ArticlesApiResponse> => {
 
 
 
+export type ArticleCreationApi = {
+    title: string // article title
+    title_file: Blob // image file for title image
+    text: string // text with common tags like <p> <article-image>
+    tags: string // '#tag1 #tag2 #tag3'
+    files: { index: number, file: Blob }[] // image files for article text
+}
 
 export type ArticleCreationApiResponse = { success: boolean }
 
-const createArticle = async (article: Article): ResponseData<ArticleCreationApiResponse> => {
-    //console.log("article before form data", article)
-
+const createArticle = async (article: ArticleCreationApi): ResponseData<ArticleCreationApiResponse> => {
     const fd = new FormData()
-
-    fd.append('title', article.title ?? '')
-    fd.append('text', article.text ?? '')
-    fd.append('tags', joinTags(article.tags))
-
-    const tam = article.titleImage
-    if (!tam) throw new Error('Title image is required')
-    fd.append('title_file', tam.image.file!, undefined)
-
-    article.textImages.forEach(it=>fd.append('files',it.image.file!,it.localId+''))
+    fd.append('title', article.title)
+    fd.append('title_file', article.title_file, undefined)
+    fd.append('text', article.text)
+    fd.append('tags', article.tags)
+    article.files.forEach(it=>fd.append('files',it.file,it.index+''))
 
     return ax.post('user/article/create', fd, {
         headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
+
+
+
+
+export type ArticleUpdateApi = {
+    uuid: string // id статьи
+    title: string // article title
+    title_file?: Blob|undefined // NEW image file for title image
+    text: string // text with common tags like <p> <article-image>
+    tags: string // '#tag1 #tag2 #tag3'
+    files?: { index: number, file: Blob }[] // NEW image files for article text
+    files_deleted?: number[]|undefined // localIds of deleted files
+}
+
+export type ArticleUpdateApiResponse = { success: boolean }
+
+const updateArticle = async (article: ArticleUpdateApi): ResponseData<ArticleUpdateApiResponse> => {
+
+    //console.log(article)
+
+    const fd = new FormData()
+    fd.append('uuid', article.uuid)
+    fd.append('title', article.title)
+    if (article.title_file) fd.append('title_file', article.title_file, undefined)
+    fd.append('text', article.text)
+    fd.append('tags', article.tags)
+    article.files?.forEach(it=>fd.append('files',it.file,it.index+''))
+    if (article.files_deleted) fd.append('files_deleted', JSON.stringify(article.files_deleted))
+
+    return ax.post('user/article/update', fd, {
+        headers: { Authorization: `Bearer ${getAccessJwt()}`}
+    })
+}
+
+
 
 
 
@@ -91,5 +129,6 @@ export const articleApi = {
     getArticleById,
     getUserArticles,
     createArticle,
+    updateArticle,
     deleteArticle,
 }

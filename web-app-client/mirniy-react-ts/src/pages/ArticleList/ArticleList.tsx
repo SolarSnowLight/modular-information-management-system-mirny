@@ -21,6 +21,7 @@ function ArticleList(){
         setArticles(data!.articles)
     })()},[])
 
+    //console.log(articles)
 
     return <MainFrame className={common.column}>
         { articles && articles.map(it=><ArticleCard key={it.id} article={it} />) }

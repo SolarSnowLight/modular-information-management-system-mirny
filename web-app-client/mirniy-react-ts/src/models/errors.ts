@@ -13,7 +13,7 @@ export type ErrorType = {
         | 'connection error'
         | 'incorrect' | 'required'
         | 'incorrect data'  | 'incorrect login' | 'incorrect password'
-    message?: string
+    message?: string|undefined
     extra?: any
 }
 

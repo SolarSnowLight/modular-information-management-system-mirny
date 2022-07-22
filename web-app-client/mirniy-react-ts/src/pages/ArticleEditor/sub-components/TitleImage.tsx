@@ -6,7 +6,7 @@ import {ArticleImage} from "src/api-service/articleService";
 
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
-    articleImage?: ArticleImage
+    articleImage?: ArticleImage|undefined
 }
 
 const TitleImage = React.memo(React.forwardRef<HTMLDivElement, Props>(
@@ -34,7 +34,7 @@ const Border = React.memo(styled.div`
     border: 4px solid #1F8DCD;
   }
 `)
-const ImageWrap = React.memo(({ articleImage }: { articleImage?: ArticleImage }) => {
+const ImageWrap = React.memo(({ articleImage }: { articleImage?: ArticleImage|undefined }) => {
     return <Image imageUrl={articleImage?.image.getUrl()}/>
 })
 const Image = React.memo(styled.div<{ imageUrl?: string }>`

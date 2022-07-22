@@ -17,7 +17,7 @@ const ArticleCard = (
     { article }: { article: Article }
 ) => {
     const a = article
-    const date = dateUtils.from_yyyy_MM_dd_hh_mm(a.publishDate)
+    const date = dateUtils.from_yyyy_MM_dd_hh_mm(a.createdAt)
 
     const onFavorite = (article: Article, isFavorite = true) => {
         console.log('setFavorite: ', isFavorite)

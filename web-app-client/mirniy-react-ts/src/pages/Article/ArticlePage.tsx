@@ -24,8 +24,11 @@ const ArticlePage = () => {
         }
     })()},[articleId])
 
+    const onList = () => {
+        nav(`/articles/user`)
+    }
     const onEdit = () => {
-        nav(`/article/${articleId}/edit`)
+        nav(`/article/edit/${articleId}`)
     }
     const onDelete = async () => {
         if (articleId){
@@ -39,6 +42,7 @@ const ArticlePage = () => {
     return <div>
         <Header>
             <div>
+                <button onClick={onList}>Список статей пользователя</button>
                 <button onClick={onDelete}>Удалить</button>
                 <button onClick={onEdit}>Редактировать</button>
             </div>

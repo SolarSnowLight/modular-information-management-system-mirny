@@ -1,7 +1,7 @@
 
 
 import common from 'src/common-styles/common.module.scss'
-import React, {useLayoutEffect, useRef, useState} from "react";
+import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
 import styled from "styled-components";
 import Space from "src/components/Space";
@@ -12,13 +12,12 @@ import {DateTime} from "src/utils/DateTime";
 import Popup from "src/components/Popup";
 import ArticleView from "src/pages/ArticleView/ArticleView";
 import TitleImage from "./sub-components/TitleImage";
-import {ImageSrc} from "src/models/ImageSrc";
-import {splitTags, walkFileTree} from "src/utils/utils";
+import {joinTags, splitTags, walkFileTree} from "src/utils/utils";
 import {IdGenerator} from "src/models/IdGenerator";
 import ListImage from './sub-components/ListImage';
 import {articleUtils} from "src/models/articleUtils";
 import {Article, ArticleImage, articleService, Image} from "src/api-service/articleService";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 
 
@@ -32,12 +31,29 @@ const wordExtensions = /\.((doc)|(docx))$/i
 
 const ArticleEditor = () => {
 
+    const { articleId } = useParams()
     const nav = useNavigate()
+
+    useEffect(()=>{(async()=>{
+        if (articleId){
+            let { data, error } = await articleService.getArticleById(articleId)
+            if (error) {
+                return
+            }
+            const a = data!.article
+            setTitle(a.title ?? '')
+            setRawText(articleUtils.unwrapP(a.text??''))
+            setTags(joinTags(a.tags))
+            setTitleImage(a.titleImage)
+            setImages(a.images)
+            setIdGen(new IdGenerator(a.images.map(it=>it.localId)))
+        }
+    })()},[articleId])
 
     const d = useAppDispatch()
     const { isDraggingFiles } = useAppSelector(s=>s.app)
 
-    const [idGen] = useState(()=>new IdGenerator())
+    const [idGen, setIdGen] = useState(()=>new IdGenerator())
 
     const [title, setTitle] = useState('')
     const onTitleInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +92,7 @@ const ArticleEditor = () => {
             const addFile = async (file: File) => {
                 if (imageExtensions.test(file.name)){
                     const newIm = await Image.fromFile(undefined, file)
-                    const newAIm = new ArticleImage(idGen.getId(), newIm)
+                    const newAIm = new ArticleImage(idGen.getId(), newIm, { isNew: true })
                     setImages(images=>[...images, newAIm])
                 }
                 else if (wordExtensions.test(file.name)){
@@ -94,8 +110,6 @@ const ArticleEditor = () => {
     const onRemove = (articleImage: ArticleImage) => {
         setImages(images.filter(it=>it!==articleImage))
     }
-
-
 
 
     const onImagePaste = (articleImage: ArticleImage) => {
@@ -118,33 +132,51 @@ const ArticleEditor = () => {
         }
     }
 
-    const [article, setArticle] = useState(undefined as Article|undefined)
+    const [builtArticle, setBuiltArticle] = useState(undefined as Article|undefined)
 
     const onPreview = () => {
         const article = prepareArticleForPreview()
-        setArticle(article)
+        setBuiltArticle(article)
     }
 
     const prepareArticleForPreview = (): Article|undefined => {
-        let text = articleUtils.wrapWithP(rawText)
+        const text = articleUtils.wrapWithP(rawText)
+        const textImIds = articleUtils.getUsedImageLocalIds(text)
+        const titleImId = titleImage?.localId
 
-        const article = new Article(
-            undefined,
+        const imgs = images
+            .map(it=>{
+                const newAIm = it.clone()
+                const isTitleNew = titleImId ? newAIm.localId===titleImId : false
+                const isTextNew = textImIds.includes(newAIm.localId)
+                newAIm.updateProps({
+                    isTitle: isTitleNew,
+                    isText: isTextNew,
+                    isTitleNew: isTitleNew,
+                    isTextNew: isTextNew
+                })
+                return newAIm
+            })
+            .filter(it=>it.props.isTitle || it.props.isText)
+
+        const createdAt = DateTime.fromDate(new Date()).to_yyyy_MM_dd_HH_mm()
+        const updatedAt = DateTime.fromDate(new Date()).to_yyyy_MM_dd_HH_mm()
+
+        return new Article(
+            articleId,
             title,
-            titleImage?.localId,
             undefined,
             undefined,
-            DateTime.fromDate(new Date()).to_yyyy_MM_dd_HH_mm(),
+            createdAt,
+            updatedAt,
             splitTags(tags),
             undefined,
             undefined,
             text,
-            images,
-            undefined,
+            imgs,
             99,
             false,
         )
-        return article
     }
 
 
@@ -152,22 +184,38 @@ const ArticleEditor = () => {
         const a = prepareArticleForSave()
         //console.log(a)
         if (a){
-            await articleService.createArticle(a)
-            nav('/articles/user')
+            let { data, error } = await articleService.saveArticle(a)
+            if (error) {
+                console.log(error)
+                return
+            }
+            if (data!.result==='saved')
+                nav('/articles/user')
+            else if (data!.result==='updated')
+                nav(`/article/${a.id}`)
         }
     }
     const prepareArticleForSave = (): Article|undefined => {
         const text = articleUtils.wrapWithP(rawText)
         const textImIds = articleUtils.getUsedImageLocalIds(text)
         const titleImId = titleImage?.localId
-        const ids = new Set([...textImIds, titleImId])
-        ids.delete(undefined)
-        const allImIds = [...ids.values()] as number[]
 
-        const article = new Article(
-            undefined,
+        const imgs = images
+            .map(it=>{
+                const newAIm = it.clone()
+                const isTitleNew = titleImId ? newAIm.localId===titleImId : false
+                const isTextNew = textImIds.includes(newAIm.localId)
+                newAIm.updateProps({
+                    isTitleNew: isTitleNew,
+                    isTextNew: isTextNew
+                })
+                return newAIm
+            })
+
+        return new Article(
+            articleId,
             title,
-            titleImId,
+            undefined,
             undefined,
             undefined,
             undefined,
@@ -175,21 +223,19 @@ const ArticleEditor = () => {
             undefined,
             undefined,
             text,
-            images.filter(it=>allImIds.includes(it.localId)),
-            textImIds,
+            imgs,
             0,
             false,
         )
-        return article
     }
 
 
 
     return <Page>
 
-        { article && <Popup onClose={()=>setArticle(undefined)}>
+        { builtArticle && <Popup onClose={()=>setBuiltArticle(undefined)}>
             <ArticlePreviewCard>
-                <ArticleView article={article}/>
+                <ArticleView article={builtArticle}/>
                 <Space h={35}/>
                 <Button1 w={138} h={42} style={{ font: '600 18px "TT Commons"' }} onClick={onSave}>Сохранить</Button1>
             </ArticlePreviewCard>

@@ -1,11 +1,9 @@
-import {ImageSrc} from "./ImageSrc";
-import {ArticleApiFull} from "../api/test/articleApiTest";
-import {Article} from "../api-service/articleService";
+import {Article} from "src/api-service/articleService";
 
 
-function wrapWithP(articleText: string){
+function wrapWithP(articleRawText: string){
     const parser = new DOMParser()
-    let wrappedText = `<root>${articleText}</root>` // need to wrap in some root tag
+    let wrappedText = `<root>${articleRawText}</root>` // need to wrap in some root tag
     let xmlDoc = parser.parseFromString(wrappedText, 'text/xml')
 
     const root = xmlDoc.childNodes[0]
@@ -29,6 +27,28 @@ function wrapWithP(articleText: string){
     const xmlSerializer = new XMLSerializer()
     const taggedText = xmlSerializer.serializeToString(root).slice(6,-7)
     return taggedText
+}
+
+
+function unwrapP(articleText: string){
+    const parser = new DOMParser()
+    let wrappedText = `<root>${articleText}</root>` // need to wrap in some root tag
+    let xmlDoc = parser.parseFromString(wrappedText, 'text/xml')
+
+    const root = xmlDoc.childNodes[0]
+    for (let i = 0; i<root.childNodes.length; i++){
+        const ch = root.childNodes[i]
+        if ('p'===ch.nodeName){
+            const text = xmlDoc.createTextNode(ch.textContent ?? '')
+            root.appendChild(text)
+            root.insertBefore(text, ch)
+            root.removeChild(ch)
+        }
+    }
+
+    const xmlSerializer = new XMLSerializer()
+    const unwrappedText = xmlSerializer.serializeToString(root).slice(6,-7)
+    return unwrappedText
 }
 
 
@@ -83,6 +103,7 @@ function getUsedImageLocalIds(articleText: string){
 
 export const articleUtils = {
     wrapWithP,
+    unwrapP,
     inlineImages,
     getUsedImageLocalIds,
 }

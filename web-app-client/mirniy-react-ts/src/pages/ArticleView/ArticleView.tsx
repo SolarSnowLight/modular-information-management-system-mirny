@@ -22,7 +22,7 @@ const ArticleView = ({ article }: { article: Article }) => {
         setHtmlContent(articleUtils.inlineImages(a))
     },[a])
 
-    const date = dateUtils.from_yyyy_MM_dd_hh_mm(a.publishDate)
+    const date = dateUtils.from_yyyy_MM_dd_hh_mm(a.createdAt)
 
     const onFavorite = (article: Article, isFavorite = true) => {
         console.log('setFavorite', isFavorite)

@@ -8,7 +8,7 @@ import {useDebounce} from "./hooks/useDebounce";
 import Login from "./pages/Login/Login";
 import ArticleList from "./pages/ArticleList/ArticleList";
 import ArticlePage from "./pages/Article/ArticlePage";
-import ArticleCreator2 from './pages/ArticleEditor/ArticleEditor';
+import ArticleEditor from './pages/ArticleEditor/ArticleEditor';
 
 function App() {
 
@@ -90,8 +90,9 @@ function App() {
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
                 <Route path='/articles/user' element={<ArticleList/>}/>
-                <Route path='/create-article' element={<ArticleCreator2/>}/>
                 <Route path='/article/:articleId' element={<ArticlePage/>}/>
+                <Route path='/article/create' element={<ArticleEditor/>}/>
+                <Route path='/article/edit/:articleId' element={<ArticleEditor/>}/>
 
                 <Route path='*' element={<Main/>}/>
             </Routes>

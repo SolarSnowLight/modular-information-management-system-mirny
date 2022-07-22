@@ -20,7 +20,7 @@ function Main(){
         <Link to={'/articles/user'}>
             <button>Статьи пользователя</button>
         </Link>
-        <Link to={'/create-article'}>
+        <Link to={'/article/create'}>
             <button>Создать статью</button>
         </Link>
     </div>
