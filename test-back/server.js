@@ -3,9 +3,12 @@ import express from "express";
 
 const PORT = 5000;
 
-const app = express();
+const app = express()
+
+app.use(express.json()) // чтобы можно было отправлять с клиента POST запросы в json формате
 
 app.get('/', (req, res) => {
+    console.log(req.body);
     res.status(200).json('Сервер запущен');
 })
 
