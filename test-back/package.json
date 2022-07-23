@@ -1,18 +1,21 @@
 {
-  "name": "back-for-beginners",
+  "name": "test-back",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "type": "module", // чтобы работал экспорт модулей
-  "dependencies": {
-    "express": "^4.18.1"
-  },
-  "devDependencies": {},
+  "main": "server.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node server.js",
+    "servak": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
 }
