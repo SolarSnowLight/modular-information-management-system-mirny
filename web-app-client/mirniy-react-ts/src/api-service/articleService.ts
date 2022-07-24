@@ -9,12 +9,13 @@ import {
     ArticleCreationApiResponse, ArticleDeletionApiResponse,
     ArticlesApiResponse, ArticleUpdateApi, ArticleUpdateApiResponse
 } from "src/api/articleApi";
-import {joinTags, readAsUrl, splitTags, trimSlash, uriToBlob} from "src/utils/utils";
+import {awaitPromisesArray, joinTags, readAsUrl, splitTags, trimSlash, uriToBlob} from "src/utils/utils";
 import {DateTime} from "src/utils/DateTime";
 import {IdGenerator} from "src/models/IdGenerator";
 import {API_URL} from "src/api/ax";
-import {Optional} from "@rrainpath/ts-utils";
+import {nonEmpty, Optional} from "@rrainpath/ts-utils";
 import {blob} from "stream/consumers";
+import {files} from "../api/files";
 
 
 
@@ -188,7 +189,7 @@ const getUserArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
             if (status===200) {
                 data = data as ArticlesApiResponse
                 return { data: {
-                        articles: data.articles?.map(articleApiToArticle)) ?? []
+                        articles: await awaitPromisesArray(data.articles?.map(articleApiToArticle))
                     } }
             }
 
@@ -255,7 +256,7 @@ export type ArticleSaveResponse = { result: 'updated' | 'saved' }
 
 const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveResponse>> => {
     const a = article
-    //console.log(a)
+    //console.log('before save:',a)
     const titleIm = a.images.find(it=>it.props.isTitleNew)
     if (!titleIm) return { error: errors.of('required', 'Title image is required') }
     if (!a.title) return { error: errors.of('required', 'Title is required') }
@@ -270,7 +271,10 @@ const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveRes
             text: a.text,
             tags: joinTags(article.tags),
             files: a.images
-                .filter(it=>!it.props.isTextNew && it.props.isText && !it.props.isNew)
+                // картинка используется в тексте после редактирования
+                // && картинка не была использована в тексте до редактирования
+                // && картинка - новый файл
+                .filter(it=>it.props.isTextNew && !it.props.isText && it.props.isNew)
                 .map(it=>({ index: it.localId, file: it.image.blob! }))
         }
 
@@ -298,7 +302,7 @@ const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveRes
         const aUApi: ArticleUpdateApi = {
             uuid: a.id,
             title: a.title,
-            title_file: a.images.find(it=>it.props.isTitleNew && !it.props.isTitle)?.image.file,
+            title_file: a.images.find(it=>it.props.isTitleNew && !it.props.isTitle)?.image.blob,
             text: a.text,
             tags: joinTags(article.tags),
             files: a.images
@@ -314,6 +318,8 @@ const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveRes
                 .filter(it=>!it.props.isTextNew /*&& it.props.isText*/ && !it.props.isNew)
                 .map(it=>it.localId)
         }
+
+        console.log('before update', aUApi)
 
         return articleApi.updateArticle(aUApi).then(
             response => {
@@ -378,14 +384,15 @@ async function articleApiToArticle(articleApi: ArticleApi): Promise<Article> {
     const titleImId = idGen.getId()
 
 
-    const imagePromises = Promise.allSettled((aa.files??[]).map(async it => new ArticleImage(
-        it.index, await Image.fromRemotePath(it.filepath, API_URL, it.filename),
-        {isText: true}
-    )))
-    const titleImPromise = new ArticleImage(
-        titleImId, await Image.fromRemotePath(aa.filepath, API_URL, aa.filename),
-        { isTitle: true }
+    const imagePromises = (aa.files??[]).map(async it => new ArticleImage(
+        it.index, await Image.fromRemotePath(it.filepath, files.API_URL, it.filename),
+        {isText: true})
     )
+
+    const titleImPromise = (async() => new ArticleImage(
+        titleImId, await Image.fromRemotePath(aa.filepath, files.API_URL, files.fileNameFromRemotePath(aa.filepath)),
+        { isTitle: true, isNew: true }
+    ))()
 
     /*let images = (aa.files??[]).map(it=>new ArticleImage(
         it.index, Image.fromRemotePath(it.filepath, API_URL, it.filename),
@@ -395,7 +402,10 @@ async function articleApiToArticle(articleApi: ArticleApi): Promise<Article> {
         titleImId, Image.fromRemotePath(aa.filepath, API_URL, it.filename),
         { isTitle: true }
     ))*/
-    const images = [...await imagePromises, await titleImPromise]
+    const images = [
+        ...await awaitPromisesArray(imagePromises),
+        await titleImPromise
+    ]
 
     const createdAt = DateTime.fromDate(new Date(aa.created_at!)).to_yyyy_MM_dd_HH_mm()
     const updatedAt = DateTime.fromDate(new Date(aa.updated_at!)).to_yyyy_MM_dd_HH_mm()

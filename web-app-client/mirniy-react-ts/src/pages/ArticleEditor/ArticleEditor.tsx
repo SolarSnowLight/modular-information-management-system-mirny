@@ -18,6 +18,7 @@ import ListImage from './sub-components/ListImage';
 import {articleUtils} from "src/models/articleUtils";
 import {Article, ArticleImage, articleService, Image} from "src/api-service/articleService";
 import {useNavigate, useParams} from "react-router-dom";
+import {nonEmpty} from "@rrainpath/ts-utils";
 
 
 
@@ -91,7 +92,7 @@ const ArticleEditor = () => {
         if (isDraggingFiles) {
             const addFile = async (file: File) => {
                 if (imageExtensions.test(file.name)){
-                    const newIm = await Image.fromFile(undefined, file)
+                    const newIm = await Image.fromFile(file)
                     const newAIm = new ArticleImage(idGen.getId(), newIm, { isNew: true })
                     setImages(images=>[...images, newAIm])
                 }
@@ -189,10 +190,12 @@ const ArticleEditor = () => {
                 console.log(error)
                 return
             }
-            if (data!.result==='saved')
+            if (data!.result==='saved'){
                 nav('/articles/user')
-            else if (data!.result==='updated')
+            }
+            else if (data!.result==='updated'){
                 nav(`/article/${a.id}`)
+            }
         }
     }
     const prepareArticleForSave = (): Article|undefined => {
@@ -203,7 +206,7 @@ const ArticleEditor = () => {
         const imgs = images
             .map(it=>{
                 const newAIm = it.clone()
-                const isTitleNew = titleImId ? newAIm.localId===titleImId : false
+                const isTitleNew = nonEmpty(titleImId) && newAIm.localId===titleImId
                 const isTextNew = textImIds.includes(newAIm.localId)
                 newAIm.updateProps({
                     isTitleNew: isTitleNew,

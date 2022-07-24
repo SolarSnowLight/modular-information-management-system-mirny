@@ -1,4 +1,5 @@
 import {stringify} from "querystring";
+import {nonEmpty} from "@rrainpath/ts-utils";
 
 
 export const wait = async <T>(delay:number, value?:T) => new Promise<T>(
@@ -56,6 +57,14 @@ https://stackoverflow.com/questions/12168909/blob-from-dataurl
  */
 
 export const uriToBlob = async (dataUri: string): Promise<Blob> =>
-    await (await fetch(dataUri)).blob()
+    await (await fetch(dataUri, { mode: 'no-cors' })).blob()
 
 
+// get only resolved promises result when all promises are settled
+export const awaitPromisesArray = async <V>(promises: Promise<V>[] = []) =>
+    (await Promise.allSettled(promises))
+        .map(it=>{
+            if (it.status==='fulfilled') return it.value
+            return undefined
+        })
+        .filter(nonEmpty)
