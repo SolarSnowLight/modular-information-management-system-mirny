@@ -16,14 +16,9 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false, /* тут было true */
     "noEmit": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@mui/*":[
-        "./node_modules/@mui/*"
-      ]
-    }
+    "jsx": "react-jsx"
   },
   "include": [
     "src"
