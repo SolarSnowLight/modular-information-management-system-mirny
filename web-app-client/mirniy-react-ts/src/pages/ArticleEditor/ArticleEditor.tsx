@@ -19,6 +19,7 @@ import {articleUtils} from "src/models/articleUtils";
 import {Article, ArticleImage, articleService, Image} from "src/api-service/articleService";
 import {useNavigate, useParams} from "react-router-dom";
 import {nonEmpty} from "@rrainpath/ts-utils";
+import TitleImage2 from "./sub-components/TitleImage2";
 
 
 
@@ -45,8 +46,13 @@ const ArticleEditor = () => {
             setTitle(a.title ?? '')
             setRawText(articleUtils.unwrapP(a.text??''))
             setTags(joinTags(a.tags))
-            setTitleImage(a.titleImage)
-            setImages(a.images)
+            setImages(a.images.map(it=>{
+                if (it.props.isTitle){
+                    it = it.clone()
+                    it.props.isTitleNew = true
+                }
+                return it
+            }))
             setIdGen(new IdGenerator(a.images.map(it=>it.localId)))
         }
     })()},[articleId])
@@ -84,23 +90,39 @@ const ArticleEditor = () => {
     const titleImageFrameRef = useRef<HTMLDivElement>(null)
 
 
-    const [titleImage, setTitleImage] = useState(undefined as ArticleImage|undefined)
     const [images, setImages] = useState([] as ArticleImage[])
     //const [word, setWord] = useState(undefined as undefined|File)
 
+    const getTitleImage = () => images.find(it=>it.props.isTitleNew)
+    const setTitleImage = (articleImage: ArticleImage) => {
+        //console.log('setTitleImage', articleImage)
+        setImages(images=>images.map(it=>{
+            if (it.props.isTitleNew){
+                it = it.clone()
+                it.props.isTitleNew = false
+            }
+            if (it===articleImage){
+                it = it.clone()
+                it.props.isTitleNew = true
+            }
+            return it
+        }))
+    }
+
+    const addFile = async (file: File): Promise<ArticleImage|undefined> => {
+        if (imageExtensions.test(file.name)){
+            const newIm = await Image.fromFile(file)
+            const newAIm = new ArticleImage(idGen.getId(), newIm, { isNew: true })
+            setImages(images=>[...images, newAIm])
+            return newAIm
+        }
+        else if (wordExtensions.test(file.name)){
+            //setWord(file)
+        }
+    }
+
     const onFilesDrop = (ev: React.DragEvent<HTMLDivElement>) => {
         if (isDraggingFiles) {
-            const addFile = async (file: File) => {
-                if (imageExtensions.test(file.name)){
-                    const newIm = await Image.fromFile(file)
-                    const newAIm = new ArticleImage(idGen.getId(), newIm, { isNew: true })
-                    setImages(images=>[...images, newAIm])
-                }
-                else if (wordExtensions.test(file.name)){
-                    //setWord(file)
-                }
-            }
-
             for (const item of ev.dataTransfer.items){
                 const fsItem = item.webkitGetAsEntry()
                 walkFileTree(fsItem, addFile)
@@ -109,13 +131,19 @@ const ArticleEditor = () => {
     }
 
     const onRemove = (articleImage: ArticleImage) => {
-        setImages(images.filter(it=>it!==articleImage))
+        setImages(images.map(it=>{
+            if (it===articleImage){
+                it = it.clone()
+                it.image = undefined
+                it.updateProps({ isTitleNew: false, isTextNew: false, isDeleted: true })
+            }
+            return it
+        }))
     }
 
-
-    const onImagePaste = (articleImage: ArticleImage) => {
+    const onTextImagePaste = (articleImage: ArticleImage) => {
         const area = textareaRef.current
-        if (area && lastFocused === area){
+        if (area){
             const s = area.selectionStart
             const oldLen = rawText.length
             const newText = rawText.substring(0,s)+`${"\n"}<article-image localId="${articleImage.localId}"/>${"\n"}`+rawText.substring(s)
@@ -123,12 +151,21 @@ const ArticleEditor = () => {
             const newSel = s+(newText.length-oldLen)
             setNewSelection({s: newSel, e: newSel})
             area.focus()
+        }
+    }
+    const onTitleImagePaste = (articleImage: ArticleImage) => {
+        setTitleImage(articleImage)
+    }
+
+    const onImagePaste = (articleImage: ArticleImage) => {
+        const area = textareaRef.current
+        if (area && lastFocused === area){
+            onTextImagePaste(articleImage)
             return
         }
         const titleImageFrame = titleImageFrameRef.current
         if (titleImageFrame && lastFocused === titleImageFrame){
-            setTitleImage(articleImage)
-            titleImageFrame.focus()
+            onTitleImagePaste(articleImage)
             return
         }
     }
@@ -143,18 +180,17 @@ const ArticleEditor = () => {
     const prepareArticleForPreview = (): Article|undefined => {
         const text = articleUtils.wrapWithP(rawText)
         const textImIds = articleUtils.getUsedImageLocalIds(text)
-        const titleImId = titleImage?.localId
 
         const imgs = images
             .map(it=>{
                 const newAIm = it.clone()
-                const isTitleNew = titleImId ? newAIm.localId===titleImId : false
-                const isTextNew = textImIds.includes(newAIm.localId)
+                const isTitle = it.props.isTitleNew
+                const isText = textImIds.includes(newAIm.localId)
                 newAIm.updateProps({
-                    isTitle: isTitleNew,
-                    isText: isTextNew,
-                    isTitleNew: isTitleNew,
-                    isTextNew: isTextNew
+                    isTitle: isTitle,
+                    isText: isText,
+                    isTitleNew: isTitle,
+                    isTextNew: isText
                 })
                 return newAIm
             })
@@ -201,12 +237,11 @@ const ArticleEditor = () => {
     const prepareArticleForSave = (): Article|undefined => {
         const text = articleUtils.wrapWithP(rawText)
         const textImIds = articleUtils.getUsedImageLocalIds(text)
-        const titleImId = titleImage?.localId
 
         const imgs = images
             .map(it=>{
                 const newAIm = it.clone()
-                const isTitleNew = nonEmpty(titleImId) && newAIm.localId===titleImId
+                const isTitleNew = it.props.isTitleNew
                 const isTextNew = textImIds.includes(newAIm.localId)
                 newAIm.updateProps({
                     isTitleNew: isTitleNew,
@@ -240,7 +275,7 @@ const ArticleEditor = () => {
             <ArticlePreviewCard>
                 <ArticleView article={builtArticle}/>
                 <Space h={35}/>
-                <Button1 w={138} h={42} style={{ font: '600 18px "TT Commons"' }} onClick={onSave}>Сохранить</Button1>
+                <ActionButton onClick={onSave}>Сохранить</ActionButton>
             </ArticlePreviewCard>
         </Popup> }
 
@@ -248,8 +283,11 @@ const ArticleEditor = () => {
 
             { images.length > 0 && <ImagesList className={common.column}>
                 <TitleForImages>Изображения</TitleForImages>
-                { images.map(it=><ListImage articleImage={it} key={it.localId}
-                                            onRemove={onRemove} onPaste={onImagePaste} />) }
+                { images.filter(it=>!it.props.isDeleted).map(it=>
+                    <ListImage articleImage={it} key={it.localId}
+                               onRemove={onRemove} onPaste={onImagePaste}
+                               onTitleImagePaste={onTitleImagePaste} onTextImagePaste={onTextImagePaste}
+                />) }
             </ImagesList> }
 
             { isDraggingFiles && <DragOverlay className={common.abs+' '+common.row}/>}
@@ -268,10 +306,16 @@ const ArticleEditor = () => {
                     textFont='TT Commons' textColor='black'
                     borderColor='#8B8B8B'
             />
+{/*
 
             <Space h={35}/>
 
-            <TitleImage ref={titleImageFrameRef} tabIndex={0} articleImage={titleImage} />
+            <TitleImage ref={titleImageFrameRef} tabIndex={0} articleImage={getTitleImage()} />
+*/}
+
+            <Space h={35}/>
+
+            <TitleImage2 articleImage={getTitleImage()} setTitleImage={setTitleImage} onFile={addFile} />
 
             <Space h={35}/>
 
@@ -293,7 +337,7 @@ const ArticleEditor = () => {
 
             <Space h={35}/>
 
-            <Button1 w={138} h={42} style={{ font: '600 18px "TT Commons"' }} onClick={onPreview}>Предпросмотр</Button1>
+            <ActionButton onClick={onPreview}>Предпросмотр</ActionButton>
 
         </ArticleFrame>
 
@@ -357,6 +401,11 @@ const TextArea = React.memo(styled.textarea`
   color: black;
   resize: vertical;
 `)
+
+const ActionButton = styled(Button1)`
+  width: 138px; height: 42px;
+  font: 600 18px "TT Commons";
+`
 
 
 

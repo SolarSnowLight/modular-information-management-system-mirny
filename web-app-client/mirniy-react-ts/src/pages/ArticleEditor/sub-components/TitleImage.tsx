@@ -35,7 +35,7 @@ const Border = React.memo(styled.div`
   }
 `)
 const ImageWrap = React.memo(({ articleImage }: { articleImage?: ArticleImage|undefined }) => {
-    return <Image imageUrl={articleImage?.image.getUrl()}/>
+    return <Image imageUrl={articleImage?.image?.getUrl()}/>
 })
 const Image = React.memo(styled.div<{ imageUrl?: string }>`
   ${absoluteOff('14px 21px')};

@@ -10,6 +10,7 @@ import Space from "../../components/Space";
 import Button1 from "../../components/Button1";
 import SpinnerIc from "../../components/icons/SpinnerIc";
 import {Link, useNavigate, useSearchParams} from "react-router-dom";
+import styled from "styled-components";
 
 
 // todo crop image, image shadow
@@ -99,7 +100,7 @@ function Login(){
 
             <div className={css.inputBox}>
                 <div className={css.btnBox}>
-                    <Button1 h={54} onClick={makeLogin}>{loginLoading?'':'Далее'}</Button1>
+                    <ActionButton onClick={makeLogin}>{loginLoading?'':'Далее'}</ActionButton>
                     { loginLoading && <div className={css.spinnerBox}>
                         <SpinnerIc circleColor='#ffffff33' indicatorColor='white' size={24}/>
                     </div> }
@@ -117,4 +118,9 @@ function Login(){
     </div>
 }
 export default React.memo(Login)
+
+const ActionButton = styled(Button1)`
+  width: 100%; height: 54px;
+  font: 600 18px "TT Commons";
+`
 

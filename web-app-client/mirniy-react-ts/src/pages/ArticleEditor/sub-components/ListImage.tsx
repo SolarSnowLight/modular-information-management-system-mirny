@@ -3,14 +3,20 @@ import Button1 from "src/components/Button1";
 import styled from "styled-components";
 import {ArticleImage} from "src/api-service/articleService";
 import React from "react";
+import {styledCommon} from "src/common-styles/commonStyled";
 
 
 
-
+type ListImageProps = {
+    articleImage: ArticleImage
+    onRemove: (articleImage: ArticleImage)=>void
+    onPaste: (articleImage: ArticleImage)=>void
+    onTitleImagePaste: (articleImage: ArticleImage)=>void
+    onTextImagePaste: (articleImage: ArticleImage)=>void
+}
 
 const ListImage = React.memo((
-    { articleImage, onRemove, onPaste }
-        : { articleImage: ArticleImage, onRemove: (imageSource: ArticleImage)=>void, onPaste: (imageSource: ArticleImage)=>void }
+    { articleImage, onRemove, onPaste, onTitleImagePaste, onTextImagePaste } : ListImageProps
 ) => {
 
     /*const onDragStart = (ev: React.DragEvent<HTMLDivElement>) => {
@@ -20,6 +26,8 @@ const ListImage = React.memo((
         ev.dataTransfer.effectAllowed = 'move'
     }*/
 
+    const enableTitle = articleImage.props.isNew || articleImage.props.isTitle
+    const enableText = articleImage.props.isNew || articleImage.props.hasServerLocalId
 
     return <ImageItemFrame
         /*draggable onDragStart={onDragStart}*/>
@@ -27,15 +35,11 @@ const ListImage = React.memo((
         <ImageItemText>id: {articleImage.localId}</ImageItemText>
         <CrossContainer onClick={()=>onRemove(articleImage)}><CrossIc color='black'/></CrossContainer>
 
-        <Image imageUrl={articleImage.image.getUrl()}/>
+        <Image imageUrl={articleImage.image!.getUrl()}/>
 
         <ButtonBox>
-            <Button1 onClick={()=>onPaste(articleImage)}
-                     style={{
-                         background: '#1F8DCD',
-                         font: "500 16px 'TT Commons'", color: '#FCFCFC',
-                     }}
-            >Добавить</Button1>
+            <AddButton onClick={()=>onTitleImagePaste(articleImage)} disabled={!enableTitle}>Заголовок</AddButton>
+            <AddButton onClick={()=>onTextImagePaste(articleImage)} disabled={!enableText}>Текст</AddButton>
         </ButtonBox>
 
     </ImageItemFrame>
@@ -69,8 +73,21 @@ const Image = React.memo(styled.div<{ imageUrl?: string }>`
   grid-area: 2 / 1 / span 1 / span 2;
 `)
 const ButtonBox = React.memo(styled.div`
-  width: 91px; height: 32px;
-  margin: 0 10px 10px 0;
+  ${styledCommon.row};
+  gap: 7px;
+  margin-right: 7px; margin-bottom: 3px;
   align-self: end; justify-self: end;
   grid-area: 2 / 1 / span 1 / span 2;
 `)
+const AddButton = styled(Button1)`
+  width: 91px; height: 32px;
+  background: #1F8DCD;
+  font: 500 16px 'TT Commons';
+  color: #FCFCFC;
+  &[disabled] {
+    border-color: #8B8B8B;
+    background: white;
+    color: #8B8B8B;
+    cursor: auto;
+  }
+`

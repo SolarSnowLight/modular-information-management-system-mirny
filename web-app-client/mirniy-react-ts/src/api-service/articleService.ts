@@ -12,10 +12,8 @@ import {
 import {awaitPromisesArray, joinTags, readAsUrl, splitTags, trimSlash, uriToBlob} from "src/utils/utils";
 import {DateTime} from "src/utils/DateTime";
 import {IdGenerator} from "src/models/IdGenerator";
-import {API_URL} from "src/api/ax";
-import {nonEmpty, Optional} from "@rrainpath/ts-utils";
-import {blob} from "stream/consumers";
-import {files} from "../api/files";
+import {Optional} from "@rrainpath/ts-utils";
+import {files} from "src/api/files";
 
 
 
@@ -24,7 +22,6 @@ export class Article {
         public id?: string,
 
         public title?: string,
-        //public titleImageLocalId?: number,
         public theme?: string,
         public shortDescription?: string,
         public createdAt?: string, // yyyy-MM-dd'T'HH:mm // 2022-01-01T01:01
@@ -37,7 +34,6 @@ export class Article {
         public text?: string, // текст с общими тегами (<p> <i> <b> <mark> <article-image>)
 
         public images: ArticleImage[] = [],
-        //public textImagesLocalIds: number[] = [],
 
         public viewsCnt?: number,
         public isFavorite?: boolean,
@@ -49,18 +45,20 @@ export class Article {
         return this.images.filter(it=>it.props.isText)
     }
 }
-type ArticleImageProps = {
-    isTitle: boolean, // пришло по апи и используется в заголовке
-    isText: boolean, // пришло по апи и используется в тексте
-    isTitleNew: boolean, // используется в заголовке после редактирования (даже если не изменилось)
-    isTextNew: boolean, // используется в тексте после редактирования (даже если не изменилось)
-    isNew: boolean // новый файл, у которого на сервере не было localId
-}
+type ArticleImageProps = typeof ArticleImage.prototype.props
 export class ArticleImage {
-    props: ArticleImageProps = { isTitle: false, isText: false, isTitleNew: false, isTextNew: false, isNew: false }
+    props = {
+        isTitle: false, // пришло по апи и используется в заголовке
+        isText: false, // пришло по апи и используется в тексте
+        isTitleNew: false, // используется в заголовке после редактирования (даже если не изменилось)
+        isTextNew: false, // используется в тексте после редактирования (даже если не изменилось)
+        isNew: false, // новый файл от пользователя
+        hasServerLocalId: false, // имеет localId на сервере (только для изображений текста, заголовочное его не имеет в принципе)
+        isDeleted: false, // изображение удалено пользователем
+    }
     constructor(
         public localId: number,
-        public image: Image,
+        public image: Image|undefined,
         props?: Optional<ArticleImageProps>,
     ) {
         if (props) this.updateProps(props)
@@ -257,25 +255,24 @@ export type ArticleSaveResponse = { result: 'updated' | 'saved' }
 const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveResponse>> => {
     const a = article
     //console.log('before save:',a)
-    const titleIm = a.images.find(it=>it.props.isTitleNew)
+    const titleIm = a.images.find(it=>it.props.isTitleNew && !it.props.isDeleted)
     if (!titleIm) return { error: errors.of('required', 'Title image is required') }
     if (!a.title) return { error: errors.of('required', 'Title is required') }
     if (!a.text) return { error: errors.of('required', 'Title image is required') }
 
-    // todo instead of file make fetch blob
-
     if (!a.id){ // create article
         const aApi: ArticleCreationApi = {
             title: a.title,
-            title_file: a.images.find(it=>it.props.isTitleNew && !it.props.isTitle)?.image.blob!,
+            title_file: a.images
+                .find(it=>it.props.isTitleNew && !it.props.isTitle && it.props.isNew && !it.props.isDeleted)?.image?.blob!,
             text: a.text,
             tags: joinTags(article.tags),
             files: a.images
                 // картинка используется в тексте после редактирования
                 // && картинка не была использована в тексте до редактирования
                 // && картинка - новый файл
-                .filter(it=>it.props.isTextNew && !it.props.isText && it.props.isNew)
-                .map(it=>({ index: it.localId, file: it.image.blob! }))
+                .filter(it=>it.props.isTextNew && !it.props.isText && it.props.isNew && !it.props.isDeleted)
+                .map(it=>({ index: it.localId, file: it.image?.blob! }))
         }
 
         return articleApi.createArticle(aApi).then(
@@ -299,27 +296,30 @@ const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveRes
             }
         )
     } else { // update article
+        //console.log('title image:',a.images.find(it=>it.props.isTitleNew && !it.props.isTitle))
+        //console.log('test image',await (await fetch("http://localhost:5000/public/af9e368e-1eac-424c-827d-bf360eb124a4", { mode: 'no-cors' })).blob())
         const aUApi: ArticleUpdateApi = {
             uuid: a.id,
             title: a.title,
-            title_file: a.images.find(it=>it.props.isTitleNew && !it.props.isTitle)?.image.blob,
+            title_file: a.images
+                .find(it=>it.props.isTitleNew && !it.props.isTitle && it.props.isNew && !it.props.isDeleted)?.image?.blob,
             text: a.text,
             tags: joinTags(article.tags),
             files: a.images
                 // картинка используется в тексте после редактирования
                 // && картинка не была использована в тексте до редактирования
                 // && картинка - новый файл
-                .filter(it=>it.props.isTextNew && !it.props.isText && it.props.isNew)
-                .map(it=>({ index: it.localId, file: it.image.blob! })),
+                .filter(it=>it.props.isTextNew && !it.props.isText && it.props.isNew && !it.props.isDeleted)
+                .map(it=>({ index: it.localId, file: it.image?.blob! })),
             files_deleted: a.images
                 // картинка не используется в тексте после редактирования
                 // && картинка была использована в тексте до редактирования
                 // && картинка - старый файл
-                .filter(it=>!it.props.isTextNew /*&& it.props.isText*/ && !it.props.isNew)
+                .filter(it=>!it.props.isNew && it.props.hasServerLocalId && (!it.props.isTextNew || it.props.isDeleted))
                 .map(it=>it.localId)
         }
 
-        console.log('before update', aUApi)
+        //console.log('before update', aUApi)
 
         return articleApi.updateArticle(aUApi).then(
             response => {
@@ -378,7 +378,6 @@ const deleteArticle = async (id: string): Promise<ServiceData<ArticleDeletionRes
 async function articleApiToArticle(articleApi: ArticleApi): Promise<Article> {
     const aa = articleApi
 
-    // todo maybe there is need to check if images is really in text
     const textImagesLocalIds = (aa.files??[]).map(it=>it.index)
     const idGen = new IdGenerator(textImagesLocalIds)
     const titleImId = idGen.getId()
@@ -386,12 +385,12 @@ async function articleApiToArticle(articleApi: ArticleApi): Promise<Article> {
 
     const imagePromises = (aa.files??[]).map(async it => new ArticleImage(
         it.index, await Image.fromRemotePath(it.filepath, files.API_URL, it.filename),
-        {isText: true})
+        { isText: true, hasServerLocalId: true })
     )
 
     const titleImPromise = (async() => new ArticleImage(
         titleImId, await Image.fromRemotePath(aa.filepath, files.API_URL, files.fileNameFromRemotePath(aa.filepath)),
-        { isTitle: true, isNew: true }
+        { isTitle: true }
     ))()
 
     /*let images = (aa.files??[]).map(it=>new ArticleImage(
@@ -413,7 +412,6 @@ async function articleApiToArticle(articleApi: ArticleApi): Promise<Article> {
     return  new Article(
         aa.uuid,
         aa.title,
-        //titleImId,
         undefined,
         undefined,
         createdAt,
@@ -423,7 +421,6 @@ async function articleApiToArticle(articleApi: ArticleApi): Promise<Article> {
         undefined,
         aa.text,
         images,
-        //textImagesLocalIds,
         undefined,
         undefined,
     )
@@ -434,7 +431,6 @@ async function articleApiToArticle(articleApi: ArticleApi): Promise<Article> {
 export const articleService = {
     getArticleById,
     getUserArticles,
-    //createArticle,
     saveArticle,
     deleteArticle,
 }

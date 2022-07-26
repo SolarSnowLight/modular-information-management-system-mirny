@@ -47,7 +47,7 @@ const ArticleCard = (
                 }
             </div>
         </Content>
-        <Photo imageUrl={a.titleImage?.image.getUrl()} />
+        <Photo imageUrl={a.titleImage?.image?.getUrl()} />
     </Card>
 }
 export default React.memo(ArticleCard)

@@ -100,7 +100,7 @@ const updateArticle = async (article: ArticleUpdateApi): ResponseData<ArticleUpd
     fd.append('text', article.text)
     fd.append('tags', article.tags)
     article.files?.forEach(it=>fd.append('files',it.file,it.index+''))
-    if (article.files_deleted) fd.append('files_deleted', JSON.stringify(article.files_deleted))
+    article.files_deleted?.forEach(it=>fd.append('files_deleted',it+''))
 
     return ax.post('user/article/update', fd, {
         headers: { Authorization: `Bearer ${getAccessJwt()}`}

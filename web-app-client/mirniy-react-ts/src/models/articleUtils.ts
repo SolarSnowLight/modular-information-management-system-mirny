@@ -63,7 +63,7 @@ function inlineImages(article: Article){
         if ('article-image'===ch.nodeName){
             const el = ch as Element
             const localId = el.attributes["localId"].value
-            const srcUrl = article.images.find(it=>it.localId==localId)?.image.getUrl()
+            const srcUrl = article.images.find(it=>it.localId==localId)?.image?.getUrl()
             const img = parser.parseFromString(
                 `<img src="${srcUrl}" style="display: block; width: 100%; height: 300px; object-fit: cover;"/>`,
                 'text/xml'

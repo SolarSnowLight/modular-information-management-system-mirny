@@ -31,7 +31,7 @@ const ArticleView = ({ article }: { article: Article }) => {
     if (!a) return <></>
 
     return <Frame className={common.column}>
-            <TitleImage imageUrl={a.titleImage?.image.getUrl()}/>
+            <TitleImage imageUrl={a.titleImage?.image?.getUrl()}/>
             <Space h={29}/>
             <div className={common.row}>
                 { date && <BottomText>{date.day}.{date.month}.{date.year} {date.hour}:{date.minute}</BottomText> }

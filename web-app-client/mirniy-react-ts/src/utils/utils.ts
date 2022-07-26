@@ -1,4 +1,3 @@
-import {stringify} from "querystring";
 import {nonEmpty} from "@rrainpath/ts-utils";
 
 
@@ -52,12 +51,89 @@ export function walkFileTree(fsItem: FileSystemEntry|null, onFile: (file:File)=>
 /*
 DataURL example:
 var url = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
+var dataURIPattern = /^data:((.*?)(;charset=.*?)?)(;base64)?,/
 
 https://stackoverflow.com/questions/12168909/blob-from-dataurl
  */
 
-export const uriToBlob = async (dataUri: string): Promise<Blob> =>
-    await (await fetch(dataUri, { mode: 'no-cors' })).blob()
+// CORS error when remote url
+export const dataUriToBlob = async (dataUri: string): Promise<Blob> =>
+    await (await fetch(dataUri , { mode: 'no-cors' })).blob()
+
+export const uriToBlob = dataUriToBlob
+
+// CORS error when remote url
+/*
+export const uriToBlob = async (uri: string): Promise<Blob> => new Promise((res,rej)=>{
+    const xhr = new XMLHttpRequest()
+    xhr.open("GET", uri)
+    xhr.responseType = 'blob'
+    xhr.onerror = function (){console.log("Network error.")}
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            console.log('ok',xhr.response)
+            res(xhr.response as Blob)
+        }
+        else {
+            console.log('error',xhr.statusText)
+        }
+    }
+    xhr.send()
+})*/
+
+/*
+export const uriToBlob = async (uri: string): Promise<Blob> => {
+
+    try {
+        return await (await fetch(uri)).blob()
+    } catch (e) {
+        return new Promise((res, rej) => {
+            const img = new Image()
+            const c = document.createElement("canvas")
+            const ctx = c.getContext('2d')
+            img.onload = function () {
+                debugger
+                // @ts-ignore
+                c.width = this.naturalWidth
+                // @ts-ignore
+                c.height = this.naturalHeight
+                debugger
+                // @ts-ignore
+                ctx.drawImage(this, 0, 0)
+                debugger
+                c.toBlob(function (blob) {
+                    debugger
+                    res(blob!)
+                }, 'image/jpeg', 0.75)
+            }
+            //img.crossOrigin = '*'
+            //img.crossOrigin = ''
+            img.crossOrigin = 'Anonymous'
+            img.src = uri
+        })
+    }
+    /!*return await (await fetch(uri)).blob()
+        .catch(()=>new Promise((res,rej)=>{
+            console.log('catching error')
+            const img = new Image()
+            const c = new HTMLCanvasElement()
+            const ctx = c.getContext('2d')
+            img.onload = function (){
+                // @ts-ignore
+                c.width = this.naturalWidth
+                // @ts-ignore
+                c.height = this.naturalHeight
+                // @ts-ignore
+                ctx.drawImage(this,0,0)
+                c.toBlob(function(blob){
+                    res(blob!)
+                }, 'image/jpeg', 0.75)
+            }
+            img.crossOrigin = ''
+            img.src = uri
+        }))*!/
+}*/
+
 
 
 // get only resolved promises result when all promises are settled
