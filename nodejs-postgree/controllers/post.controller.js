@@ -3,10 +3,10 @@ const db = require('../db') // соединение с БД
 class PostController {
 
     async createPost(req, res) {
-        const {title, content, userID} = req.body
+        const {title, content, user_id} = req.body
         const newPost = await db.query(
-            `INSERT INTO post (title, content, userID) values ($1, $2, $3) RETURNING *`,
-            [title, content, userID]
+            `INSERT INTO post (title, content, user_id) values ($1, $2, $3) RETURNING *`,
+            [title, content, user_id]
         )
         res.json(newPost.rows[0])
     }
@@ -17,7 +17,7 @@ class PostController {
             `select * from post where user_id = $1`,
             [id]
         )
-        res.json(newPost.rows[0])
+        res.json(posts.rows)
     }
 }
 
