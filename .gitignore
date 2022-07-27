@@ -1,9 +1,6 @@
-main-server
-test-back
-test-google-oauth
-web-app-client
+nogejs-postgree
+backend-begin
 
-./main-server
-./test-back
-./test-google-oauth
-./web-app-client
+
+./nogejs-postgree
+./backend-begin
