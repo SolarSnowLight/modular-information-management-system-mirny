@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import CrossIc from "./icons/CrossIc";
+import React from "react";
 
 
 const Popup = ({ children, onClose }: { children: React.ReactNode, onClose: ()=>void }) => {
@@ -14,7 +15,7 @@ const Popup = ({ children, onClose }: { children: React.ReactNode, onClose: ()=>
         </PreviewContent>
     </PopupFrame>
 }
-export default Popup
+export default React.memo(Popup)
 
 
 const PopupFrame = styled.div`

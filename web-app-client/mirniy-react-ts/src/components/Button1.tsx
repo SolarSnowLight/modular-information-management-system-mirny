@@ -3,6 +3,7 @@
 //import React from "react";
 import styled from "styled-components";
 import {allDefault} from "src/common-styles/commonStyled";
+import React from "react";
 
 /*
 type Button1Props = React.HTMLAttributes<HTMLButtonElement> & {
@@ -40,4 +41,4 @@ const Button1 = styled.button`
   cursor: pointer;
 `
 
-export default Button1
+export default React.memo(Button1)

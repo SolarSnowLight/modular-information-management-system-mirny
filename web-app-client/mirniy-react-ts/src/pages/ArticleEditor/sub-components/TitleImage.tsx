@@ -17,7 +17,7 @@ const TitleImage = React.memo(React.forwardRef<HTMLDivElement, Props>(
             <ImageWrap articleImage={articleImage}/>
         </Frame>
 }))
-export default TitleImage
+export default React.memo(TitleImage)
 
 const Frame = styled.div`
   position: relative;

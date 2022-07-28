@@ -10,7 +10,7 @@ function Header({ children }: { children: React.ReactNode}){
         </HeaderContent>
     </HeaderFrame>
 }
-export default Header
+export default React.memo(Header)
 
 
 const height = '82px'

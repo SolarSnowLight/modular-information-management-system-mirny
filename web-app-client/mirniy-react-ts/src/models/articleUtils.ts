@@ -101,9 +101,33 @@ function getUsedImageLocalIds(articleText: string){
 }
 
 
+const deleteImageTagsById = (articleText: string, localId: number) => {
+    const parser = new DOMParser()
+    let wrappedText = `<root>${articleText}</root>` // need to wrap in some root tag
+    let xmlDoc = parser.parseFromString(wrappedText, 'text/xml')
+
+    const root = xmlDoc.childNodes[0]
+    for (let i = 0; i<root.childNodes.length; i++){
+        const ch = root.childNodes[i]
+        if ('article-image'===ch.nodeName){
+            const el = ch as Element
+            const textLocalId = el.attributes["localId"].value
+            if (textLocalId==localId) root.removeChild(ch)
+        }
+    }
+
+    const xmlSerializer = new XMLSerializer()
+    const imagesInlinedText = xmlSerializer.serializeToString(root).slice(6,-7)
+    return imagesInlinedText
+}
+
+
+
+
 export const articleUtils = {
     wrapWithP,
     unwrapP,
     inlineImages,
     getUsedImageLocalIds,
+    deleteImageTagsById,
 }

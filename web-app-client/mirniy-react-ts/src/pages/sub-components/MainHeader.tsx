@@ -29,11 +29,11 @@ function MainHeader(){
 export default React.memo(MainHeader)
 
 
-const AccessJwtView = styled.div`
+const AccessJwtView = React.memo(styled.div`
   font-size: 12px;
   flex-grow: 1;
   overflow-wrap: anywhere;
   overflow-y: auto;
   color: #FCFCFC; // White todo extract
   //white-space: break-spaces;
-`
+`)

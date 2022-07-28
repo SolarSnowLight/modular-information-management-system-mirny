@@ -11,14 +11,12 @@ import {lastFocused} from "src/utils/documentUtils";
 import {DateTime} from "src/utils/DateTime";
 import Popup from "src/components/Popup";
 import ArticleView from "src/pages/ArticleView/ArticleView";
-import TitleImage from "./sub-components/TitleImage";
 import {joinTags, splitTags, walkFileTree} from "src/utils/utils";
 import {IdGenerator} from "src/models/IdGenerator";
 import ListImage from './sub-components/ListImage';
 import {articleUtils} from "src/models/articleUtils";
 import {Article, ArticleImage, articleService, Image} from "src/api-service/articleService";
 import {useNavigate, useParams} from "react-router-dom";
-import {nonEmpty} from "@rrainpath/ts-utils";
 import TitleImage2 from "./sub-components/TitleImage2";
 
 
@@ -136,6 +134,7 @@ const ArticleEditor = () => {
                 it = it.clone()
                 it.image = undefined
                 it.updateProps({ isTitleNew: false, isTextNew: false, isDeleted: true })
+                setRawText(articleUtils.deleteImageTagsById(rawText, it.localId))
             }
             return it
         }))
@@ -402,10 +401,10 @@ const TextArea = React.memo(styled.textarea`
   resize: vertical;
 `)
 
-const ActionButton = styled(Button1)`
+const ActionButton = React.memo(styled(Button1)`
   width: 138px; height: 42px;
   font: 600 18px "TT Commons";
-`
+`)
 
 
 

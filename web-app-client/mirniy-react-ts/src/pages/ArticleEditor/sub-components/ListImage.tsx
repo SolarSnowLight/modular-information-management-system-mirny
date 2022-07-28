@@ -45,7 +45,7 @@ const ListImage = React.memo((
     </ImageItemFrame>
 
 })
-export default ListImage
+export default React.memo(ListImage)
 
 const ImageItemFrame = React.memo(styled.div`
   display: grid;

@@ -3,6 +3,7 @@ import css from './Input1.module.scss'
 import EyeIc from "./icons/EyeIc";
 import {FormEventHandler, useState} from "react";
 import EyeCrossedOutIc from "./icons/EyeCrossedOutIc";
+import * as React from "react";
 
 
 // todo refactor it
@@ -75,4 +76,4 @@ const Input1 = ({
 
     </div>
 }
-export default Input1
+export default React.memo(Input1)

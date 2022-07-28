@@ -119,8 +119,8 @@ function Login(){
 }
 export default React.memo(Login)
 
-const ActionButton = styled(Button1)`
+const ActionButton = React.memo(styled(Button1)`
   width: 100%; height: 54px;
   font: 600 18px "TT Commons";
-`
+`)
 

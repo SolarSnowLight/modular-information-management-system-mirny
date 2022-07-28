@@ -38,29 +38,29 @@ const TitleImage2 = React.memo((
         <FileInput ref={fileInputRef} type='file' accept='image/*' onInput={onFileInput}/>
     </Frame>
 })
-export default TitleImage2
+export default React.memo(TitleImage2)
 
-const Frame = styled.div`
+const Frame = React.memo(styled.div`
   width: fit-content; height: fit-content;
   position: relative;
   border-radius: 4px;
   cursor: pointer;
-`
+`)
 const Border = React.memo(styled.div`
   ${styledCommon.absolute};
   pointer-events: none;
   border: 2px dashed #1F8DCD; // todo dash offset ???
   border-radius: 4px;
 `)
-const Label = styled.div`
+const Label = React.memo(styled.div`
   padding: 10px 16px;
   font: 600 18px 'TT Commons';
   color: #1F8DCD;
   transform: translateY(-1px);
-`
-const FileInput = styled.input`
+`)
+const FileInput = React.memo(styled.input`
   display: none;
-`
+`)
 
 const ImageWrap = React.memo(({ articleImage }: { articleImage?: ArticleImage|undefined }) => {
     return <Image imageUrl={articleImage?.image!.getUrl()}/>
