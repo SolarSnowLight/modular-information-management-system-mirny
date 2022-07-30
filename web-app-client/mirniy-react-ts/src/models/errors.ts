@@ -8,8 +8,8 @@
  */
 
 export type ErrorType = {
-    code: 401 | 403 | 404 | 500
-        | 'error' | 'errors'
+    code: 401 | 403 | 404 | 500 | number
+        | 'error' | 'errors' | 'unknown error'
         | 'connection error'
         | 'incorrect' | 'required'
         | 'incorrect data'  | 'incorrect login' | 'incorrect password'

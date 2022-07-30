@@ -1,12 +1,15 @@
 import {Link, useLocation} from "react-router-dom";
 import MainHeader from "./sub-components/MainHeader";
 import React from "react";
+import {useAppSelector} from "../redux/reduxHooks";
 
 
 function Main(){
 
     const location = useLocation()
     const currLocation = location.pathname+location.search+location.hash
+
+    const { accessJwt } = useAppSelector(s=>s.user)
 
     return <div>
         <MainHeader/>
@@ -17,6 +20,9 @@ function Main(){
         <Link to={'/login?backpath='+currLocation}>
             <button>Вход</button>
         </Link>
+        { accessJwt && <Link to={'/user/profile'}>
+            <button>Профиль</button>
+        </Link>}
         <Link to={'/articles/user'}>
             <button>Статьи пользователя</button>
         </Link>

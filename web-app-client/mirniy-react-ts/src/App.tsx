@@ -9,6 +9,7 @@ import Login from "./pages/Login/Login";
 import ArticleList from "./pages/ArticleList/ArticleList";
 import ArticlePage from "./pages/Article/ArticlePage";
 import ArticleEditor from './pages/ArticleEditor/ArticleEditor';
+import Profile from "./pages/Profile/Profile";
 
 function App() {
 
@@ -89,6 +90,7 @@ function App() {
             <Routes>
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
+                <Route path='/user/profile' element={<Profile/>}/>
                 <Route path='/articles/user' element={<ArticleList/>}/>
                 <Route path='/article/:articleId' element={<ArticlePage/>}/>
                 <Route path='/article/create' element={<ArticleEditor/>}/>

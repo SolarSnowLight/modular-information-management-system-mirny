@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import {AppThunk} from "./store";
 import {userService} from "src/api-service/userService";
 import {loadingActions} from "./loadingReducer";
-import {UserRegister} from "src/api/userApi";
+import {UserRegisterApi} from "src/api/userApi";
 import {errorsActions} from "./errorsReducer";
 import {errors, ErrorType} from '../models/errors';
 
@@ -223,7 +223,7 @@ const logout = (): AppThunk<Promise<void|boolean>> =>
 const phonePattern = /^\+(\d\D*){9,15}$/
 const birthDatePattern = /^\D*(?<day>\d{1,2})\D+(?<month>\d{1,2})\D+(?<year>\d{4})\D*$/
 
-const signup = (userData: UserRegister): AppThunk<Promise<void|boolean>> =>
+const signup = (userData: UserRegisterApi): AppThunk<Promise<void|boolean>> =>
     async (dispatch, getState) => {
 
         let state = getState()

@@ -1,5 +1,5 @@
 import Axios, {AxiosError} from "axios";
-import {AuthResponse} from "./userApi";
+import {AuthResponseApi} from "./userApi";
 import {Store} from "src/redux/store";
 import {userActions, UserState} from "src/redux/userReducer";
 import {trimSlash} from "src/utils/utils";
@@ -58,7 +58,7 @@ export function setupAxios(reduxStore: Store){
                         // Обновление токена
                         originalRequest._isRetried = true;
 
-                        const secondResponse = await ax.post<AuthResponse>(refreshPath, undefined, {
+                        const secondResponse = await ax.post<AuthResponseApi>(refreshPath, undefined, {
                             //headers: { Authorization: `Bearer ${getAccessJwt()}`}
                             headers: { Authorization: originalRequest.headers?.Authorization ?? 'Bearer undefined'}
                         })
