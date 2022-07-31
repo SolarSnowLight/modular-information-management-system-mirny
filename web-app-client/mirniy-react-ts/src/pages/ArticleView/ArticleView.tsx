@@ -8,14 +8,12 @@ import './ArticleView.scss';
 import React, {useEffect, useState} from "react";
 import {dateUtils} from "src/utils/dateUtils";
 import {articleUtils} from "src/models/articleUtils";
-import { Article } from "src/api-service/articleService";
+import {Article} from "src/api-service/articleServiceUtils";
 
 
 const ArticleView = ({ article }: { article: Article }) => {
 
     const a = article
-
-    //console.log(a)
 
     const [htmlContent, setHtmlContent] = useState(undefined as string|undefined)
     useEffect(()=>{

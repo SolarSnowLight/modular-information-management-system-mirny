@@ -1,8 +1,8 @@
-import {userActions} from "../../redux/userReducer";
+import {userActions} from "src/redux/userReducer";
 import React, {useState} from "react";
-import {useAppDispatch, useAppSelector} from "../../redux/reduxHooks";
-import LoadingIc from "../../components/icons/LoadingIc";
-import {errorsActions} from "../../redux/errorsReducer";
+import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
+import LoadingIc from "src/components/icons/LoadingIc";
+import {errorsActions} from "src/redux/errorsReducer";
 
 
 function Signup(){

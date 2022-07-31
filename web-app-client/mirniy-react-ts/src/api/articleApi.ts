@@ -1,5 +1,5 @@
 
-import {ResponseData} from "./utils";
+import {ApiResult} from "./utils";
 import ax, {getAccessJwt} from "./ax";
 
 
@@ -27,9 +27,12 @@ export type ArticleImageApi = {
 
 
 
-export type ArticleApiResponse = ArticleApi
+export type SuccessApi = { success: boolean }
 
-const getArticleById = async (id: string): ResponseData<ArticleApiResponse> => {
+
+
+
+const getArticleById = async (id: string): ApiResult<ArticleApi> => {
     return ax.post('user/article/get',{
         uuid: id
     }, {
@@ -40,9 +43,9 @@ const getArticleById = async (id: string): ResponseData<ArticleApiResponse> => {
 
 
 
-export type ArticlesApiResponse = { articles: ArticleApi[] | null }
+export type ArticlesApi = { articles: ArticleApi[] | null }
 
-const getUserArticles = async (): ResponseData<ArticlesApiResponse> => {
+const getUserArticles = async (): ApiResult<ArticlesApi> => {
     return ax.post('user/article/get/all', undefined, {
         headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
@@ -51,7 +54,7 @@ const getUserArticles = async (): ResponseData<ArticlesApiResponse> => {
 
 
 
-export type ArticleCreationApi = {
+export type ArticleCreationApiInput = {
     title: string // article title
     title_file: Blob // image file for title image
     text: string // text with common tags like <p> <article-image>
@@ -59,9 +62,7 @@ export type ArticleCreationApi = {
     files: { index: number, file: Blob }[] // image files for article text
 }
 
-export type ArticleCreationApiResponse = { success: boolean }
-
-const createArticle = async (article: ArticleCreationApi): ResponseData<ArticleCreationApiResponse> => {
+const createArticle = async (article: ArticleCreationApiInput): ApiResult<SuccessApi> => {
     const fd = new FormData()
     fd.append('title', article.title)
     fd.append('title_file', article.title_file, undefined)
@@ -77,7 +78,7 @@ const createArticle = async (article: ArticleCreationApi): ResponseData<ArticleC
 
 
 
-export type ArticleUpdateApi = {
+export type ArticleUpdateApiInput = {
     uuid: string // id статьи
     title: string // article title
     title_file?: Blob|undefined // NEW image file for title image
@@ -87,12 +88,7 @@ export type ArticleUpdateApi = {
     files_deleted?: number[]|undefined // localIds of deleted files
 }
 
-export type ArticleUpdateApiResponse = { success: boolean }
-
-const updateArticle = async (article: ArticleUpdateApi): ResponseData<ArticleUpdateApiResponse> => {
-
-    //console.log(article)
-
+const updateArticle = async (article: ArticleUpdateApiInput): ApiResult<SuccessApi> => {
     const fd = new FormData()
     fd.append('uuid', article.uuid)
     fd.append('title', article.title)
@@ -110,17 +106,13 @@ const updateArticle = async (article: ArticleUpdateApi): ResponseData<ArticleUpd
 
 
 
-
-export type ArticleDeletionApiResponse = { success: boolean }
-
-const deleteArticle = async (id: string): ResponseData<ArticleDeletionApiResponse> => {
+const deleteArticle = async (id: string): ApiResult<SuccessApi> => {
     return ax.post('user/article/delete',{
         uuid: id
     }, {
         headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
-
 
 
 

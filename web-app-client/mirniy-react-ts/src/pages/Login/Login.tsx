@@ -1,14 +1,14 @@
 
 import mirRab from 'src/assets/images/mir-rab.png'
 import css from './Login.module.scss'
-import Input1 from "../../components/Input1";
-import {useAppDispatch, useAppSelector} from "../../redux/reduxHooks";
+import Input1 from "src/components/Input1";
+import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
 import React, {useState} from "react";
-import {errorsActions} from "../../redux/errorsReducer";
-import {userActions} from "../../redux/userReducer";
-import Space from "../../components/Space";
-import Button1 from "../../components/Button1";
-import SpinnerIc from "../../components/icons/SpinnerIc";
+import {errorsActions} from "src/redux/errorsReducer";
+import {userActions} from "src/redux/userReducer";
+import Space from "src/components/Space";
+import Button1 from "src/components/Button1";
+import SpinnerIc from "src/components/icons/SpinnerIc";
 import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import styled from "styled-components";
 
@@ -17,9 +17,6 @@ import styled from "styled-components";
 
 
 function Login(){
-
-    //console.log('mir-rab', mirRab)
-    //console.log('mir-rab', typeof mirRab)
 
     const d = useAppDispatch()
 

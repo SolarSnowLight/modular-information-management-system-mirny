@@ -3,7 +3,8 @@ import styled from "styled-components";
 import React, {useEffect, useState} from "react";
 import Header from "src/components/Header";
 import ArticleView from "src/pages/ArticleView/ArticleView";
-import {Article, articleService} from "src/api-service/articleService";
+import {articleService} from "src/api-service/articleService";
+import {Article} from "src/api-service/articleServiceUtils";
 
 
 
@@ -16,11 +17,12 @@ const ArticlePage = () => {
     const [article, setArticle] = useState(undefined as Article|undefined)
     useEffect(()=>{(async()=>{
         if (articleId){
-            let { data, error } = await articleService.getArticleById(articleId)
-            if (error) {
+            const r = await articleService.getArticleById(articleId)
+            if (r.type==='error') {
+                console.log(r.error)
                 return
             }
-            setArticle(data!.article)
+            setArticle(r.data.article)
         }
     })()},[articleId])
 
@@ -32,8 +34,11 @@ const ArticlePage = () => {
     }
     const onDelete = async () => {
         if (articleId){
-            let {data, error} = await articleService.deleteArticle(articleId)
-            if (error) return
+            const r = await articleService.deleteArticle(articleId)
+            if (r.type==='error') {
+                console.log(r.error)
+                return
+            }
             nav(`/articles/user`)
         }
     }

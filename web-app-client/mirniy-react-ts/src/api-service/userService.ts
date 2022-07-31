@@ -1,135 +1,95 @@
-import {AuthResponseApi, LogoutResponseApi, userApi, UserProfileApi, UserRegisterApi} from "src/api/userApi";
-import Axios, {AxiosError} from "axios";
-import {ServData, ServiceData, serviceUtils, ServResult} from "./utils";
-import {BadRequest} from "src/api/utils";
-import {articleApi, ArticlesApiResponse} from "../api/articleApi";
-import {awaitPromisesArray} from "../utils/utils";
-import {errors} from "../models/errors";
-import {ArticlesResponse} from "./articleService";
+import {AuthApi, LogoutApi, userApi, UserProfileApi} from "src/api/userApi";
+import {Serv, serviceUtils} from "./utils";
 
 
-type AuthService = {
+
+
+type AuthServ = {
     accessToken: string
 }
-const login = async (login: string, password: string): Promise<ServiceData<AuthService>> => {
-    return userApi.login(login,password).then(
-        response => {
-            let { status, data } = response
-            if (status===200) {
-                data = data as AuthResponseApi
-                return { data: {
-                    accessToken: data.access_token,
-                }}
-            }
-            data = data as BadRequest|undefined
-            return { error: { code: 'error', message: data?.message } }
-        },
-        (error: Error|AxiosError) => {
-            if (Axios.isAxiosError(error)){
-                if (error.code==='ERR_NETWORK')
-                    // error.code: "ERR_NETWORK" when server not found
-                    return { error: { code: 'connection error' } }
-                if (error.response){
-                    const status = error.response.status
-                    const data = error.response.data as BadRequest|undefined
+const login = async (login: string, password: string): Serv<AuthServ> => {
+    try {
+        let { status, data } = await userApi.login(login,password)
 
-                    if (status===400)
-                        return { error: { code: 'error', message: data?.message } }
-                    if (status===401)
-                        return { error: { code: 'incorrect data', message: data?.message } }
-                    if (status===500)
-                        return { error: { code: 500, message: data?.message } }
-
-                    return { error: { code: 'error', message: data?.message } }
-                }
-            }
-            return { error: { code: 'error' } }
+        if (status===200) {
+            data = data as AuthApi
+            return serviceUtils.buildData<AuthServ>({
+                accessToken: data.access_token
+            })
         }
-    )
+
+        return serviceUtils.defaultError()
+    } catch (e: any){
+        return serviceUtils.generalError(e)
+    }
 }
 
 
 
 
-type LogoutService = {
+type LogoutServ = {
     isLogout: boolean
 }
-const logout = async (): Promise<ServiceData<LogoutService>> => {
-    return userApi.logout().then(
-        response => {
-            let { status, data } = response
-            if (status===200) {
-                data = data as LogoutResponseApi
-                return { data: {
-                    isLogout: data.is_logout
-                }}
-            }
-            data = data as BadRequest
-            return { error: { code: 'error', message: data.message } }
-        },
-        (error: Error|AxiosError) => {
-            if (Axios.isAxiosError(error)){
-                if (error.code==='ERR_NETWORK')
-                    // error.code: "ERR_NETWORK" when server not found
-                    return { error: { code: 'connection error' } }
-                if (error.response){
-                    const status = error.response.status
-                    const data = error.response.data as BadRequest|undefined
+const logout = async (): Serv<LogoutServ> => {
+    try {
+        let { status, data } = await userApi.logout()
 
-                    if (status===400)
-                        return { error: { code: 'error', message: data?.message } }
-                    if (status===401)
-                        return { error: { code: 401, message: data?.message } }
-                    if (status===500)
-                        return { error: { code: 500, message: data?.message } }
-
-                    return { error: { code: 'error', message: data?.message } }
-                }
-            }
-            return { error: { code: 'error' } }
+        if (status===200) {
+            data = data as LogoutApi
+            return serviceUtils.buildData<LogoutServ>({
+                isLogout: data.is_logout
+            })
         }
-    )
+
+        return serviceUtils.defaultError()
+    } catch (e: any){
+        return serviceUtils.generalError(e)
+    }
 }
 
 
 
 
-const signup = async (userData: UserRegisterApi): Promise<ServiceData<AuthService>> => {
-    return userApi.signup(userData).then(
-        response => {
-            let { status, data } = response
-            if (status===200) {
-                data = data as AuthResponseApi
-                return { data: {
-                        accessToken: data.access_token,
-                    }}
-            }
-            data = data as BadRequest
-            return { error: { code: 'error', message: data.message } }
-        },
-        (error: Error|AxiosError) => {
-            if (Axios.isAxiosError(error)){
-                if (error.code==='ERR_NETWORK')
-                    // error.code: "ERR_NETWORK" when server not found
-                    return { error: { code: 'connection error' } }
-                if (error.response){
-                    const status = error.response.status
-                    const data = error.response.data as BadRequest|undefined
-
-                    if (status===400)
-                        return { error: { code: 'error', message: data?.message } }
-                    if (status===401)
-                        return { error: { code: 401, message: data?.message } }
-                    if (status===500)
-                        return { error: { code: 500, message: data?.message } }
-
-                    return { error: { code: 'error', message: data?.message } }
-                }
-            }
-            return { error: { code: 'error' } }
-        }
-    )
+export type UserRegisterServ = {
+    email: string
+    password: string
+    name: string
+    surname: string
+    patronymic: string
+    nickname: string
+    sex: boolean
+    phone: string
+    birthDate: string
 }
+const signup = async (userData: UserRegisterServ): Serv<AuthServ> => {
+    try {
+        let { status, data } = await userApi.signup({
+            email: userData.email,
+            password: userData.password,
+            data: {
+                name: userData.name,
+                surname: userData.surname,
+                patronymic: userData.patronymic,
+                date_birth: userData.birthDate,
+                phone: userData.phone,
+                gender: userData.sex,
+                nickname: userData.nickname,
+            }
+        })
+
+        if (status===200) {
+            data = data as AuthApi
+            return serviceUtils.buildData<AuthServ>({
+                accessToken: data.access_token
+            })
+        }
+
+        return serviceUtils.defaultError()
+    } catch (e: any){
+        return serviceUtils.generalError(e)
+    }
+}
+
 
 
 
@@ -142,61 +102,61 @@ export type ProfileServ = {
     nickname: string
     birthDate: string
 }
+const getProfile = async (): Serv<ProfileServ> => {
+    try {
+        let { status, data } = await userApi.getProfile()
 
-const getProfile = async (): Promise<ServResult<ProfileServ>> => {
-    return userApi.getProfile().then(
-        async response => {
-            let { status, data } = response
-            if (status===200) {
-                data = data as UserProfileApi
-                const finalData: ServData<ProfileServ> = { data: {
-                    name: data.name,
-                    surname: data.surname,
-                    patronymic: data.patronymic,
-                    sex: data.gender,
-                    phone: data.phone,
-                    nickname: data.nickname,
-                    birthDate: data.date_birth,
-                } }
-                return finalData
-            }
+        if (status===200) {
+            data = data as UserProfileApi
+            return serviceUtils.buildData<ProfileServ>({
+                name: data.name,
+                surname: data.surname,
+                patronymic: data.patronymic,
+                sex: data.gender,
+                phone: data.phone,
+                nickname: data.nickname,
+                birthDate: data.date_birth,
+            })
+        }
 
-            return serviceUtils.defaultError()
-        },
-        serviceUtils.generalError
-    )
+        return serviceUtils.defaultError()
+    } catch (e: any){
+        return serviceUtils.generalError(e)
+    }
 }
 
-const updateProfile = async (profileData: ProfileServ): Promise<ServResult<ProfileServ>> => {
-    return userApi.updateProfile({
-        name: profileData.name,
-        surname: profileData.surname,
-        patronymic: profileData.patronymic,
-        gender: profileData.sex,
-        phone: profileData.phone,
-        nickname: profileData.nickname,
-        date_birth: profileData.birthDate,
-    }).then(
-        async response => {
-            let { status, data } = response
-            if (status===200) {
-                data = data as UserProfileApi
-                const finalData: ServData<ProfileServ> = { data: {
-                    name: data.name,
-                    surname: data.surname,
-                    patronymic: data.patronymic,
-                    sex: data.gender,
-                    phone: data.phone,
-                    nickname: data.nickname,
-                    birthDate: data.date_birth,
-                } }
-                return finalData
-            }
 
-            return serviceUtils.defaultError()
-        },
-        serviceUtils.generalError
-    )
+
+
+const updateProfile = async (profileData: ProfileServ): Serv<ProfileServ> => {
+    try {
+        let { status, data } = await userApi.updateProfile({
+            name: profileData.name,
+            surname: profileData.surname,
+            patronymic: profileData.patronymic,
+            gender: profileData.sex,
+            phone: profileData.phone,
+            nickname: profileData.nickname,
+            date_birth: profileData.birthDate,
+        })
+
+        if (status===200) {
+            data = data as UserProfileApi
+            return serviceUtils.buildData<ProfileServ>({
+                name: data.name,
+                surname: data.surname,
+                patronymic: data.patronymic,
+                sex: data.gender,
+                phone: data.phone,
+                nickname: data.nickname,
+                birthDate: data.date_birth,
+            })
+        }
+
+        return serviceUtils.defaultError()
+    } catch (e: any){
+        return serviceUtils.generalError(e)
+    }
 }
 
 

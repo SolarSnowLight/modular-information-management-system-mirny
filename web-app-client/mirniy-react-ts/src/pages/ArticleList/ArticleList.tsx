@@ -2,7 +2,8 @@ import common from 'src/common-styles/common.module.scss'
 import React, {useEffect, useState} from "react";
 import ArticleCard from "./sub-components/ArticleCard";
 import styled from "styled-components";
-import {Article, articleService} from "src/api-service/articleService";
+import {articleService} from "src/api-service/articleService";
+import {Article} from "src/api-service/articleServiceUtils";
 
 
 
@@ -13,12 +14,12 @@ function ArticleList(){
     const [articles, setArticles] = useState(undefined as Article[]|undefined)
 
     useEffect(()=>{(async()=>{
-        let { data, error } = await articleService.getUserArticles()
-        if (error) {
-            console.log(error)
+        const r = await articleService.getUserArticles()
+        if (r.type==='error') {
+            console.log(r.error)
             return
         }
-        setArticles(data!.articles)
+        setArticles(r.data.articles)
     })()},[])
 
     //console.log(articles)

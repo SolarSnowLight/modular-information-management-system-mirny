@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import React, {useRef} from "react";
-import {ArticleImage} from "src/api-service/articleService";
 import {styledCommon} from "src/common-styles/commonStyled";
+import { ArticleImage } from "src/api-service/articleServiceUtils";
 
 
 

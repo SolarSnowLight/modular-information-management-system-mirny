@@ -7,7 +7,7 @@ import StarIc from "src/components/icons/StartIc";
 import styled from "styled-components";
 import {dateUtils} from "src/utils/dateUtils";
 import React from "react";
-import {Article} from "src/api-service/articleService";
+import {Article} from "src/api-service/articleServiceUtils";
 
 
 

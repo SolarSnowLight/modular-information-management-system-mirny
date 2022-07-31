@@ -27,6 +27,8 @@ const of = (
 
 
 
+
+
 const emailPattern = /^.+@.+$/
 const checkEmail = (email?: string|null): ErrorType|undefined => {
     if (!email || !emailPattern.test(email))

@@ -1,6 +1,6 @@
 import axTest from "./axTest";
 import {GraphQlData} from "./utils";
-import {ImageSrc} from "src/models/ImageSrc";
+import {ImageSrc} from "src/models/test/ImageSrc";
 
 
 

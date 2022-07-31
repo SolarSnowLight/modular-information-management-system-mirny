@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import React from "react";
 import {absolute, absoluteOff} from "src/common-styles/commonStyled";
-import {ArticleImage} from "src/api-service/articleService";
+import {ArticleImage} from "src/api-service/articleServiceUtils";
 
 
 

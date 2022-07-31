@@ -14,7 +14,7 @@ const Profile = () => {
         if (accessJwt){
             ;(async()=>{
                 const data = await userService.getProfile()
-                if (data.error){
+                if (data.type === 'error'){
                     setError(data.error)
                     return
                 }

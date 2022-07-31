@@ -1,4 +1,4 @@
-import {Article} from "src/api-service/articleService";
+import {Article} from "src/api-service/articleServiceUtils";
 
 
 function wrapWithP(articleRawText: string){

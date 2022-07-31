@@ -1,6 +1,6 @@
 
 import {Reducer} from "redux";
-import {ErrorType} from "../models/errors";
+import {ErrorType} from "src/models/errors";
 
 
 /*type Errors2<T extends string|never> = {
@@ -104,34 +104,6 @@ const initialState = {
 
 export const errorsReducer: Reducer<ErrorsState> = (state = initialState, action) => {
     switch (action.type){
-        /*case 'addErrors': {
-            const newState = {...state}
-            const parts = action.payload as ErrorsDraft
-            for (let k1 in parts){
-                if (k1 in newState && typeof parts[k1] === 'object'){
-                    newState[k1] = {...newState[k1]}
-                    let common = parts[k1]!.common
-                    if (common && common instanceof Array && common.length>0){
-                        newState[k1]!.hasError = true
-                        newState[k1]!.common = [...newState[k1]!.common, ...common]
-                    }
-                    let errors = parts[k1]!.errors
-                    if (errors && typeof errors === 'object')
-                        for (let k2 in parts[k1]!.errors){
-                            if (k2 in newState[k1].errors){
-                                newState[k1].errors = {...newState[k1].errors}
-                                let prop = parts[k1]!.errors[k2]
-                                if (prop && prop instanceof Array && prop.length>0){
-                                    newState[k1]!.hasError = true
-                                    newState[k1]!.errors[k2] = [...newState[k1]!.errors[k2], ...prop]
-                                }
-                            }
-                        }
-                }
-            }
-            return newState
-        }*/
-
 
         // if property exists and set to undefined - it will be reseted
         case 'addErrors': {
@@ -181,35 +153,19 @@ export const errorsReducer: Reducer<ErrorsState> = (state = initialState, action
             return newState
         }
 
-
-        /*case 'clearErrors':
-            const partName = action.payload as keyof ErrorsState
-            return {
-                ...state,
-                [partName]: {...initialState[partName]}
-            }*/
-
         default: return state
     }
 }
 
 
 
-/*const addError = (errors: ErrorsDraft) => ({
-    type: 'addErrors', payload: errors
-})*/
 const addErrors = (errors: ErrorsDraft) => ({
     type: 'addErrors', payload: errors
 })
 
-/*const clearErrors = (part: keyof ErrorsState) => ({
-    type: 'clearErrors', payload: part
-})*/
 
 
 export const errorsActions = {
-    //addError,
     addErrors,
-    //clearErrors,
 }
 

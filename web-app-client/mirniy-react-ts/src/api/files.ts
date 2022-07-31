@@ -1,4 +1,4 @@
-import {trimSlash} from "../utils/utils";
+import {trimSlash} from "src/utils/utils";
 
 
 const ip = 'localhost'

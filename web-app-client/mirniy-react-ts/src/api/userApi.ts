@@ -1,17 +1,17 @@
 import ax, {getAccessJwt} from './ax'
-import {ResponseData} from "./utils";
+import {ApiResult} from "./utils";
 
 
 
 
 
-// 200
-export type AuthResponseApi = {
+export type AuthApi = {
     access_token: string
 }
+
 const login = async (
     login: string, password: string
-): ResponseData<AuthResponseApi> => {
+): ApiResult<AuthApi> => {
     return ax.post("auth/sign-in", {
         email: login,
         password: password,
@@ -19,42 +19,36 @@ const login = async (
 }
 
 
-// 200
-export type LogoutResponseApi = {
+
+export type LogoutApi = {
     is_logout: boolean
 }
-const logout = async (): ResponseData<LogoutResponseApi> => {
+
+const logout = async (): ApiResult<LogoutApi> => {
     return ax.post('auth/logout', undefined, {
         headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
 
 
-export type UserRegisterApi = {
+
+
+export type UserRegisterApiInput = {
     email: string
     password: string
-    name: string
-    surname: string
-    patronymic: string
-    nickname: string
-    sex: boolean
-    phone: string
-    birthDate: string
+    data: {
+        name: string
+        surname: string
+        patronymic: string
+        date_birth: string
+        phone: string
+        gender: boolean
+        nickname: string
+    }
 }
-const signup = async (userData: UserRegisterApi): ResponseData<AuthResponseApi> => {
-    return ax.post('auth/sign-up',{
-        email: userData.email,
-        password: userData.password,
-        data: {
-            name: userData.name,
-            surname: userData.surname,
-            patronymic: userData.patronymic,
-            date_birth: userData.birthDate,
-            phone: userData.phone,
-            gender: userData.sex,
-            nickname: userData.nickname,
-        }
-    })
+
+const signup = async (userData: UserRegisterApiInput): ApiResult<AuthApi> => {
+    return ax.post('auth/sign-up',userData)
 }
 
 
@@ -69,18 +63,23 @@ export type UserProfileApi = {
     nickname: string // "nick"
     date_birth: string // "01-01-2000"
 }
-const getProfile = async (): ResponseData<UserProfileApi> => {
+
+const getProfile = async (): ApiResult<UserProfileApi> => {
     return ax.post('user/profile/get', undefined, {
         headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
 
 
-const updateProfile = async (profileData: UserProfileApi): ResponseData<UserProfileApi> => {
+
+
+const updateProfile = async (profileData: UserProfileApi): ApiResult<UserProfileApi> => {
     return ax.post('user/profile/update', profileData, {
         headers: { Authorization: `Bearer ${getAccessJwt()}`}
     })
 }
+
+
 
 
 export const userApi = {

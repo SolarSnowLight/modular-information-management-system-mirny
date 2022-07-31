@@ -1,10 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {AppThunk} from "./store";
-import {userService} from "src/api-service/userService";
+import {UserRegisterServ, userService} from "src/api-service/userService";
 import {loadingActions} from "./loadingReducer";
-import {UserRegisterApi} from "src/api/userApi";
 import {errorsActions} from "./errorsReducer";
-import {errors, ErrorType} from '../models/errors';
+import {errors, ErrorType} from 'src/models/errors';
 
 
 type User = {
@@ -39,6 +38,8 @@ const userSlice = createSlice({
         }
     }
 })
+
+
 
 
 
@@ -94,20 +95,11 @@ const login = (login: string, password: string): AppThunk<Promise<void|boolean>>
 
         dispatch(loadingActions.setLoading('login'))
         // request
-        let { data, error } = await userService.login(login, password)
+        const r = await userService.login(login, password)
             .finally(()=>dispatch(loadingActions.setLoading('login',false)))
-            .catch(err=>{
-                dispatch(errorsActions.addErrors({
-                    login: { common: [
-                            { code: 'error', message: 'Ошибка' }
-                        ]}
-                }))
-                throw err
-            })
-
 
         // error check
-        if (error) switch (error.code){
+        if (r.type==='error') switch (r.error.code){
             case "connection error":
                 dispatch(errorsActions.addErrors({
                     login: { common: [
@@ -131,19 +123,11 @@ const login = (login: string, password: string): AppThunk<Promise<void|boolean>>
                 return
         }
 
-        // all is ok
-        data = data!
 
         dispatch(setJwt({
-            accessJwt: data.accessToken
+            accessJwt: r.data.accessToken
         }))
 
-
-        // todo request user or get info from jwt
-        /*const user = {
-            name: 'someusername'
-        }
-        dispatch(setUser(user))*/
         return true
     }
 
@@ -171,12 +155,12 @@ const logout = (): AppThunk<Promise<void|boolean>> =>
 
         dispatch(loadingActions.setLoading('logout'))
 
-        let { data, error } = await userService.logout()
+        const r = await userService.logout()
             .finally(()=>dispatch(loadingActions.setLoading('logout',false)))
 
 
-        if (error){
-            switch (error.code){
+        if (r.type==='error'){
+            switch (r.error.code){
                 case "connection error":
                     dispatch(errorsActions.addErrors({
                         logout: { common:[
@@ -201,9 +185,8 @@ const logout = (): AppThunk<Promise<void|boolean>> =>
             }
         }
 
-        data = data!
 
-        if (!data.isLogout){
+        if (!r.data.isLogout){
             dispatch(errorsActions.addErrors({
                 logout: { common:[
                     { code: 'error', message: 'Ошибка разлогинивания' }
@@ -223,7 +206,7 @@ const logout = (): AppThunk<Promise<void|boolean>> =>
 const phonePattern = /^\+(\d\D*){9,15}$/
 const birthDatePattern = /^\D*(?<day>\d{1,2})\D+(?<month>\d{1,2})\D+(?<year>\d{4})\D*$/
 
-const signup = (userData: UserRegisterApi): AppThunk<Promise<void|boolean>> =>
+const signup = (userData: UserRegisterServ): AppThunk<Promise<void|boolean>> =>
     async (dispatch, getState) => {
 
         let state = getState()
@@ -354,17 +337,15 @@ const signup = (userData: UserRegisterApi): AppThunk<Promise<void|boolean>> =>
             userData.birthDate = `${(day+'').padStart(2,'0')}-${(month+'').padStart(2,'0')}-${(year+'').padStart(4,'0')}`
         }
 
-        console.log('userData', userData)
-
 
         dispatch(loadingActions.setLoading('signup'))
 
         // request
-        let {data, error} = await userService.signup(userData)
+        const r = await userService.signup(userData)
             .finally(()=>dispatch(loadingActions.setLoading('signup',false)))
 
         // error check
-        if (error) switch (error.code) {
+        if (r.type==='error') switch (r.error.code) {
             case "connection error":
                 dispatch(errorsActions.addErrors({
                     signup: { common: [
@@ -375,7 +356,7 @@ const signup = (userData: UserRegisterApi): AppThunk<Promise<void|boolean>> =>
             case 500:
                 dispatch(errorsActions.addErrors({
                     signup: { common: [
-                            { code: 'error', message: error.message }
+                            { code: 'error', message: r.error.message }
                         ]}
                 }))
                 return
@@ -389,19 +370,9 @@ const signup = (userData: UserRegisterApi): AppThunk<Promise<void|boolean>> =>
         }
 
 
-        // all is ok
-        data = data!
-
         dispatch(setJwt({
-            accessJwt: data.accessToken
+            accessJwt: r.data.accessToken
         }))
-
-
-        // todo request user or get info from jwt
-        /*const user = {
-            name: 'someusername'
-        }
-        dispatch(setUser(user))*/
 
         return true
     }

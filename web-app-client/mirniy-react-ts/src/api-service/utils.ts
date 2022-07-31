@@ -1,4 +1,4 @@
-import {ErrorType} from "src/models/errors";
+import {errors, ErrorType} from "src/models/errors";
 import Axios, {AxiosError} from "axios";
 import {BadRequest} from "src/api/utils";
 
@@ -13,19 +13,30 @@ export type ServiceData<D> = {
 
 
 export type ServData<D> = {
+    type: 'data'
     data: D
 }
 export type ServError = {
+    type: 'error'
     error: ErrorType
 }
 export type ServResult<D> = ServData<D> | ServError
+export type Serv<D> = Promise<ServResult<D>>
+
+
+const buildData = <D>(data: D): ServData<D> => ({ type: 'data', data: data })
+const buildError = (
+    code: ErrorType['code'],
+    message?: ErrorType['message'],
+    extra?: ErrorType['extra']
+): ServError => ({ type: 'error', error: errors.of(code, message, extra) })
 
 
 const generalError = (error: Error|AxiosError): ServError => {
     if (Axios.isAxiosError(error)){
         if (error.code==='ERR_NETWORK'){
             // error.code: "ERR_NETWORK" when server not found
-            return { error: { code: 'connection error' } }
+            return { error: { code: 'connection error' }, type: 'error' }
         }
         if (error.response){
             const status = error.response.status
@@ -38,16 +49,18 @@ const generalError = (error: Error|AxiosError): ServError => {
             if (status===500)
                 return { error: { code: 500, message: data?.message } }*/
 
-            return { error: { code: status, message: data?.message } }
+            return { error: { code: status, message: data?.message }, type: 'error' }
         }
     }
-    return { error: { code: 'unknown error' } }
+    return { error: { code: 'unknown error' }, type: 'error' }
 }
 
-const defaultError = (): ServError => ({ error: { code: 'error' } })
+const defaultError = (): ServError => ({ error: { code: 'error' }, type: 'error' })
 
 
 export const serviceUtils = {
     generalError,
     defaultError,
+    buildData,
+    buildError,
 }

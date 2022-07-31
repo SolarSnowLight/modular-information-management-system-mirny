@@ -15,4 +15,17 @@ export type InternalServerError = BadRequest
 export type Default = BadRequest
 
 
-export type ResponseData<D> = Promise<AxiosResponse<D|BadRequest|undefined>>
+export type ApiResult<D> = Promise<AxiosResponse<D|BadRequest|undefined>>
+
+
+
+/*
+export interface ApiData<D> extends AxiosResponse<D> {
+    status: 200
+}
+export interface ApiError extends AxiosResponse<BadRequest> {
+    status: Exclude<number, 200>
+}
+export type ApiResult2<D> = ApiData<D> | ApiError
+export type FromApi<D> = Promise<ApiResult2<D>>
+*/

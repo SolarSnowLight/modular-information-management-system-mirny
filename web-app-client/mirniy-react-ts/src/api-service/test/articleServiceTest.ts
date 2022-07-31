@@ -3,7 +3,7 @@ import {GraphQlData} from "src/api/test/utils";
 import {errors} from "src/models/errors";
 import {ServiceData} from "../utils";
 import Axios, {AxiosError} from "axios";
-import {ImageSrc} from "src/models/ImageSrc";
+import {ImageSrc} from "src/models/test/ImageSrc";
 
 
 export type ArticlesResponse = { articles: ArticleApiFull[] }

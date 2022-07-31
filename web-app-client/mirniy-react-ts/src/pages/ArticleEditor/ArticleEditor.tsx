@@ -15,9 +15,10 @@ import {joinTags, splitTags, walkFileTree} from "src/utils/utils";
 import {IdGenerator} from "src/models/IdGenerator";
 import ListImage from './sub-components/ListImage';
 import {articleUtils} from "src/models/articleUtils";
-import {Article, ArticleImage, articleService, Image} from "src/api-service/articleService";
+import {articleService} from "src/api-service/articleService";
 import {useNavigate, useParams} from "react-router-dom";
 import TitleImage2 from "./sub-components/TitleImage2";
+import {Article, ArticleImage, Img } from 'src/api-service/articleServiceUtils';
 
 
 
@@ -36,11 +37,12 @@ const ArticleEditor = () => {
 
     useEffect(()=>{(async()=>{
         if (articleId){
-            let { data, error } = await articleService.getArticleById(articleId)
-            if (error) {
+            const r = await articleService.getArticleById(articleId)
+            if (r.type==='error') {
+                console.log(r.error)
                 return
             }
-            const a = data!.article
+            const a = r.data.article
             setTitle(a.title ?? '')
             setRawText(articleUtils.unwrapP(a.text??''))
             setTags(joinTags(a.tags))
@@ -109,7 +111,7 @@ const ArticleEditor = () => {
 
     const addFile = async (file: File): Promise<ArticleImage|undefined> => {
         if (imageExtensions.test(file.name)){
-            const newIm = await Image.fromFile(file)
+            const newIm = await Img.fromFile(file)
             const newAIm = new ArticleImage(idGen.getId(), newIm, { isNew: true })
             setImages(images=>[...images, newAIm])
             return newAIm
