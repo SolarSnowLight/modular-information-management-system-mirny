@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React, {useRef} from "react";
-import {styledCommon} from "src/common-styles/commonStyled";
+import {commonStyled} from "src/common-styles/commonStyled";
 import { ArticleImage } from "src/api-service/articleServiceUtils";
 
 
@@ -47,7 +47,7 @@ const Frame = React.memo(styled.div`
   cursor: pointer;
 `)
 const Border = React.memo(styled.div`
-  ${styledCommon.absolute};
+  ${commonStyled.absolute};
   pointer-events: none;
   border: 2px dashed #1F8DCD; // todo dash offset ???
   border-radius: 4px;

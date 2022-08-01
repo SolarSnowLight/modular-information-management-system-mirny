@@ -1,5 +1,6 @@
-import ax, {getAccessJwt} from './ax'
+import ax, {CustomConfig, getAccessJwt} from './ax'
 import {ApiResult} from "./utils";
+import {AxiosRequestConfig} from "axios";
 
 
 
@@ -17,6 +18,18 @@ const login = async (
         password: password,
     })
 }
+
+
+
+
+const refreshJwts = async (authorizationHeader: string|number|boolean) => {
+    const configWithCustomData: AxiosRequestConfig & CustomConfig = {
+        headers: { Authorization: authorizationHeader },
+        customData: { isRefreshJwtsRequest: true },
+    }
+    return ax.post<AuthApi>('auth/refresh', undefined, configWithCustomData )
+}
+
 
 
 
@@ -84,6 +97,7 @@ const updateProfile = async (profileData: UserProfileApi): ApiResult<UserProfile
 
 export const userApi = {
     login,
+    refreshJwts,
     logout,
     signup,
     getProfile,

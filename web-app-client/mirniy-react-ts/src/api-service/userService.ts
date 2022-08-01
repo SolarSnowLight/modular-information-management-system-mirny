@@ -1,5 +1,6 @@
 import {AuthApi, LogoutApi, userApi, UserProfileApi} from "src/api/userApi";
 import {Serv, serviceUtils} from "./utils";
+import {DateTime} from "../utils/DateTime";
 
 
 
@@ -100,7 +101,7 @@ export type ProfileServ = {
     sex: boolean
     phone: string
     nickname: string
-    birthDate: string
+    birthDate: DateTime
 }
 const getProfile = async (): Serv<ProfileServ> => {
     try {
@@ -115,7 +116,7 @@ const getProfile = async (): Serv<ProfileServ> => {
                 sex: data.gender,
                 phone: data.phone,
                 nickname: data.nickname,
-                birthDate: data.date_birth,
+                birthDate: DateTime.from_dd_MM_yyyy(data.date_birth)!,
             })
         }
 
@@ -137,7 +138,7 @@ const updateProfile = async (profileData: ProfileServ): Serv<ProfileServ> => {
             gender: profileData.sex,
             phone: profileData.phone,
             nickname: profileData.nickname,
-            date_birth: profileData.birthDate,
+            date_birth: profileData.birthDate.to_dd_MM_yyyy(),
         })
 
         if (status===200) {
@@ -149,7 +150,7 @@ const updateProfile = async (profileData: ProfileServ): Serv<ProfileServ> => {
                 sex: data.gender,
                 phone: data.phone,
                 nickname: data.nickname,
-                birthDate: data.date_birth,
+                birthDate: DateTime.from_dd_MM_yyyy(data.date_birth)!,
             })
         }
 

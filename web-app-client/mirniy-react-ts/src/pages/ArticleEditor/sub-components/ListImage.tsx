@@ -2,7 +2,7 @@ import CrossIc from "src/components/icons/CrossIc";
 import Button1 from "src/components/Button1";
 import styled from "styled-components";
 import React from "react";
-import {styledCommon} from "src/common-styles/commonStyled";
+import {commonStyled} from "src/common-styles/commonStyled";
 import {ArticleImage} from "src/api-service/articleServiceUtils";
 
 
@@ -73,7 +73,7 @@ const Image = React.memo(styled.div<{ imageUrl?: string }>`
   grid-area: 2 / 1 / span 1 / span 2;
 `)
 const ButtonBox = React.memo(styled.div`
-  ${styledCommon.row};
+  ${commonStyled.row};
   gap: 7px;
   margin-right: 7px; margin-bottom: 3px;
   align-self: end; justify-self: end;

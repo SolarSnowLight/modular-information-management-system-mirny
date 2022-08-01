@@ -1,5 +1,5 @@
 import Axios, {AxiosError} from "axios";
-import {AuthApi} from "./userApi";
+import {AuthApi, userApi} from "./userApi";
 import {Store} from "src/redux/store";
 import {userActions, UserState} from "src/redux/userReducer";
 import {trimSlash} from "src/utils/utils";
@@ -19,7 +19,15 @@ const ax = Axios.create({
 export let getAccessJwt = (): UserState["accessJwt"] => undefined
 
 
-const refreshPath = 'auth/refresh'
+
+
+type CustomConfigData = {
+    isRetry?: boolean
+    isRefreshJwtsRequest?: boolean
+}
+export type CustomConfig = {
+    customData?: CustomConfigData
+}
 export function setupAxios(reduxStore: Store){
 
     const removeAuthData = () => {
@@ -32,48 +40,40 @@ export function setupAxios(reduxStore: Store){
         reduxStore.dispatch(userActions.setJwt(authData))
     }
 
+    // Если при запросе возвращается статус 401,
+    // значит токен устарел и делается отдельный запрос за новыми токенами,
+    // потом повторяется старый запрос но с новым токеном.
     ax.interceptors.response.use(
-        response => response,
+        response => {
+            const originalRequest = response.config as typeof response.config & CustomConfig
+            if (response.status===200 && originalRequest.customData?.isRefreshJwtsRequest){
+                const d = response.data as AuthApi
+                setAuthData({ accessJwt: d.access_token })
+            }
+            return response
+        },
         async (error: Error|AxiosError) => {
-            //console.log('ERROR:',error)
             if (Axios.isAxiosError(error) && error.config && error.response){
 
-                // Для повтора исходного запроса
-                // Access token is included from config if it was there
-                // Refresh token is automatically included from cookies
-                const originalRequest = error.config as typeof error.config & { _isRetried?: boolean }
-                const originalUrl = new URL(Axios.getUri(originalRequest))
-                //console.log('path',originalUrl.pathname)
+                const originalRequest = error.config as typeof error.config & CustomConfig
 
-                if (originalUrl.pathname.endsWith(refreshPath)) {
-                    //console.log(error.response.status)
-                    //console.log(error)
+                if (originalRequest.customData?.isRefreshJwtsRequest){
                     if (error.response.status === 401){
                         removeAuthData()
                     } else {
                         console.log('ошибка обновления access token')
-                    }
-                } else if (error.response.status === 401){
-                    if (!originalRequest._isRetried){
-                        // Обновление токена
-                        originalRequest._isRetried = true;
-
-                        const secondResponse = await ax.post<AuthApi>(refreshPath, undefined, {
-                            //headers: { Authorization: `Bearer ${getAccessJwt()}`}
-                            headers: { Authorization: originalRequest.headers?.Authorization ?? 'Bearer undefined'}
-                        })
-
-                        const newAccessJwt = secondResponse.data.access_token
-
-                        setAuthData({ accessJwt: newAccessJwt })
-
-                        originalRequest.headers ??= {}
-                        originalRequest.headers.Authorization = `Bearer ${newAccessJwt}`
-                        await ax.request(originalRequest);
-                    } else {
                         removeAuthData()
                     }
+                } else if (error.response.status === 401 && !originalRequest.customData?.isRetry) {
+                    await userApi.refreshJwts(originalRequest.headers?.Authorization ?? 'Bearer undefined')
+
+                    originalRequest.customData ??= {}
+                    originalRequest.headers ??= {}
+                    originalRequest.customData.isRetry = true
+                    originalRequest.headers.Authorization = `Bearer ${getAccessJwt()}`
+                    return ax.request(originalRequest)
                 }
+
             }
 
             throw error

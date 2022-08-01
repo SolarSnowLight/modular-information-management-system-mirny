@@ -23,6 +23,17 @@ export const row = css`
   flex-flow: row nowrap;
 `
 
+export const col = css`
+  display: flex;
+  flex-flow: column nowrap;
+`
+
+export const center = css`
+  display: grid;
+  align-content: center;
+  justify-content: center;
+`
+
 
 function offsetToPosition(offset?: string){
     if (offset){
@@ -36,8 +47,10 @@ function offsetToPosition(offset?: string){
 }
 
 
-export const styledCommon = {
+export const commonStyled = {
     absolute,
     allDefault,
     row,
+    col,
+    center,
 }
