@@ -2,12 +2,13 @@ import React, {useEffect, useState} from "react"
 import {ProfileServ, userService} from "src/api-service/userService"
 import {useAppSelector} from "src/redux/reduxHooks"
 import {ErrorType} from "src/models/errors"
-import styled from "styled-components"
+import styled, {css} from "styled-components"
 import {commonStyled} from "src/common-styles/commonStyled"
 import mirRabLogo from 'src/assets/icons/mir-rab-logo.svg'
 import defaultAva from 'src/assets/images/default-ava.jpg'
 import Space from "src/components/Space"
 import PencilIc from "src/components/icons/PencilIc";
+import Input2 from "../../components/Input2";
 
 
 const Profile = () => {
@@ -60,11 +61,25 @@ const Profile = () => {
                         <PencilIc fill='black' size={18}/>
                     </PencilFrame>
                 </MainInfoContainer>
+
+                <Space h={8}/>
+
+
             </> }
 
-            <Space h={47}/>
+            <Space h={23}/>
+
+            <Input2
+                frameMainStyle={css`width: 380px; height: 45px`}
+                title={'Title'}
+                value={'value'}
+            />
+
+            <Space h={23}/>
 
 
+
+            <Space h={23}/>
 
         </ProfileFrame>
         {/*<>{JSON.stringify(profileData)}</>*/}

@@ -6,9 +6,9 @@ import styled from "styled-components";
 import common from 'src/common-styles/common.module.scss'
 import './ArticleView.scss';
 import React, {useEffect, useState} from "react";
-import {dateUtils} from "src/utils/dateUtils";
 import {articleUtils} from "src/models/articleUtils";
 import {Article} from "src/api-service/articleServiceUtils";
+import {DateTime} from "src/utils/DateTime";
 
 
 const ArticleView = ({ article }: { article: Article }) => {
@@ -20,7 +20,7 @@ const ArticleView = ({ article }: { article: Article }) => {
         setHtmlContent(articleUtils.inlineImages(a))
     },[a])
 
-    const date = dateUtils.from_yyyy_MM_dd_hh_mm(a.createdAt)
+    const date = DateTime.from_yyyy_MM_dd_hh_mm(a.createdAt)
 
     const onFavorite = (article: Article, isFavorite = true) => {
         console.log('setFavorite', isFavorite)

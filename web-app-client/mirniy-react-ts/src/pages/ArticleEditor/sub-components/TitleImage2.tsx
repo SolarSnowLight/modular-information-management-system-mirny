@@ -47,7 +47,7 @@ const Frame = React.memo(styled.div`
   cursor: pointer;
 `)
 const Border = React.memo(styled.div`
-  ${commonStyled.absolute};
+  ${commonStyled.abs};
   pointer-events: none;
   border: 2px dashed #1F8DCD; // todo dash offset ???
   border-radius: 4px;

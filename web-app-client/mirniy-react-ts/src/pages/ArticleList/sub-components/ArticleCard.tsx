@@ -5,9 +5,9 @@ import EyeIc from "src/components/icons/EyeIc";
 import StarFilledIc from "src/components/icons/StarFilledIc";
 import StarIc from "src/components/icons/StartIc";
 import styled from "styled-components";
-import {dateUtils} from "src/utils/dateUtils";
 import React from "react";
 import {Article} from "src/api-service/articleServiceUtils";
+import {DateTime} from "src/utils/DateTime";
 
 
 
@@ -17,7 +17,7 @@ const ArticleCard = (
     { article }: { article: Article }
 ) => {
     const a = article
-    const date = dateUtils.from_yyyy_MM_dd_hh_mm(a.createdAt)
+    const date = DateTime.from_yyyy_MM_dd_hh_mm(a.createdAt)
 
     const onFavorite = (article: Article, isFavorite = true) => {
         console.log('setFavorite: ', isFavorite)

@@ -1,7 +1,7 @@
 import {css} from "styled-components";
 
 
-export const absolute = css`
+export const abs = css`
   position: absolute;
   top: 0; right: 0; bottom: 0; left: 0;
 `
@@ -48,7 +48,7 @@ function offsetToPosition(offset?: string){
 
 
 export const commonStyled = {
-    absolute,
+    abs,
     allDefault,
     row,
     col,

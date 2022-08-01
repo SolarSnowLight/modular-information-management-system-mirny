@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React from "react";
-import {absolute, absoluteOff} from "src/common-styles/commonStyled";
+import {abs, absoluteOff} from "src/common-styles/commonStyled";
 import {ArticleImage} from "src/api-service/articleServiceUtils";
 
 
@@ -25,7 +25,7 @@ const Frame = styled.div`
   cursor: pointer;
 `
 const Border = React.memo(styled.div`
-  ${absolute};
+  ${abs};
   pointer-events: none;
   border: 2px dashed #1F8DCD;
   border-radius: 4px;
