@@ -10,7 +10,7 @@ import {commonStyled} from "src/common-styles/commonStyled";
 
 
 
-type Input2Props = React.HTMLAttributes<HTMLInputElement> & {
+export type Input2Props = JSX.IntrinsicElements['input'] & /*React.HTMLAttributes<HTMLInputElement> &*/ {
 
     hasError?: boolean
     frameMainStyle?: ReturnType<typeof css>
@@ -23,37 +23,23 @@ type Input2Props = React.HTMLAttributes<HTMLInputElement> & {
     placeholder?: string
 
     inputStyle?: ReturnType<typeof css>
-
-
-    hide?: boolean
-    hideable?: boolean
-
-
-
+    defaultHide?: boolean
+    allowHideSwitch?: boolean
 }
 
-// todo React.forwardRef - use focus here
-// todo password hide symbols
 
 const Input2 = React.forwardRef<HTMLInputElement, Input2Props>((
     {
         frameMainStyle, frameErrorStyle, hasError,
         titleStyle, title,
         placeholderStyle, placeholder,
-        inputStyle,
-
-            hideable, hide,
+        inputStyle, allowHideSwitch, defaultHide,
         ...props
     },
     ref
 ) => {
-
-
     const { value } = props
-
-    const inputFocused = false // todo remove
-
-    const [hideText, setHideText] = useState(hide)
+    const [hideText, setHideText] = useState(defaultHide)
 
     return <MainFrame hasError={hasError} mainStyle={frameMainStyle} errorStyle={frameErrorStyle}>
 
@@ -61,7 +47,7 @@ const Input2 = React.forwardRef<HTMLInputElement, Input2Props>((
 
         <InputContainer>
 
-            { placeholder && !inputFocused && !value &&
+            { placeholder && !value &&
                 <PlaceholderBox>
                     <Placeholder addStyle={placeholderStyle}>
                         {placeholder}
@@ -69,14 +55,14 @@ const Input2 = React.forwardRef<HTMLInputElement, Input2Props>((
                 </PlaceholderBox>
             }
 
-            <Input ref={ref} {...props}
+            <Input ref={ref as any} {...props}
                    type={ hideText ? 'password' : undefined}
                    addStyle={inputStyle}
             />
 
         </InputContainer>
 
-        { hideable && <EyeContainer onClick={()=>setHideText(!hideText)}>
+        { allowHideSwitch && <EyeContainer onClick={()=>setHideText(!hideText)}>
             { hideText
                 ? <EyeIc fill='black' size={22} />
                 : <EyeCrossedOutIc fill='black' size={23} />
@@ -85,10 +71,10 @@ const Input2 = React.forwardRef<HTMLInputElement, Input2Props>((
 
     </MainFrame>
 })
-export default Input2
+export default React.memo(Input2)
 
 
-const MainFrame = styled.div<{
+const MainFrame = React.memo(styled.div<{
     hasError?: boolean | undefined
     mainStyle?: ReturnType<typeof css> | undefined
     errorStyle?: ReturnType<typeof css> | undefined
@@ -103,8 +89,8 @@ const MainFrame = styled.div<{
     border: 1px solid #EE1D23;
     ${() => p.errorStyle};
   ` : undefined};
-`
-const Title = styled.div<{
+`)
+const Title = React.memo(styled.div<{
     addStyle?: ReturnType<typeof css>  | undefined
 }>`
   position: absolute;
@@ -115,21 +101,21 @@ const Title = styled.div<{
   pointer-events: none;
   font: 400 14px 'TT Commons';
   ${p => p.addStyle};
-`
-const InputContainer = styled.div`
+`)
+const InputContainer = React.memo(styled.div`
   position: relative;
   flex-grow: 1; height: 100%;
   padding-left: 14px;
-`
-const PlaceholderBox = styled.div`
+`)
+const PlaceholderBox = React.memo(styled.div`
   ${commonStyled.abs};
   left: 14px;
   display: grid;
   align-content: center;
   //justify-content: center;
   pointer-events: none;
-`
-const Placeholder = styled.div<{
+`)
+const Placeholder = React.memo(styled.div<{
     addStyle?: ReturnType<typeof css>  | undefined
 }>`
   color: black; // todo extract into props
@@ -138,8 +124,8 @@ const Placeholder = styled.div<{
   pointer-events: none;
   padding-bottom: 0.15em;
   ${p => p.addStyle};
-`
-const Input = styled.input<{
+`)
+const Input = React.memo(styled.input<{
     addStyle?: ReturnType<typeof css>  | undefined
 }>`
   ${commonStyled.allDefault};
@@ -150,11 +136,11 @@ const Input = styled.input<{
   //vertical-align: super;
   //background: red;
   ${p => p.addStyle};
-`
-const EyeContainer = styled.div`
+`)
+const EyeContainer = React.memo(styled.div`
   aspect-ratio: 1; height: 100%;
   ${commonStyled.center};
   cursor: pointer;
-`
+`)
 
 

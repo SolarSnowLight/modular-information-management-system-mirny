@@ -90,7 +90,7 @@ function App() {
             <Routes>
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
-                <Route path='/user/profile' element={<Profile/>}/>
+                <Route path='/user/profile/*' element={<Profile/>}/>
                 <Route path='/articles/user' element={<ArticleList/>}/>
                 <Route path='/article/:articleId' element={<ArticlePage/>}/>
                 <Route path='/article/create' element={<ArticleEditor/>}/>

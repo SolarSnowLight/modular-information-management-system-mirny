@@ -1,7 +1,7 @@
 import {Link, useLocation} from "react-router-dom";
 import MainHeader from "./sub-components/MainHeader";
 import React from "react";
-import {useAppSelector} from "../redux/reduxHooks";
+import {useAppSelector} from "src/redux/reduxHooks";
 
 
 function Main(){

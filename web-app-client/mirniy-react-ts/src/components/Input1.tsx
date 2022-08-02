@@ -29,6 +29,9 @@ type Input1Props = {
     borderColor?: string
 }
 
+/**
+ * @deprecated Use Input2 instead
+ */
 const Input1 = ({
         w = '100%', h = '100%', title, placeholder, autofocused, hasError,
         hideable, hide, value, onInput,
