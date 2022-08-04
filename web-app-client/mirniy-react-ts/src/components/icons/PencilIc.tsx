@@ -4,10 +4,12 @@ import React from "react";
 
 
 const PencilIc = (
-    { fill = 'black', size }: { fill?: string, size?: number }
+    { color = 'black', size }: { color?: string|undefined, size?: number|string|undefined }
 ) => {
-    return <SvgIcon style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
-                    fill={fill} stroke={fill}/>
+    return <SvgIcon
+        style={{ width: size, aspectRatio: '1', maxWidth: '100%', maxHeight: '100%' }}
+        fill={color} stroke={color}
+    />
 }
 export default React.memo(PencilIc)
 

@@ -30,10 +30,10 @@ const Button1 = React.memo(React.forwardRef<HTMLButtonElement, Button1Props>(
 const Button1 = styled.button`
   ${allDefault};
   
-  background: #1F8DCD; // Blue todo extract color
+  background: #1F8DCD;
   border-radius: 4px;
 
-  color: white; // White todo extract color
+  color: white;
   font: 600 22px 'TT Commons';
   padding-bottom: 0.15em;
   text-align: center;

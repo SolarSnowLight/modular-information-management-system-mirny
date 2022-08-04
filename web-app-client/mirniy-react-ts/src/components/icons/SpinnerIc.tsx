@@ -1,6 +1,6 @@
 import React, {useLayoutEffect, useRef} from 'react'
 import css from './SpinnerIc.module.scss'
-import { ReactComponent as SpinnerSvg } from 'src/assets/icons/spinner.svg'
+import { ReactComponent as SvgIcon } from 'src/assets/icons/spinner.svg'
 
 // USING CSS VARIABLES
 
@@ -17,8 +17,9 @@ const SpinnerIc = (
         }
     },[circleColor,indicatorColor])
 
-    return <SpinnerSvg ref={svgRef} className={css.loading}
-                       style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
+    return <SvgIcon
+        ref={svgRef} className={css.loading}
+        style={{ width: size, aspectRatio: '1', maxWidth: '100%', maxHeight: '100%' }}
     />
 }
 export default React.memo(SpinnerIc)

@@ -72,8 +72,8 @@ const Input1 = ({
             </div>
             <div className={css.eyeContainer} onClick={()=>setHideText(!hideText)}>
                 { hideable && (hideText
-                    ? <EyeIc fill='black' size={22} />
-                    : <EyeCrossedOutIc fill='black' size={23} />
+                    ? <EyeIc color='black' size={22} />
+                    : <EyeCrossedOutIc color='black' size={23} />
                 )}
             </div>
 

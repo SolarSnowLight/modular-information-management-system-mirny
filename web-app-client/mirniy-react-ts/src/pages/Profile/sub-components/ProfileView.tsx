@@ -37,13 +37,11 @@ const ProfileView = ({ profileData }: { profileData: ProfileServ }) => {
                     <Age>{p.sex ? 'Мужчина' : 'Женщина'}, {p.birthDate.getAge()}</Age>
                 </TextCol>
                 <Link to={'/user/profile/edit'}><PencilFrame>
-                    <PencilIc fill='black' size={18}/>
+                    <PencilIc color='black' size={18}/>
                 </PencilFrame></Link>
             </MainInfoContainer>
 
-            <Space h={8}/>
-
-            <Space h={23}/>
+            <Space h={47}/>
 
             <Input2 {...input2Style}
                     title={'Телефон'} value={phoneUtils.format1(p.phone)} readOnly

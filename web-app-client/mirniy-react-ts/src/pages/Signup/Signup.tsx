@@ -72,7 +72,7 @@ function Signup(){
 
         <div>Регистрация</div>
 
-        { signupLoading && <LoadingIc fill={"#6663ff"} size={30}/> }
+        { signupLoading && <LoadingIc color={"#6663ff"} size={30}/> }
 
         {
             signupErrors.common.length > 0 &&

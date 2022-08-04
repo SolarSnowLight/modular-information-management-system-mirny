@@ -95,7 +95,8 @@ const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveSer
         }
     } else { // update article
         //console.log('title image:',a.images.find(it=>it.props.isTitleNew && !it.props.isTitle))
-        //console.log('test image',await (await fetch("http://localhost:5000/public/af9e368e-1eac-424c-827d-bf360eb124a4", { mode: 'no-cors' })).blob())
+        //console.log('test image no-cors',await (await fetch("http://localhost:5000/public/fe4d0fb5-2c07-499e-a4d9-81cc473c9977", { mode: 'no-cors' })).blob())
+        //console.log('test image',await (await fetch("http://localhost:5000/public/fe4d0fb5-2c07-499e-a4d9-81cc473c9977")).blob())
         const aUApi: ArticleUpdateApiInput = {
             uuid: a.id,
             title: a.title,

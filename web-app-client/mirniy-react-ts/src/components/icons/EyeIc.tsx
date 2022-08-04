@@ -1,13 +1,14 @@
 
-import {ReactComponent as EyeSvg} from "src/assets/icons/eye.svg"
+import {ReactComponent as SvgIcon} from "src/assets/icons/eye.svg"
 import React from "react";
 
 
 const EyeIc = (
-    { fill = 'black', size }: { fill?: string, size?: number }
+    { color = 'black', size }: { color?: string|undefined, size?: number|string|undefined }
 ) => {
-    return <EyeSvg style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
-                   fill={fill} stroke={fill}/>
+    return <SvgIcon
+        style={{ width: size, aspectRatio: '1', maxWidth: '100%', maxHeight: '100%' }}
+        fill={color} />
 }
 export default React.memo(EyeIc)
 

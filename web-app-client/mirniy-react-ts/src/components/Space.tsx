@@ -2,7 +2,7 @@ import React from "react";
 
 
 const Space = (
-    {w,h,flexGrow}: { w?: number|string, h?: number|string, flexGrow?: number }
+    {w,h,flexGrow}: { w?: number|string|undefined, h?: number|string|undefined, flexGrow?: number|undefined }
 ) => <div style={{ width: w, height: h, flexGrow: flexGrow }}/>
 
 

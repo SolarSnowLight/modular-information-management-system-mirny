@@ -33,7 +33,7 @@ const ArticleCard = (
                 <Space w={10}/>
                 { date && <BottomText>{date.day}.{date.month}</BottomText> }
                 <Space flexGrow={1} />
-                <EyeIcBox className={common.center}><EyeIc fill='#8B8B8B' size={22}/></EyeIcBox>
+                <EyeIcBox className={common.center}><EyeIc color='#8B8B8B' size={22}/></EyeIcBox>
                 <Space w={10}/>
                 <ViewsCnt>{a.viewsCnt}</ViewsCnt>
                 <Space w={20}/>

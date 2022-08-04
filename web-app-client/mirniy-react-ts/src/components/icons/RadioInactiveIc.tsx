@@ -1,16 +1,16 @@
 
-import {ReactComponent as SvgIcon} from "src/assets/icons/star.svg"
+import {ReactComponent as SvgIcon} from "src/assets/icons/radio-inactive.svg"
 import React from "react";
 
 
-const StarIc = (
+const RadioInactiveIc = (
     { color = 'black', size }: { color?: string|undefined, size?: number|string|undefined }
 ) => {
     return <SvgIcon
         style={{ width: size, aspectRatio: '1', maxWidth: '100%', maxHeight: '100%' }}
-        fill={color}
+        fill={color} stroke={color}
     />
 }
-export default React.memo(StarIc)
+export default React.memo(RadioInactiveIc)
 
 

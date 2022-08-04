@@ -1,5 +1,5 @@
 
-import {ReactComponent as LoadingSvg} from "src/assets/icons/loading.svg"
+import {ReactComponent as SvgIcon} from "src/assets/icons/loading.svg"
 import css from "./LoadingIc.module.scss"
 import React from "react";
 
@@ -7,11 +7,13 @@ import React from "react";
 
 
 const LoadingIc = (
-    { fill = '#6663ff', size }: { fill?: string, size?: number }
+    { color = '#6663ff', size }: { color?: string|undefined, size?: number|string|undefined }
 ) => {
-    return <LoadingSvg className={css.loading}
-        style={{ width: size, height: size, maxWidth: '100%', maxHeight: '100%' }}
-        fill={fill} stroke={fill}/>
+    return <SvgIcon
+        className={css.loading}
+        style={{ width: size, aspectRatio: '1', maxWidth: '100%', maxHeight: '100%' }}
+        fill={color} stroke={color}
+    />
 }
 export default React.memo(LoadingIc)
 
