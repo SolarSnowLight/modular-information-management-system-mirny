@@ -1,6 +1,6 @@
 import {ArticleApiFull, ArticleApi, articleApiTest, ArticleApiResponse, ArticlesApiResponse} from "../../api/test/articleApiTest";
 import {GraphQlData} from "src/api/test/utils";
-import {errors} from "src/models/errors";
+import {errorUtils} from "src/utils/errorUtils";
 import {ServiceData} from "../utils";
 import Axios, {AxiosError} from "axios";
 import {ImageSrc} from "src/models/test/ImageSrc";
@@ -19,7 +19,7 @@ const getArticles = async (): Promise<ServiceData<ArticlesResponse>> => {
                     }}
             }
 
-            return { error: errors.of('error') }
+            return { error: errorUtils.of('error') }
         },
         (error: Error|AxiosError) => {
             if (Axios.isAxiosError(error)){
@@ -46,7 +46,7 @@ const getArticleById = async (id: string): Promise<ServiceData<ArticleResponse>>
                     }}
             }
 
-            return { error: errors.of('error') }
+            return { error: errorUtils.of('error') }
         },
         (error: Error|AxiosError) => {
             if (Axios.isAxiosError(error)){

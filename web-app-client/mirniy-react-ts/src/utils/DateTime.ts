@@ -11,6 +11,7 @@ export class DateTime {
         public second: number = 0,
     ){ }
 
+
     public static fromDate(date: Date): DateTime {
         return new DateTime(
             date.getFullYear(), date.getMonth()+1, date.getDate(),
@@ -27,6 +28,7 @@ export class DateTime {
         if (match) return new DateTime(+match.groups!.year!, +match.groups!.month!, +match.groups!.day!)
     }
 
+
     // eg from "2022-01-01T00:00" in format yyyy-MM-ddThh:mm
     public static from_yyyy_MM_dd_hh_mm(date?: string){
         const match = date?.match(yyyy_MM_dd_hh_mm_pattern)
@@ -35,6 +37,7 @@ export class DateTime {
             +match.groups!.hour!, +match.groups!.minute!
         )
     }
+
 
     to_yyyy_MM_dd_HH_mm_ss(){
         return `${(this.year+'').padStart(4,'0')}-${(this.month+'').padStart(2,'0')}-${(this.day+'').padStart(2,'0')}T`+
@@ -50,11 +53,23 @@ export class DateTime {
         return `${(this.day+'').padStart(2,'0')}-${(this.month+'').padStart(2,'0')}-${(this.year+'').padStart(4,'0')}`
     }
 
+
     getAge(){
         const now = DateTime.now()
         let age = now.year - this.year
         if (now.month<this.month || (now.month===this.month && now.day<this.day)) age--
         return age
+    }
+
+    normalize(){
+        const d = new Date(this.year, this.month-1, this.day, this.hour, this.minute, this.second)
+        this.year = d.getFullYear()
+        this.month = d.getMonth()+1
+        this.day = d.getDate()
+        this.hour = d.getHours()
+        this.minute = d.getMinutes()
+        this.second = d.getSeconds()
+        return this
     }
 }
 

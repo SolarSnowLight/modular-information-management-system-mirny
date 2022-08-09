@@ -3,7 +3,7 @@ import {AppThunk} from "./store";
 import {UserRegisterServ, userService} from "src/api-service/userService";
 import {loadingActions} from "./loadingReducer";
 import {errorsActions} from "./errorsReducer";
-import {errors, ErrorType} from 'src/models/errors';
+import {errorUtils, ErrorType} from 'src/utils/errorUtils';
 
 
 type User = {
@@ -66,7 +66,7 @@ const login = (login: string, password: string): AppThunk<Promise<void|boolean>>
                             ]}}
                 }))
             }
-            if (error = errors.checkEmail(login)) {
+            if (error = errorUtils.checkEmail(login)) {
                 anyPrevalidationError = true
                 dispatch(errorsActions.addErrors({
                     login: { errors: { login: [error] }}
@@ -84,7 +84,7 @@ const login = (login: string, password: string): AppThunk<Promise<void|boolean>>
                 anyPrevalidationError = true
                 dispatch(errorsActions.addErrors({
                     login: { errors: { password: [
-                        errors.of('incorrect', 'Пароль должен быть не короче 6 символов')
+                        errorUtils.of('incorrect', 'Пароль должен быть не короче 6 символов')
                     ]}}
                 }))
             }
@@ -225,7 +225,7 @@ const signup = (userData: UserRegisterServ): AppThunk<Promise<void|boolean>> =>
                             ]}}
                 }))
             }
-            if (error = errors.checkEmail(userData.email)) {
+            if (error = errorUtils.checkEmail(userData.email)) {
                 anyPrevalidationError = true
                 dispatch(errorsActions.addErrors({
                     signup: { errors: { email: [error] }}

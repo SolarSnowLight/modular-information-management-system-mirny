@@ -36,8 +36,24 @@ const checkEmail = (email?: string|null): ErrorType|undefined => {
 }
 
 
+const isPositiveInteger = (i: number) => {
+    return Number.isInteger(i) && i>0
+}
 
-export const errors = {
+
+
+
+
+
+
+
+
+
+
+
+
+export const errorUtils = {
     of,
     checkEmail,
+    isPositiveInteger,
 }

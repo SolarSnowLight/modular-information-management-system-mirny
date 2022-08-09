@@ -50,7 +50,7 @@ const ProfileView = ({ profileData }: { profileData: ProfileServ }) => {
             <Space h={23}/>
 
             <Input2 {...input2Style}
-                    title={'E-mail'} value={'<email>'} readOnly
+                    title={'E-mail'} value={p.email} readOnly
             />
 
         </> }

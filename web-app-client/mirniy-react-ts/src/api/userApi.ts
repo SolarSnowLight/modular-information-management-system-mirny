@@ -68,6 +68,7 @@ const signup = async (userData: UserRegisterApiInput): ApiResult<AuthApi> => {
 
 
 export type UserProfileApi = {
+    email: string
     name: string // "Имя"
     surname: string // "Фамилия"
     patronymic: string // "Отчество"

@@ -1,6 +1,6 @@
 import {AuthApi, LogoutApi, userApi, UserProfileApi} from "src/api/userApi";
 import {Serv, serviceUtils} from "./utils";
-import {DateTime} from "../utils/DateTime";
+import {DateTime} from "src/utils/DateTime";
 
 
 
@@ -95,6 +95,7 @@ const signup = async (userData: UserRegisterServ): Serv<AuthServ> => {
 
 
 export type ProfileServ = {
+    email: string
     name: string
     surname: string
     patronymic: string
@@ -110,6 +111,7 @@ const getProfile = async (): Serv<ProfileServ> => {
         if (status===200) {
             data = data as UserProfileApi
             return serviceUtils.buildData<ProfileServ>({
+                email: data.email,
                 name: data.name,
                 surname: data.surname,
                 patronymic: data.patronymic,
@@ -132,6 +134,7 @@ const getProfile = async (): Serv<ProfileServ> => {
 const updateProfile = async (profileData: ProfileServ): Serv<ProfileServ> => {
     try {
         let { status, data } = await userApi.updateProfile({
+            email: profileData.email,
             name: profileData.name,
             surname: profileData.surname,
             patronymic: profileData.patronymic,
@@ -144,6 +147,7 @@ const updateProfile = async (profileData: ProfileServ): Serv<ProfileServ> => {
         if (status===200) {
             data = data as UserProfileApi
             return serviceUtils.buildData<ProfileServ>({
+                email: data.email,
                 name: data.name,
                 surname: data.surname,
                 patronymic: data.patronymic,

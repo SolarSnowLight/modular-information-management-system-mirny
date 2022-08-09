@@ -1,4 +1,4 @@
-import {errors, ErrorType} from "src/models/errors";
+import {errorUtils, ErrorType} from "src/utils/errorUtils";
 import Axios, {AxiosError} from "axios";
 import {BadRequest} from "src/api/utils";
 
@@ -29,7 +29,7 @@ const buildError = (
     code: ErrorType['code'],
     message?: ErrorType['message'],
     extra?: ErrorType['extra']
-): ServError => ({ type: 'error', error: errors.of(code, message, extra) })
+): ServError => ({ type: 'error', error: errorUtils.of(code, message, extra) })
 
 
 const generalError = (error: Error|AxiosError): ServError => {

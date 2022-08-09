@@ -1,5 +1,5 @@
 
-import {errors} from "src/models/errors";
+import {errorUtils} from "src/utils/errorUtils";
 import {Serv, ServiceData, serviceUtils} from "./utils";
 import {
     ArticleApi,
@@ -64,9 +64,9 @@ export type ArticleSaveServ = { result: 'updated' | 'saved' }
 const saveArticle = async (article: Article): Promise<ServiceData<ArticleSaveServ>> => {
     const a = article
     const titleIm = a.images.find(it=>it.props.isTitleNew && !it.props.isDeleted)
-    if (!titleIm) return { error: errors.of('required', 'Title image is required') }
-    if (!a.title) return { error: errors.of('required', 'Title is required') }
-    if (!a.text) return { error: errors.of('required', 'Title image is required') }
+    if (!titleIm) return { error: errorUtils.of('required', 'Title image is required') }
+    if (!a.title) return { error: errorUtils.of('required', 'Title is required') }
+    if (!a.text) return { error: errorUtils.of('required', 'Title image is required') }
 
     if (!a.id){ // create article
         const aApi: ArticleCreationApiInput = {

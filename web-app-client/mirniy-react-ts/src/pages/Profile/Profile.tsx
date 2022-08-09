@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
 import {ProfileServ, userService} from "src/api-service/userService"
 import {useAppSelector} from "src/redux/reduxHooks"
-import {ErrorType} from "src/models/errors"
+import {ErrorType} from "src/utils/errorUtils"
 import styled from "styled-components"
 import {commonStyled} from "src/common-styles/commonStyled"
 import ProfileView from "./sub-components/ProfileView";
@@ -32,7 +32,7 @@ const Profile = () => {
 
     return <Page>
         { profileData && !isEdit && <ProfileView profileData={profileData} /> }
-        { profileData && isEdit && <ProfileEdit profileData={profileData} /> }
+        { profileData && isEdit && <ProfileEdit profileData={profileData} setProfileData={setProfileData}/> }
         {/*<>{JSON.stringify(profileData)}</>*/}
     </Page>
 }
