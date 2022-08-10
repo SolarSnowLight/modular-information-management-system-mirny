@@ -7,6 +7,8 @@
     401 - forbidden if try to access to resource and can't
  */
 
+import {empty} from "@rrainpath/ts-utils";
+
 export type ErrorType = {
     code: 401 | 403 | 404 | 500 | number
         | 'error' | 'errors' | 'unknown error'
@@ -28,18 +30,14 @@ const of = (
 
 
 
-
 const emailPattern = /^.+@.+$/
-const checkEmail = (email?: string|null): ErrorType|undefined => {
-    if (!email || !emailPattern.test(email))
-        return of('incorrect', 'Некорректный формат email')
-}
+
 
 
 const isPositiveInteger = (i: number) => {
     return Number.isInteger(i) && i>0
 }
-
+const isValidEmail = (email?: string|empty) => email && emailPattern.test(email)
 
 
 
@@ -54,6 +52,6 @@ const isPositiveInteger = (i: number) => {
 
 export const errorUtils = {
     of,
-    checkEmail,
+    isValidEmail,
     isPositiveInteger,
 }

@@ -115,7 +115,7 @@ const Age = React.memo(styled.div`
 
 
 const input2Style = {
-    frameMainStyle: css`width: 380px; height: 45px; border: 1px solid #8B8B8B;`,
+    frameMainStyle: css`width: 380px; height: 45px; :before{border: 1px solid #8B8B8B;}`,
     titleStyle: css`font: 400 12px 'TT Commons'; color: #424041; /*Gray1*/`,
     inputStyle: css`font: 500 16px 'TT Commons'; color: black;`,
 }

@@ -1,6 +1,7 @@
 import {AuthApi, LogoutApi, userApi, UserProfileApi} from "src/api/userApi";
 import {Serv, serviceUtils} from "./utils";
 import {DateTime} from "src/utils/DateTime";
+import {SuccessApi} from "../api/utils";
 
 
 
@@ -165,6 +166,26 @@ const updateProfile = async (profileData: ProfileServ): Serv<ProfileServ> => {
 }
 
 
+type UserDataToRecoveryPwd = {
+    email: string
+}
+
+const sendUserDataToRecoveryPwd = async (userData: UserDataToRecoveryPwd): Serv<undefined> => {
+    try {
+        let { status, data } = await userApi.sendUserDataToRecoveryPwd({
+            email: userData.email
+        })
+
+        if (status===200) {
+            return serviceUtils.buildData(undefined)
+        }
+
+        return serviceUtils.defaultError()
+    } catch (e: any){
+        return serviceUtils.generalError(e)
+    }
+}
+
 
 
 export const userService = {
@@ -173,4 +194,5 @@ export const userService = {
     signup,
     getProfile,
     updateProfile,
+    sendUserDataToRecoveryPwd,
 }

@@ -16,7 +16,7 @@ export type Default = BadRequest
 
 
 export type ApiResult<D> = Promise<AxiosResponse<D|BadRequest|undefined>>
-
+export type SuccessApi = { success: boolean }
 
 
 /*
@@ -29,3 +29,5 @@ export interface ApiError extends AxiosResponse<BadRequest> {
 export type ApiResult2<D> = ApiData<D> | ApiError
 export type FromApi<D> = Promise<ApiResult2<D>>
 */
+
+

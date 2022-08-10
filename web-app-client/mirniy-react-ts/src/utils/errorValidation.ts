@@ -1,4 +1,5 @@
 import {ErrorType, errorUtils} from "./errorUtils";
+import {empty} from "@rrainpath/ts-utils";
 
 
 export type Validator<V = any, Vs = object> = (value: V, values: Vs) => ErrorType | undefined
@@ -10,6 +11,14 @@ const checkPositiveInteger = (value: string, message: string) => {
     const v = +value
     return !(Number.isSafeInteger(+v) && v>0) ? errorUtils.of('incorrect', message) : undefined
 }
+
+const checkEmail = (email?: string|empty): ErrorType|undefined => {
+    if (!errorUtils.isValidEmail(email))
+        return errorUtils.of('incorrect', 'Некорректный формат email')
+}
+
+
+
 
 const validate = <Vs extends object>(
     errors: { [field: string]: ErrorType[] },
@@ -49,6 +58,7 @@ const hasError = (errors: { [field: string]: ErrorType[] }) => {
 export const errorValidation = {
     required,
     checkPositiveInteger,
+    checkEmail,
     validate,
     hasError,
 }

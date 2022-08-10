@@ -11,6 +11,7 @@ import Button1 from "src/components/Button1";
 import SpinnerIc from "src/components/icons/SpinnerIc";
 import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import styled from "styled-components";
+import {commonStyled} from "../../common-styles/commonStyled";
 
 
 // todo crop image, image shadow
@@ -110,6 +111,19 @@ function Login(){
                 </div>
             </div>
 
+            <Space h={40} />
+
+            <AdditionalOptionBox><AdditionalOption>
+                Войти позже
+            </AdditionalOption></AdditionalOptionBox>
+
+            <Space h={12} />
+
+            <AdditionalOptionBox><Link to={'/user/password/recovery'}><AdditionalOption>
+                    Восстановить пароль
+            </AdditionalOption></Link></AdditionalOptionBox>
+
+
         </div>
 
     </div>
@@ -121,3 +135,13 @@ const ActionButton = React.memo(styled(Button1)`
   font: 600 18px "TT Commons";
 `)
 
+const AdditionalOptionBox = styled.div`
+  ${commonStyled.center};
+  width: 327px; height: fit-content;
+`
+const AdditionalOption = styled.div`
+  font: 500 16px 'TT Commons';
+  color: #8B8B8B;
+  text-decoration-line: underline;
+  cursor: pointer;
+`

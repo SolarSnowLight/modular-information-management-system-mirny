@@ -167,7 +167,7 @@ const ProfileEdit = ({ profileData, setProfileData }: {
 
             <Input2 {...input2Style}
                     title={'Отчество'} value={patronymic} onInput={onPatronymicInput}
-                    placeholder={'Введите отчесвто'}
+                    placeholder={'Введите отчество'}
                     hasError={errors.patronymic.length>0}
             />
 
@@ -335,8 +335,8 @@ const SexText = React.memo(styled.label`
 
 
 const input2Style: Input2CustomProps = {
-    frameMainStyle: css`width: 380px; height: 45px; border: 1px solid #8B8B8B;`,
-    frameErrorStyle: css`border: 1px solid #EE1D23;`,
+    frameMainStyle: css`width: 380px; height: 45px; :before{border: 1px solid #8B8B8B;}`,
+    frameErrorStyle: css`:before{border: 1px solid #EE1D23;}`,
     titleStyle: css`font: 400 12px 'TT Commons'; color: #424041; /*Gray1*/`,
     placeholderStyle: css`font: 500 16px 'TT Commons'; color: #8B8B8B; /*Gray2*/`,
     inputStyle: css`font: 500 16px 'TT Commons'; color: black;`,

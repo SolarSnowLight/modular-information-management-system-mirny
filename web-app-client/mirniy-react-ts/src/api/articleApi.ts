@@ -1,5 +1,5 @@
 
-import {ApiResult} from "./utils";
+import {ApiResult, SuccessApi} from "./utils";
 import ax, {getAccessJwt} from "./ax";
 
 
@@ -27,7 +27,6 @@ export type ArticleImageApi = {
 
 
 
-export type SuccessApi = { success: boolean }
 
 
 

@@ -4,6 +4,7 @@ import {UserRegisterServ, userService} from "src/api-service/userService";
 import {loadingActions} from "./loadingReducer";
 import {errorsActions} from "./errorsReducer";
 import {errorUtils, ErrorType} from 'src/utils/errorUtils';
+import {errorValidation} from "../utils/errorValidation";
 
 
 type User = {
@@ -66,7 +67,7 @@ const login = (login: string, password: string): AppThunk<Promise<void|boolean>>
                             ]}}
                 }))
             }
-            if (error = errorUtils.checkEmail(login)) {
+            if (error = errorValidation.checkEmail(login)) {
                 anyPrevalidationError = true
                 dispatch(errorsActions.addErrors({
                     login: { errors: { login: [error] }}
@@ -225,7 +226,7 @@ const signup = (userData: UserRegisterServ): AppThunk<Promise<void|boolean>> =>
                             ]}}
                 }))
             }
-            if (error = errorUtils.checkEmail(userData.email)) {
+            if (error = errorValidation.checkEmail(userData.email)) {
                 anyPrevalidationError = true
                 dispatch(errorsActions.addErrors({
                     signup: { errors: { email: [error] }}

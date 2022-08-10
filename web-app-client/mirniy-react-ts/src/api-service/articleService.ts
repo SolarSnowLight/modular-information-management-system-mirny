@@ -5,10 +5,11 @@ import {
     ArticleApi,
     articleApi,
     ArticleCreationApiInput, ArticlesApi,
-    ArticleUpdateApiInput, SuccessApi,
+    ArticleUpdateApiInput,
 } from "src/api/articleApi";
 import {awaitPromisesArray, joinTags} from "src/utils/utils";
 import {Article, articleApiToArticle} from "./articleServiceUtils";
+import {SuccessApi} from "../api/utils";
 
 
 

@@ -60,30 +60,32 @@ const Input2 = React.forwardRef<HTMLInputElement, Input2Props>((
 
         { title && <Title addStyle={titleStyle} addStyle2={titleStyle2}>{title}</Title> }
 
-        <InputContainer>
+        <Frame>
+            <InputContainer>
 
-            { placeholder && !value &&
-                <PlaceholderBox>
-                    <Placeholder addStyle={placeholderStyle} addStyle2={placeholderStyle2}>
-                        {placeholder}
-                    </Placeholder>
-                </PlaceholderBox>
-            }
+                { placeholder && !value &&
+                    <PlaceholderBox>
+                        <Placeholder addStyle={placeholderStyle} addStyle2={placeholderStyle2}>
+                            {placeholder}
+                        </Placeholder>
+                    </PlaceholderBox>
+                }
 
-            <Input ref={ref as any} {...props}
-                   type={ hideText ? 'password' : undefined}
-                   addStyle={inputStyle} addStyle2={inputStyle2}
-            />
+                <Input ref={ref as any} {...props}
+                       type={ hideText ? 'password' : undefined}
+                       addStyle={inputStyle} addStyle2={inputStyle2}
+                />
 
-        </InputContainer>
+            </InputContainer>
 
-        {/* todo control icon size */}
-        { allowHideSwitch && <EyeContainer onClick={()=>setHideText(!hideText)}>
-            { hideText
-                ? <EyeIc color={hideIcColor2 ?? hideIcColor ?? 'black'} size={22} />
-                : <EyeCrossedOutIc color={showIcColor2 ?? showIcColor ?? 'black'} size={22} />
-            }
-        </EyeContainer> }
+            {/* todo control icon size */}
+            { allowHideSwitch && <EyeContainer onClick={()=>setHideText(!hideText)}>
+                { hideText
+                    ? <EyeIc color={hideIcColor2 ?? hideIcColor ?? 'black'} size={22} />
+                    : <EyeCrossedOutIc color={showIcColor2 ?? showIcColor ?? 'black'} size={22} />
+                }
+            </EyeContainer> }
+        </Frame>
 
     </MainFrame>
 })
@@ -98,18 +100,24 @@ const MainFrame = React.memo(styled.div<{
     errorStyle2?: ReturnType<typeof css> | undefined
 }>`
   position: relative;
-  ${commonStyled.row};
-  border: 2px solid #8B8B8B;
-  border-radius: 4px;
+  
+  :before {
+    content: ''; ${commonStyled.abs};
+    border: 2px solid #8B8B8B;
+    border-radius: 4px;
+  }
 
   ${p => p.mainStyle};
   ${p => p.mainStyle2};
   
   ${p => p.hasError ? css`
-    border: 1px solid #EE1D23;
+    :before{
+      border: 1px solid #EE1D23;
+    }
     ${() => p.errorStyle};
     ${() => p.errorStyle2};
   ` : undefined};
+
 `)
 const Title = React.memo(styled.div<{
     addStyle?: ReturnType<typeof css>  | undefined
@@ -124,6 +132,10 @@ const Title = React.memo(styled.div<{
   font: 400 14px 'TT Commons';
   ${p => p.addStyle};
   ${p => p.addStyle2};
+`)
+const Frame = React.memo(styled.div`
+  ${commonStyled.abs};
+  ${commonStyled.row};
 `)
 const InputContainer = React.memo(styled.div`
   position: relative;

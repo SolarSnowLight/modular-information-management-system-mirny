@@ -1,5 +1,5 @@
 import ax, {CustomConfig, getAccessJwt} from './ax'
-import {ApiResult} from "./utils";
+import {ApiResult, SuccessApi} from "./utils";
 import {AxiosRequestConfig} from "axios";
 
 
@@ -46,7 +46,7 @@ const logout = async (): ApiResult<LogoutApi> => {
 
 
 
-export type UserRegisterApiInput = {
+type UserRegisterApiInput = {
     email: string
     password: string
     data: {
@@ -67,7 +67,7 @@ const signup = async (userData: UserRegisterApiInput): ApiResult<AuthApi> => {
 
 
 
-export type UserProfileApi = {
+type UserProfileApi = {
     email: string
     name: string // "Имя"
     surname: string // "Фамилия"
@@ -94,6 +94,16 @@ const updateProfile = async (profileData: UserProfileApi): ApiResult<UserProfile
 }
 
 
+type UserDataToRecoveryPwd = {
+    email: string
+}
+
+const sendUserDataToRecoveryPwd = async (userData: UserDataToRecoveryPwd): ApiResult<undefined> => {
+    return ax.post('auth/recovery/password', userData, {
+        headers: { Authorization: `Bearer ${getAccessJwt()}`}
+    })
+}
+
 
 
 export const userApi = {
@@ -103,4 +113,9 @@ export const userApi = {
     signup,
     getProfile,
     updateProfile,
+    sendUserDataToRecoveryPwd,
+}
+export type {
+    UserRegisterApiInput,
+    UserProfileApi,
 }
