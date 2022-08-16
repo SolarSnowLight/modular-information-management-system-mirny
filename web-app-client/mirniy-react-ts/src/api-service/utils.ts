@@ -36,7 +36,13 @@ const generalError = (error: Error|AxiosError): ServError => {
     if (Axios.isAxiosError(error)){
         if (error.code==='ERR_NETWORK'){
             // error.code: "ERR_NETWORK" when server not found
-            return { error: { code: 'connection error' }, type: 'error' }
+            return {
+                error: {
+                    code: 'connection error',
+                    message: 'Ошибка соединения с сервером, проверьте соединение с интернетом'
+                },
+                type: 'error'
+            }
         }
         if (error.response){
             const status = error.response.status

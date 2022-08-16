@@ -166,6 +166,8 @@ const updateProfile = async (profileData: ProfileServ): Serv<ProfileServ> => {
 }
 
 
+
+
 type UserDataToRecoveryPwd = {
     email: string
 }
@@ -188,6 +190,32 @@ const sendUserDataToRecoveryPwd = async (userData: UserDataToRecoveryPwd): Serv<
 
 
 
+
+type NewPwd = {
+    pwd: string
+    pwdToken: string
+}
+
+const setNewPwd = async (newPwd: NewPwd): Serv<undefined> => {
+    try {
+        let { status, data } = await userApi.setNewPwd({
+            password: newPwd.pwd,
+            token: newPwd.pwdToken,
+        })
+
+        if (status===200) {
+            return serviceUtils.buildData(undefined)
+        }
+
+        return serviceUtils.defaultError()
+    } catch (e: any){
+        return serviceUtils.generalError(e)
+    }
+}
+
+
+
+
 export const userService = {
     login,
     logout,
@@ -195,4 +223,5 @@ export const userService = {
     getProfile,
     updateProfile,
     sendUserDataToRecoveryPwd,
+    setNewPwd,
 }

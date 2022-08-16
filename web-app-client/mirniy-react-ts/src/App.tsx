@@ -10,7 +10,9 @@ import ArticleList from "./pages/ArticleList/ArticleList";
 import ArticlePage from "./pages/Article/ArticlePage";
 import ArticleEditor from './pages/ArticleEditor/ArticleEditor';
 import Profile from "./pages/Profile/Profile";
-import PasswordRecovery from "./pages/PasswordRecovery/PwdRecoveryUserDataInput";
+import PwdRecoveryGetUserData from "./pages/PasswordRecovery/PwdRecoveryGetUserData";
+import Test from "./pages/Test";
+import PwdRecoverySetNewPwd from "./pages/PasswordRecovery/PwdRecoverySetNewPwd";
 
 function App() {
 
@@ -92,11 +94,14 @@ function App() {
                 <Route path='/signup' element={<Signup/>}/>
                 <Route path='/login' element={<Login/>}/>
                 <Route path='/user/profile/*' element={<Profile/>}/>
-                <Route path='/user/password/recovery' element={<PasswordRecovery/>}/>
+                <Route path='/user/password/recovery' element={<PwdRecoveryGetUserData/>}/>
+                <Route path='/auth/reset/password/:pwdToken' element={<PwdRecoverySetNewPwd/>}/>
                 <Route path='/articles/user' element={<ArticleList/>}/>
                 <Route path='/article/:articleId' element={<ArticlePage/>}/>
                 <Route path='/article/create' element={<ArticleEditor/>}/>
                 <Route path='/article/edit/:articleId' element={<ArticleEditor/>}/>
+
+                <Route path='/test' element={<Test/>}/>
 
                 <Route path='*' element={<Main/>}/>
             </Routes>

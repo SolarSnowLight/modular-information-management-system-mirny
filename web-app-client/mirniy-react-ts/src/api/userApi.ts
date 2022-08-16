@@ -94,6 +94,8 @@ const updateProfile = async (profileData: UserProfileApi): ApiResult<UserProfile
 }
 
 
+
+
 type UserDataToRecoveryPwd = {
     email: string
 }
@@ -106,6 +108,21 @@ const sendUserDataToRecoveryPwd = async (userData: UserDataToRecoveryPwd): ApiRe
 
 
 
+
+type NewPwd = {
+    password: string
+    token: string
+}
+
+const setNewPwd = async (newPwd: NewPwd): ApiResult<undefined> => {
+    return  ax.post('auth/reset/password', newPwd, {
+        headers: { Authorization: `Bearer ${getAccessJwt()}`}
+    })
+}
+
+
+
+
 export const userApi = {
     login,
     refreshJwts,
@@ -114,6 +131,7 @@ export const userApi = {
     getProfile,
     updateProfile,
     sendUserDataToRecoveryPwd,
+    setNewPwd,
 }
 export type {
     UserRegisterApiInput,

@@ -11,7 +11,7 @@ import InputRadio from "src/components/InputRadio";
 import Button1 from "src/components/Button1";
 import SpinnerIc from "src/components/icons/SpinnerIc";
 import {errorValidation} from "src/utils/errorValidation";
-import {profileEditValidation} from "src/form-validation/profileEditValidation";
+import {profileEditValidation} from "src/pages/Profile/sub-components/ProfileEditValidation";
 import {DateTime} from "src/utils/DateTime";
 
 

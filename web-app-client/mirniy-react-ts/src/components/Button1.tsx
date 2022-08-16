@@ -40,5 +40,18 @@ const Button1 = styled.button`
 
   cursor: pointer;
 `
-
 export default React.memo(Button1)
+
+
+
+
+export const Button1a = React.memo(styled(Button1)`
+  width: 380px; height: 42px;
+  font: 600 18px "TT Commons";
+  :disabled {
+    background: transparent;
+    border: 1px solid #8B8B8B; /* Gray2 */
+    color: #8B8B8B; /* Gray2 */
+    cursor: auto;
+  }
+`)

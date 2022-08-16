@@ -4,7 +4,7 @@ import {commonStyled} from "src/common-styles/commonStyled";
 import Space from "src/components/Space";
 import mirRabLogo from 'src/assets/icons/mir-rab-logo.svg'
 import Input2, {Input2CustomProps} from "src/components/Input2";
-import {pwdRecoveryUserDataInputValidation} from "src/form-validation/pwdRecoveryUserDataInputValidation";
+import {pwdRecoveryGetUserDataValidation} from "src/pages/PasswordRecovery/PwdRecoveryGetUserDataValidation";
 import SpinnerIc from "src/components/icons/SpinnerIc";
 import {errorValidation} from "src/utils/errorValidation";
 import {userService} from "src/api-service/userService";
@@ -13,14 +13,14 @@ import Button1 from "src/components/Button1";
 
 
 
-const PwdRecoveryUserDataInput = () => {
+const PwdRecoveryGetUserData = () => {
     const [email, setEmail] = useState('')
     const onEmailInput = (ev: React.ChangeEvent<HTMLInputElement>) => {
         setErrors({...errors, email: [], common: []})
         setEmail(ev.target.value)
     }
 
-    const [errors, setErrors] = useState(pwdRecoveryUserDataInputValidation.getInitialErrors())
+    const [errors, setErrors] = useState(pwdRecoveryGetUserDataValidation.getInitialErrors())
     const [loading, setLoading] = useState(false)
 
     const [requested, setRequested] = useState(false)
@@ -30,14 +30,14 @@ const PwdRecoveryUserDataInput = () => {
         setLoading(true)
         try {
             const values = { email }
-            const newErrors = await pwdRecoveryUserDataInputValidation.checkOnErrors(values)
+            const newErrors = await pwdRecoveryGetUserDataValidation.checkOnErrors(values)
             setErrors(newErrors)
             if (errorValidation.hasError(newErrors)) return
 
             const r = await userService.sendUserDataToRecoveryPwd({ email })
 
             if (r.type==='error'){
-                const errors = pwdRecoveryUserDataInputValidation.getInitialErrors()
+                const errors = pwdRecoveryGetUserDataValidation.getInitialErrors()
                 errors.common.push(r.error)
                 setErrors(errors)
                 return
@@ -96,7 +96,7 @@ const PwdRecoveryUserDataInput = () => {
         </MainFrame>
     </Page>
 }
-export default React.memo(PwdRecoveryUserDataInput)
+export default React.memo(PwdRecoveryGetUserData)
 
 
 const Page = React.memo(styled.div`

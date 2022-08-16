@@ -28,7 +28,7 @@ const checkOnErrors = async (values: Values): Promise<Errors> => {
 
 
 
-export const pwdRecoveryUserDataInputValidation = {
+export const pwdRecoveryGetUserDataValidation = {
     getInitialErrors,
     checkOnErrors,
 }
