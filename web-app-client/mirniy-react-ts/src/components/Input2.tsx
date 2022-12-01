@@ -5,7 +5,7 @@ import {useState} from "react";
 import EyeCrossedOutIc from "./icons/EyeCrossedOutIc";
 import * as React from "react";
 import styled, {css} from "styled-components";
-import {commonStyled} from "src/common-styles/commonStyled";
+import {commonStyled} from "src/styles/commonStyled";
 
 
 

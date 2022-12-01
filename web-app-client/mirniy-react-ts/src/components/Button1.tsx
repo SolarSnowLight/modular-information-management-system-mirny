@@ -2,7 +2,7 @@
 //import css from './Button1.module.scss'
 //import React from "react";
 import styled from "styled-components";
-import {allDefault} from "src/common-styles/commonStyled";
+import {allDefault} from "src/styles/commonStyled";
 import React from "react";
 
 /*

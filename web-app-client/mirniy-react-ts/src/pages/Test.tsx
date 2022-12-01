@@ -21,7 +21,7 @@ const Test = () => {
 
         <Input3a
             hasError={false}
-            allowHideSwitch
+            enableHideSwitch
             /*type='password'*/
             title='Title'
             placeholder='Placeholder'
@@ -31,9 +31,10 @@ const Test = () => {
 
         <Input3b
             hasError={true}
-            allowHideSwitch
+            enableHideSwitch
             /*type='password'*/
             title='Title'
+            hideIcStyle={{mainColor:'red', size: undefined}}
         />
 
         <Space h={16}/>
@@ -49,9 +50,9 @@ const Test = () => {
 export default Test
 
 
-const Input3b = styled(Input3).attrs({
-    hideIcStyle: { mainColor: 'black', size: 25 }
-})`
+const Input3b = styled(Input3).attrs(p=>({
+    hideIcStyle: {...{ mainColor: 'black', size: 25 },...p.hideIcStyle}
+}))`
   
 `
 

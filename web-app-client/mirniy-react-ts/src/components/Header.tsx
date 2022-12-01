@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import common from 'src/common-styles/common.module.scss'
+import common from 'src/styles/common.module.scss'
 import React from "react";
 
 

@@ -2,7 +2,11 @@ import {ErrorType, errorUtils} from "./errorUtils";
 import {empty} from "@rrainpath/ts-utils";
 
 
-export type Validator<V = any, Vs = object> = (value: V, values: Vs) => ErrorType | undefined
+type Errors = { [field: string]: ErrorType[] }
+type Values = object
+type Validator<V = any, Vs = Values> = (value: V, values: Vs) => ErrorType | undefined
+type Validators<Es extends Errors, Vs extends Values> = { [Field in (keyof Es & keyof Vs)]?: Validator<Vs[Field],Vs>[] };
+
 
 const required = (value: string, message: string) =>
     value.length<=0 ? errorUtils.of('required', message) : undefined
@@ -18,24 +22,17 @@ const checkEmail = (email?: string|empty): ErrorType|undefined => {
 }
 
 
-
-
-const validate = <Vs extends object>(
-    errors: { [field: string]: ErrorType[] },
-    validators: { [Field in keyof typeof errors]?: Validator<Vs>[] },
+/*const validate0 = <Es extends Errors, Vs extends Values>(
+    errors: Es,
+    validators: Validators<Es,Vs>,
     values: Vs,
     config: { mode: 'form-first-error' | 'field-first-error' | 'all-errors' } = { mode: 'field-first-error' },
 ) => {
-    //console.log('errors:',errors)
-    //console.log('validators:',validators)
-    //console.log('values:',values)
-    //console.log('config:',config)
-
     loop: for (const f in errors){
         const v = values[f]
-        const vdArr = validators[f]??[]
-        for (let i = 0; i < vdArr.length; i++) {
-            const vd = vdArr[i]
+        const vds = validators[f]??[]
+        for (let i = 0; i < vds.length; i++) {
+            const vd = vds[i]
             const result = vd(v,values)
             if (result) {
                 errors[f].push(result)
@@ -44,10 +41,30 @@ const validate = <Vs extends object>(
             }
         }
     }
+}*/
+const validate = <Es extends Errors, Vs extends Values>(
+    errors: Es,
+    validators: Validators<Es,Vs>,
+    values: Vs,
+    config: { mode: 'form-first-error' | 'field-first-error' | 'all-errors' } = { mode: 'field-first-error' },
+) => {
+    loop: for (const field in validators){
+        const vds = validators[field]
+        const v = values[field]
+        for (let i = 0; i < vds.length; i++) {
+            const vd = vds[i]
+            const result = vd(v,values)
+            if (result) {
+                errors[field].push(result)
+                if (config.mode==='form-first-error') return
+                if (config.mode==='field-first-error') continue loop
+            }
+        }
+    }
 }
 
 
-const hasError = (errors: { [field: string]: ErrorType[] }) => {
+const hasError = (errors: Errors) => {
     for (const e in errors) {
         if (errors[e].length > 0) return true
     }
@@ -61,4 +78,10 @@ export const errorValidation = {
     checkEmail,
     validate,
     hasError,
+}
+export type {
+    Errors,
+    Values,
+    Validator,
+    Validators,
 }

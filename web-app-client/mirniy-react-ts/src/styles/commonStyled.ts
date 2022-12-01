@@ -30,8 +30,8 @@ export const col = css`
 
 export const center = css`
   display: grid;
-  align-content: center;
-  justify-content: center;
+  place-items: center;
+  place-content: center;
 `
 
 

@@ -27,13 +27,18 @@ code {
 
 @font-face {
     font-family: 'TT Commons';
-    font-weight: 300;
-    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Light.otf');
+    font-weight: 100;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Thin.otf');
 }
 @font-face {
     font-family: 'TT Commons';
-    font-weight: 400;
-    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Regular.otf');
+    font-weight: 200;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons ExtraLight.otf');
+}
+@font-face {
+    font-family: 'TT Commons';
+    font-weight: 300;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Light.otf');
 }
 @font-face {
     font-family: 'TT Commons';
@@ -54,4 +59,14 @@ code {
     font-family: 'TT Commons';
     font-weight: 700;
     src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Bold.otf');
+}
+@font-face {
+    font-family: 'TT Commons';
+    font-weight: 800;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons ExtraBold.otf');
+}
+@font-face {
+    font-family: 'TT Commons';
+    font-weight: 900;
+    src: local('TT Commons'), url('src/assets/fonts/TT Commons/TT Commons Black.otf');
 }

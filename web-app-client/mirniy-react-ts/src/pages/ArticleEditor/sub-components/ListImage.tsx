@@ -2,7 +2,7 @@ import CrossIc from "src/components/icons/CrossIc";
 import Button1 from "src/components/Button1";
 import styled from "styled-components";
 import React from "react";
-import {commonStyled} from "src/common-styles/commonStyled";
+import {commonStyled} from "src/styles/commonStyled";
 import {ArticleImage} from "src/api-service/articleServiceUtils";
 
 

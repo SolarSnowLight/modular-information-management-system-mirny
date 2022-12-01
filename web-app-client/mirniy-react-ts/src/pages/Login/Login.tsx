@@ -11,7 +11,7 @@ import Button1 from "src/components/Button1";
 import SpinnerIc from "src/components/icons/SpinnerIc";
 import {Link, useNavigate, useSearchParams} from "react-router-dom";
 import styled from "styled-components";
-import {commonStyled} from "../../common-styles/commonStyled";
+import {commonStyled} from "../../styles/commonStyled";
 
 
 // todo crop image, image shadow

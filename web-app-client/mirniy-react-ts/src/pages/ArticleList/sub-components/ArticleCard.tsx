@@ -1,4 +1,4 @@
-import common from 'src/common-styles/common.module.scss'
+import common from 'src/styles/common.module.scss'
 import {Link} from "react-router-dom";
 import Space from "src/components/Space";
 import EyeIc from "src/components/icons/EyeIc";
@@ -24,7 +24,7 @@ const ArticleCard = (
     }
 
     return <Card className={common.row}>
-        <Content className={common.column}>
+        <Content className={common.col}>
             <Link to={`/article/${a.id}`}><Title>{a.title}</Title></Link>
             <Description>{a.shortDescription}</Description>
             <Divider/>

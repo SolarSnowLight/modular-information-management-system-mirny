@@ -1,8 +1,21 @@
 import {ErrorType, errorUtils} from "src/utils/errorUtils";
-import {errorValidation} from "src/utils/errorValidation";
+import {errorValidation, Validators} from "src/utils/errorValidation";
 
 
-type ProfileEditErrors = {
+const req = errorValidation.required
+
+const checkYear = (year: string) => {
+    return req(year,'Год рождения обязателен')
+    || (!errorUtils.isPositiveInteger(+year) ? errorUtils.of('incorrect','Год должен быть целым положительным числом') : undefined)
+    || ((year+'').length!==4 ? errorUtils.of('incorrect', 'Год должен быть четырёхзначным') : undefined)
+}
+const checkMonth = (month: string) => {
+    return req(month,'Месяц рождения обязателен')
+    || (errorValidation.checkPositiveInteger(month,'Месяц должен быть целым положительным числом'))
+    || (+month>=1 && +month<=12 ? undefined : errorUtils.of('incorrect', 'Номер месяца должен быть от 1 до 12'))
+}
+
+type Errors = {
     name: ErrorType[]
     surname: ErrorType[]
     patronymic: ErrorType[]
@@ -17,7 +30,19 @@ type ProfileEditErrors = {
 
     common: ErrorType[]
 }
-const initialErrors = (): ProfileEditErrors => ({
+type Values = {
+    name: string
+    surname: string
+    patronymic: string
+    day: string
+    month: string
+    year: string
+    nick: string
+    pwd: string
+    pwd2: string
+}
+
+const initialErrors = (): Errors => ({
     name: [],
     surname: [],
     patronymic: [],
@@ -32,56 +57,40 @@ const initialErrors = (): ProfileEditErrors => ({
 
     common: [],
 })
-type ProfileEditValues = {
-    name: string
-    surname: string
-    patronymic: string
-    day: string
-    month: string
-    year: string
-    nick: string
-    pwd: string
-    pwd2: string
-}
-const checkOnErrors = async (values: ProfileEditValues): Promise<ProfileEditErrors> => {
+const checkOnErrors = async (values: Values): Promise<Errors> => {
     const errors = initialErrors()
-    const validators = {
-        name: [ v => errorValidation.required(v,'Имя обязательно') ],
-        surname: [ v => errorValidation.required(v,'Фамилия обязательна') ],
-        patronymic: [ v => errorValidation.required(v,'Отчество обязательно') ],
+    const validators: Validators<Errors, Values> = {
+        name: [ v => req(v,'Имя обязательно') ],
+        surname: [ v => req(v,'Фамилия обязательна') ],
+        patronymic: [ v => req(v,'Отчество обязательно') ],
         day: [
-            v => errorValidation.required(v,'День рождения обязателен'),
-            v => errorValidation.checkPositiveInteger(v,'День должен быть целым положительным числом'),
+            v => req(v,'День рождения обязателен'),
             (v,vs) => {
+                let err = checkYear(vs.year)
+                if (err) return undefined
+                err = checkMonth(vs.month)
+                if (err) return undefined
+
+                err = errorValidation.checkPositiveInteger(v,'День должен быть целым положительным числом')
+                if (err) return err
+
                 const d = +vs.day, m = +vs.month, y = +vs.year
-                if (!errorUtils.isPositiveInteger(y) || (y+'').length!==4) return undefined
-                if (!errorUtils.isPositiveInteger(m) || m<1||m>12) return undefined
-                if (!errorUtils.isPositiveInteger(d)) return undefined
 
                 const maxD = new Date(y,(m-1)+1,0).getDate()
 
-                if (d<1 || d>maxD)
-                    return errorUtils.of('incorrect', 'Неправильный день')
+                if (d<1 || d>maxD) return errorUtils.of('incorrect', 'Неправильный день')
                 return undefined
             }
         ],
-        month: [
-            v => errorValidation.required(v,'Месяц рождения обязателен'),
-            v => errorValidation.checkPositiveInteger(v,'Месяц должен быть целым положительным числом'),
-            v => v>=1 && v<=12 ? undefined : errorUtils.of('incorrect', 'Номер месяца должен быть от 1 до 12')
-        ],
-        year: [
-            v => errorValidation.required(v,'Год рождения обязателен'),
-            v => !errorUtils.isPositiveInteger(+v) ? errorUtils.of('incorrect','Год должен быть целым положительным числом') : undefined,
-            v => (v+'').length!==4 ? errorUtils.of('incorrect', 'Год должен быть четырёхзначным') : undefined,
-        ],
-        nick: [ v => errorValidation.required(v,'Никнейм обязателен') ],
+        month: [ checkMonth ],
+        year: [ checkYear ],
+        nick: [ v => req(v,'Никнейм обязателен') ],
         pwd: [
-            v => errorValidation.required(v,'Пароль обязателен'),
+            v => req(v,'Пароль обязателен'),
             v => v.length<6 ? errorUtils.of('incorrect', 'Пароль должен быть не короче 6 символов') : undefined,
         ],
         pwd2: [
-            v => errorValidation.required(v,'Повторите пароль'),
+            v => req(v,'Повторите пароль'),
             (v,vs) => v===vs.pwd ? undefined : errorUtils.of('incorrect', 'Пароли должны совпадать')
         ]
     }
@@ -96,7 +105,3 @@ export const profileEditValidation = {
     initialErrors,
     checkOnErrors,
 }
-/*export {
-    type ProfileEditErrors,
-    type ProfileEditValues,
-}*/

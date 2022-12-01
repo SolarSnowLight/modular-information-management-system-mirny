@@ -3,7 +3,7 @@ import EyeIc from "src/components/icons/EyeIc";
 import StarFilledIc from "src/components/icons/StarFilledIc";
 import StarIc from "src/components/icons/StartIc";
 import styled from "styled-components";
-import common from 'src/common-styles/common.module.scss'
+import common from 'src/styles/common.module.scss'
 import './ArticleView.scss';
 import React, {useEffect, useState} from "react";
 import {articleUtils} from "src/models/articleUtils";
@@ -30,13 +30,13 @@ const ArticleView = ({ article }: { article: Article }) => {
 
     if (!a) return <></>
 
-    return <Frame className={common.column}>
+    return <Frame className={common.col}>
             <TitleImage imageUrl={a.titleImage?.image?.getUrl()}/>
             <Space h={29}/>
             <div className={common.row}>
                 { date && <BottomText>{date.day}.{date.month}.{date.year} {date.hour}:{date.minute}</BottomText> }
                 <Space w={39}/>
-                <div className={common.column}>
+                <div className={common.col}>
                     <BottomText>Авторы: <Blue>{a.authors}</Blue></BottomText>
                     <Space h={9}/>
                     <BottomText>Фото: <Blue>{a.photographers}</Blue></BottomText>

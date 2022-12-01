@@ -1,8 +1,7 @@
 import React, {useState} from "react";
-import styled, {css} from "styled-components";
-import {commonStyled} from "src/common-styles/commonStyled";
+import styled from "styled-components";
+import {commonStyled} from "src/styles/commonStyled";
 import Space from "src/components/Space";
-import mirRabLogo from 'src/assets/icons/mir-rab-logo.svg'
 import {pwdRecoverySetNewPwdValidation} from "src/pages/PasswordRecovery/PwdRecoverySetNewPwdValidation";
 import SpinnerIc from "src/components/icons/SpinnerIc";
 import {errorValidation} from "src/utils/errorValidation";
@@ -10,6 +9,7 @@ import {userService} from "src/api-service/userService";
 import {Button1a} from "src/components/Button1";
 import {Input3a} from "src/components/Input3";
 import {useNavigate, useParams} from "react-router-dom";
+import MirRabEmblem from "src/components/MirRabEmblem";
 
 
 
@@ -61,11 +61,7 @@ const PwdRecoverySetNewPwd = () => {
 
             <Space h={96}/>
 
-            <MirRabEmblem>
-                <MirRabLogo/>
-                <Space w={16}/>
-                <MirRabTitle>МИРНИНСКИЙ<br/>РАБОЧИЙ</MirRabTitle>
-            </MirRabEmblem>
+            <MirRabEmblem/>
 
             <Space h={40}/>
 
@@ -102,7 +98,7 @@ const PwdRecoverySetNewPwd = () => {
                 { errors.common.length>0 && `Ошибка: ${errors.common[0].message}` }
             </ErrorContainer>
 
-            <Space h={23}/>
+            <Space h={64}/>
 
         </MainFrame>
     </Page>
@@ -121,21 +117,7 @@ const MainFrame = React.memo(styled.div`
 `)
 
 
-const MirRabEmblem = React.memo(styled.div`
-  ${commonStyled.row};
-  width: 380px;
-`)
-const MirRabLogo = React.memo(styled.div`
-  width: 30px; aspect-ratio: 1;
-  background-image: url(${mirRabLogo});
-  background-position: right;
-  background-repeat: no-repeat;
-  background-size: cover;
-`)
-const MirRabTitle = React.memo(styled.div`
-  font: 400 18px 'TT Commons';
-  color: black;
-`)
+
 
 const MainTitle = React.memo(styled.div`
   width: 380px;

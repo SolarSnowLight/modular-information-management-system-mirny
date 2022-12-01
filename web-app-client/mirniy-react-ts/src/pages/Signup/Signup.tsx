@@ -3,6 +3,10 @@ import React, {useState} from "react";
 import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
 import LoadingIc from "src/components/icons/LoadingIc";
 import {errorsActions} from "src/redux/errorsReducer";
+import css from './Signup.module.scss'
+import MirRabEmblem from "src/components/MirRabEmblem";
+import Space from "src/components/Space";
+import {Link, useLocation, useSearchParams} from "react-router-dom";
 
 
 function Signup(){
@@ -10,6 +14,13 @@ function Signup(){
     const { signup: signupErrors } = useAppSelector(s=>s.errors)
     const { signup: signupLoading } = useAppSelector(s=>s.loading)
     const d = useAppDispatch()
+
+
+
+    const [params] = useSearchParams()
+    const backpath = params.get("backpath")
+
+
 
     const signup = () => {
         d(userActions.signup({
@@ -64,173 +75,184 @@ function Signup(){
     }
 
 
-    return <div>
-        <div>access jwt: {accessJwt+''}</div>
-        {/*<div>refresh jwt: {refreshJwt+''}</div>*/}
-        {/*<div>userid: {decodeJwt(accessJwt??'').users_id}</div>*/}
+    return <div className={css.page}>
+        <div className={css.pageFrame}>
 
+            <MirRabEmblem/>
 
-        <div>Регистрация</div>
+            <Space h={40}/>
 
-        { signupLoading && <LoadingIc color={"#6663ff"} size={30}/> }
+            <div className={css.mainTitle}>Регистрация</div>
 
-        {
-            signupErrors.common.length > 0 &&
-            <div>
-                <span>Common signup error: </span>
-                <span>code: </span>
-                <span style={{color: 'red'}}>{signupErrors.common[0].code} </span>
-                <span>message: </span>
-                <span style={{color: 'red'}}>{signupErrors.common[0].message} </span>
+            <Space h={14}/>
+
+            <div className={css.titleText}>Уже есть аккаунт? <Link to={'/login?backpath='+backpath}><span className={css.action}>
+                    Войти
+                </span></Link>
             </div>
-        }
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <div>
-                <input placeholder='email'
-                       value={email} onInput={onEmailInput}/>
+            <Space h={68}/>
+
+            { signupLoading && <LoadingIc color={"#6663ff"} size={30}/> }
+
+            {
+                signupErrors.common.length > 0 &&
+                <div>
+                    <span>Common signup error: </span>
+                    <span>code: </span>
+                    <span style={{color: 'red'}}>{signupErrors.common[0].code} </span>
+                    <span>message: </span>
+                    <span style={{color: 'red'}}>{signupErrors.common[0].message} </span>
+                </div>
+            }
+
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <div>
+                    <input placeholder='email'
+                           value={email} onInput={onEmailInput}/>
+                </div>
+                {
+                    signupErrors.errors.email.length > 0 &&
+                    <div>
+                        <span>Email error: </span>
+                        <span>code: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.email[0].code} </span>
+                        <span>message: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.email[0].message} </span>
+                    </div>
+                }
             </div>
-            {
-                signupErrors.errors.email.length > 0 &&
-                <div>
-                    <span>Email error: </span>
-                    <span>code: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.email[0].code} </span>
-                    <span>message: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.email[0].message} </span>
-                </div>
-            }
-        </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <div>
-                <input placeholder='password' type='password'
-                       value={password} onInput={onPwdInput}/>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <div>
+                    <input placeholder='password' type='password'
+                           value={password} onInput={onPwdInput}/>
+                </div>
+                {
+                    signupErrors.errors.password.length > 0 &&
+                    <div>
+                        <span>Password error: </span>
+                        <span>code: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.password[0].code} </span>
+                        <span>message: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.password[0].message} </span>
+                    </div>
+                }
             </div>
-            {
-                signupErrors.errors.password.length > 0 &&
-                <div>
-                    <span>Password error: </span>
-                    <span>code: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.password[0].code} </span>
-                    <span>message: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.password[0].message} </span>
-                </div>
-            }
-        </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <div>
-                <input placeholder='имя'
-                       value={name} onInput={onNameInput}/>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <div>
+                    <input placeholder='имя'
+                           value={name} onInput={onNameInput}/>
+                </div>
+                {
+                    signupErrors.errors.name.length > 0 &&
+                    <div>
+                        <span>Name error: </span>
+                        <span>code: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.name[0].code} </span>
+                        <span>message: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.name[0].message} </span>
+                    </div>
+                }
             </div>
-            {
-                signupErrors.errors.name.length > 0 &&
-                <div>
-                    <span>Name error: </span>
-                    <span>code: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.name[0].code} </span>
-                    <span>message: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.name[0].message} </span>
-                </div>
-            }
-        </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <div>
-                <input placeholder='фамилия'
-                       value={surname} onInput={onSurnameInput}/>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <div>
+                    <input placeholder='фамилия'
+                           value={surname} onInput={onSurnameInput}/>
+                </div>
+                {
+                    signupErrors.errors.surname.length > 0 &&
+                    <div>
+                        <span>Surname error: </span>
+                        <span>code: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.surname[0].code} </span>
+                        <span>message: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.surname[0].message} </span>
+                    </div>
+                }
             </div>
-            {
-                signupErrors.errors.surname.length > 0 &&
-                <div>
-                    <span>Surname error: </span>
-                    <span>code: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.surname[0].code} </span>
-                    <span>message: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.surname[0].message} </span>
-                </div>
-            }
-        </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <input placeholder='отчество'
-                   value={patronymic} onInput={onPatronymicInput}/>
-            {
-                signupErrors.errors.patronymic.length > 0 &&
-                <div>
-                    <span>Patronymic error: </span>
-                    <span>code: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.patronymic[0].code} </span>
-                    <span>message: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.patronymic[0].message} </span>
-                </div>
-            }
-        </div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <input placeholder='отчество'
+                       value={patronymic} onInput={onPatronymicInput}/>
+                {
+                    signupErrors.errors.patronymic.length > 0 &&
+                    <div>
+                        <span>Patronymic error: </span>
+                        <span>code: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.patronymic[0].code} </span>
+                        <span>message: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.patronymic[0].message} </span>
+                    </div>
+                }
+            </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <input placeholder='никнейм'
-                   value={nickname} onInput={onNicknameInput}/>
-            {
-                signupErrors.errors.nickname.length > 0 &&
-                <div>
-                    <span>Nickname error: </span>
-                    <span>code: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.nickname[0].code} </span>
-                    <span>message: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.nickname[0].message} </span>
-                </div>
-            }
-        </div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <input placeholder='никнейм'
+                       value={nickname} onInput={onNicknameInput}/>
+                {
+                    signupErrors.errors.nickname.length > 0 &&
+                    <div>
+                        <span>Nickname error: </span>
+                        <span>code: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.nickname[0].code} </span>
+                        <span>message: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.nickname[0].message} </span>
+                    </div>
+                }
+            </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <span>Пол:</span>
-            <span> </span>
-            <input type='radio' name='sex' value='М' id='male'
-                    checked={sex} onChange={()=>onSexInput(true)} />
-            <span> </span>
-            <label htmlFor='male'>М</label>
-            <span> </span>
-            <input type='radio' name='sex' value='Ж' id='female'
-                    checked={!sex} onChange={()=>onSexInput(false)} />
-            <span> </span>
-            <label htmlFor='female'>Ж</label>
-        </div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <span>Пол:</span>
+                <span> </span>
+                <input type='radio' name='sex' value='М' id='male'
+                        checked={sex} onChange={()=>onSexInput(true)} />
+                <span> </span>
+                <label htmlFor='male'>М</label>
+                <span> </span>
+                <input type='radio' name='sex' value='Ж' id='female'
+                        checked={!sex} onChange={()=>onSexInput(false)} />
+                <span> </span>
+                <label htmlFor='female'>Ж</label>
+            </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <input placeholder='телефон +7-987-654-32-10'
-                   value={phone} onInput={onPhoneInput}/>
-            {
-                signupErrors.errors.phone.length > 0 &&
-                <div>
-                    <span>Phone error: </span>
-                    <span>code: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.phone[0].code} </span>
-                    <span>message: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.phone[0].message} </span>
-                </div>
-            }
-        </div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <input placeholder='телефон +7-987-654-32-10'
+                       value={phone} onInput={onPhoneInput}/>
+                {
+                    signupErrors.errors.phone.length > 0 &&
+                    <div>
+                        <span>Phone error: </span>
+                        <span>code: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.phone[0].code} </span>
+                        <span>message: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.phone[0].message} </span>
+                    </div>
+                }
+            </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <input placeholder='дата рождения'
-                   value={birthDate} onInput={onBirthDateInput}/>
-            {
-                signupErrors.errors.birthDate.length > 0 &&
-                <div>
-                    <span>Birth Date error: </span>
-                    <span>code: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.birthDate[0].code} </span>
-                    <span>message: </span>
-                    <span style={{color: 'red'}}>{signupErrors.errors.birthDate[0].message} </span>
-                </div>
-            }
-        </div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <input placeholder='дата рождения'
+                       value={birthDate} onInput={onBirthDateInput}/>
+                {
+                    signupErrors.errors.birthDate.length > 0 &&
+                    <div>
+                        <span>Birth Date error: </span>
+                        <span>code: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.birthDate[0].code} </span>
+                        <span>message: </span>
+                        <span style={{color: 'red'}}>{signupErrors.errors.birthDate[0].message} </span>
+                    </div>
+                }
+            </div>
 
-        <div style={{display: 'flex', flexDirection: 'row'}}>
-            <button onClick={signup}>Зарегистрироваться</button>
-        </div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
+                <button onClick={signup}>Зарегистрироваться</button>
+            </div>
 
+        </div>
     </div>
 }
 

@@ -14,6 +14,11 @@ import PwdRecoveryGetUserData from "./pages/PasswordRecovery/PwdRecoveryGetUserD
 import Test from "./pages/Test";
 import PwdRecoverySetNewPwd from "./pages/PasswordRecovery/PwdRecoverySetNewPwd";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// minified version is also included
+// import 'react-toastify/dist/ReactToastify.min.css';
+
 function App() {
 
     const d = useAppDispatch()
@@ -113,6 +118,19 @@ function App() {
             </div> }*/}
 
         </div>
+
+        <ToastContainer
+            position="top-center"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+        />
+
     </>
 }
 

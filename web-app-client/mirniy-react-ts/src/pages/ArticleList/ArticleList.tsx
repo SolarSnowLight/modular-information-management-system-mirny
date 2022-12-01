@@ -1,4 +1,4 @@
-import common from 'src/common-styles/common.module.scss'
+import common from 'src/styles/common.module.scss'
 import React, {useEffect, useState} from "react";
 import ArticleCard from "./sub-components/ArticleCard";
 import styled from "styled-components";
@@ -24,7 +24,7 @@ function ArticleList(){
 
     //console.log(articles)
 
-    return <MainFrame className={common.column}>
+    return <MainFrame className={common.col}>
         { articles && articles.map(it=><ArticleCard key={it.id} article={it} />) }
     </MainFrame>
 }

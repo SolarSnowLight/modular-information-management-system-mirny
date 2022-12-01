@@ -1,28 +1,27 @@
 import React from "react"
 import styled, {css} from "styled-components"
-import {commonStyled} from "src/common-styles/commonStyled";
+import {commonStyled} from "src/styles/commonStyled";
 import RadioActiveIc from "./icons/RadioActiveIc";
 import RadioInactiveIc from "./icons/RadioInactiveIc";
 
 
 export type InputRadioCustomProps = {
-    frameStyle?: ReturnType<typeof css> | undefined
-    frameStyle2?: ReturnType<typeof css> | undefined
+    styled?: ReturnType<typeof css> | undefined
     activeIcColor?: string|undefined
     inactiveIcColor?: string|undefined
 }
-export type InputRadioProps = JSX.IntrinsicElements['input'] /*& React.HTMLAttributes<HTMLInputElement>*/ & InputRadioCustomProps
+export type InputRadioProps = JSX.IntrinsicElements['input'] & InputRadioCustomProps /*& React.HTMLAttributes<HTMLInputElement>*/
 
 const InputRadio = React.forwardRef<HTMLInputElement, InputRadioProps>((
     {
-        frameStyle, frameStyle2,
+        styled,
         activeIcColor = '#1F8DCD', inactiveIcColor = 'black',
         ...props
     },
     ref
 ) => {
 
-    return <Frame addStyle={frameStyle} addStyle2={frameStyle2}>
+    return <Frame styled={styled}>
 
         <Input ref={ref as any} {...props} type='radio'/>
 
@@ -35,13 +34,11 @@ export default React.memo(InputRadio)
 
 
 const Frame = React.memo(styled.div<{
-    addStyle?: ReturnType<typeof css>  | undefined
-    addStyle2?: ReturnType<typeof css>  | undefined
+    styled?: ReturnType<typeof css>  | undefined
 }>`
   ${commonStyled.row};
   position: relative;
-  ${p => p.addStyle};
-  ${p => p.addStyle2};
+  ${p => p.styled};
 `)
 const Input = React.memo(styled.input`
   //display: none;

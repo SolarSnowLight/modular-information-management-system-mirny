@@ -1,6 +1,6 @@
 
 
-import common from 'src/common-styles/common.module.scss'
+import common from 'src/styles/common.module.scss'
 import React, {useEffect, useLayoutEffect, useRef, useState} from "react";
 import {useAppDispatch, useAppSelector} from "src/redux/reduxHooks";
 import styled from "styled-components";
@@ -282,7 +282,7 @@ const ArticleEditor = () => {
 
         <ImagesFrame onDrop={onFilesDrop}>
 
-            { images.length > 0 && <ImagesList className={common.column}>
+            { images.length > 0 && <ImagesList className={common.col}>
                 <TitleForImages>Изображения</TitleForImages>
                 { images.filter(it=>!it.props.isDeleted).map(it=>
                     <ListImage articleImage={it} key={it.localId}
@@ -294,7 +294,7 @@ const ArticleEditor = () => {
             { isDraggingFiles && <DragOverlay className={common.abs+' '+common.row}/>}
         </ImagesFrame>
 
-        <ArticleFrame className={common.column}>
+        <ArticleFrame className={common.col}>
 
             <TitleText>Шапка статьи</TitleText>
 

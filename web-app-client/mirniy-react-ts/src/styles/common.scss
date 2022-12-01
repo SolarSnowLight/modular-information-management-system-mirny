@@ -5,7 +5,7 @@
     flex-flow: row nowrap;
 }
 
-@mixin column {
+@mixin col {
     display: flex;
     flex-flow: column nowrap;
 }

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import React from "react";
-import {abs, absoluteOff} from "src/common-styles/commonStyled";
+import {abs, absoluteOff} from "src/styles/commonStyled";
 import {ArticleImage} from "src/api-service/articleServiceUtils";
 
 

@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import styled, {css} from "styled-components";
-import {commonStyled} from "src/common-styles/commonStyled";
+import {commonStyled} from "src/styles/commonStyled";
 import Space from "src/components/Space";
 import mirRabLogo from 'src/assets/icons/mir-rab-logo.svg'
 import Input2, {Input2CustomProps} from "src/components/Input2";
@@ -26,8 +26,7 @@ const PwdRecoveryGetUserData = () => {
     const [requested, setRequested] = useState(false)
 
     const sendEmail = async () => {
-        if (loading) return;
-        setLoading(true)
+        if (loading) return; setLoading(true)
         try {
             const values = { email }
             const newErrors = await pwdRecoveryGetUserDataValidation.checkOnErrors(values)
